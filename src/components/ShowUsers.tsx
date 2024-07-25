@@ -115,7 +115,7 @@ const ShowUsers: React.FC = () => {
                               if (result.isConfirmed) {
                                 MySwal.fire(
                                   "Borrado",
-                                  "El usuario ha sido eliminado",
+                                  "El usuario se eliminó",
                                   "success"
                                 );
                               }
