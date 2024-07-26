@@ -15,6 +15,7 @@ interface HeaderProps {
     <>
       <Navbar bg="light" className="px-3 border border-primary">
         <Navbar.Brand href="#">
+          
           <img
             src={logo}
             alt="ASYMETRICS"

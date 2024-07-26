@@ -26,7 +26,7 @@
 .custom-icon:hover .fa-circle-info,
 .custom-icon:hover .fa-bell,
 .custom-icon:hover .fa-circle-question {
-    color: #a30059; 
+    color: #ce0875; 
 }
 
 .nav-link {
@@ -68,6 +68,28 @@
 .custom-button:hover {
     background-color: #007BCC; 
 
+}
+
+.btn-custom-danger {
+    background-color: #E6007D;
+    border-color: #E6007D;
+    color: #fff;
+  }
+  
+  .btn-custom-danger:hover {
+    background-color: #d1006f;
+    border-color: #d1006f;
+  }
+  
+.btn-custom-editar{
+    background-color: #E6007D;
+    border-color: #E6007D;
+    color: #fff;
+}
+
+.btn-custom-editar:hover {
+    background-color: #d1006f;
+    border-color: #d1006f;
 }
 
  

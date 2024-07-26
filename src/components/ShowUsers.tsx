@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { showAlert } from "./functions";
 
 const MySwal = withReactContent(Swal);
@@ -51,15 +53,10 @@ const ShowUsers: React.FC = () => {
       setEmail(email);
       setPriority(priority);
     }
-	window.setTimeout(() => {
-		document.getElementById("nombre")?.focus();
-	},500);
+    window.setTimeout(() => {
+      document.getElementById("nombre")?.focus();
+    }, 500);
   };
-
-  const validar = () => {
-	var parametros = [name, email, priority];
-	var metodo = ["nombre", "email", "priority"];
-};
 
   return (
     <div className="App">
@@ -81,8 +78,8 @@ const ShowUsers: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12 col-lg-8 offset-2">
             <div className="table-responsive">
-              <table className="table table-bordered table-head">
-                <thead className="text-center">
+              <table className="table table-bordered">
+                <thead className="text-center" style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
                   <tr>
                     <th>ID</th>
                     <th>Nombre</th>
@@ -100,29 +97,29 @@ const ShowUsers: React.FC = () => {
                       <td>{user.priority}</td>
                       <td className="text-center">
                         <button onClick={() => openModal("2", user.id, user.name, user.email, user.priority)}
-							className="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#modalUsers">
-                          <i className="fa-solid fa-edit"></i> Editar
+                          className="btn btn-custom-editar m-2" data-bs-toggle="modal" data-bs-target="#modalUsers">
+                          <i className="fa-solid fa-edit"></i>
                         </button>
-                        <button className="btn btn-danger" onClick={() => {
-                            MySwal.fire({
-                              title: "¿Estás seguro?",
-                              text: "No podrás revertir esto",
-                              icon: "warning",
-                              showCancelButton: true,
-                              confirmButtonText: "Sí, bórralo",
-                              cancelButtonText: "Cancelar",
-                            }).then((result) => {
-                              if (result.isConfirmed) {
-                                MySwal.fire(
-                                  "Borrado",
-                                  "El usuario se eliminó",
-                                  "success"
-                                );
-                              }
-                            });
-                          }}
+                        <button className="btn btn-custom-danger" onClick={() => {
+                          MySwal.fire({
+                            title: "¿Estás seguro?",
+                            text: "No podrás revertir esto",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonText: "Sí, bórralo",
+                            cancelButtonText: "Cancelar",
+                          }).then((result) => {
+                            if (result.isConfirmed) {
+                              MySwal.fire(
+                                "Borrado",
+                                "El usuario se eliminó",
+                                "success"
+                              );
+                            }
+                          });
+                        }}
                         >
-                          <i className="fa-solid fa-trash"></i> Eliminar
+                          <FontAwesomeIcon icon={ faCircleXmark } />
                         </button>
                       </td>
                     </tr>
@@ -192,15 +189,15 @@ const ShowUsers: React.FC = () => {
                     onChange={(e) => setPriority(e.target.value)}
                   />
                 </div>
-				<div className="d-grid col-6 mx-auto">
-					<button className="btn btn btn-success">
-				   <i className="fa-solid fa-floppy-disk m-2"></i>Guardar
-				</button>
-				</div>
+                <div className="d-grid col-6 mx-auto">
+                  <button className="btn btn btn-success">
+                    <i className="fa-solid fa-floppy-disk m-2"></i>Guardar
+                  </button>
+                </div>
               </div>
-			  <div className="modal-footer">
-				<button type="button" className="btn btn-secondary m-2" data-bs-dismiss="modal">Cerrar</button>
-			  </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary m-2" data-bs-dismiss="modal">Cerrar</button>
+              </div>
             </div>
           </div>
         </div>

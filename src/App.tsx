@@ -6,6 +6,9 @@ import Home from './pages/HomePage';
 import MatrizPeligro from './pages/MatrizPeligroPage';
 import PlanificadorActividad from './pages/PlanificadorActividadPage';
 import MatrizLegal from './pages/MatrizLegalPage';
+import Usuarios from './pages/UsuariosPage';
+import Perfiles from  './pages/PerfilesPage';
+import Tareas from './pages/TareasPage';
 import { Container, Row, Col } from 'react-bootstrap';
 
 export function App() {
@@ -30,6 +33,9 @@ export function App() {
                                 <Route path="/matriz-peligro" element={<MatrizPeligro />} />
                                 <Route path="/planificador-actividad" element={<PlanificadorActividad />} />
                                 <Route path="/matriz-legal" element={<MatrizLegal />} />
+                                <Route path="/admin/usuarios" element={<Usuarios />} />
+                                <Route path="/admin/perfiles" element={<Perfiles />} />
+                                <Route path="/admin/tareas" element={<Tareas />} />
                             </Routes>
                         </Col>
                     </Row>
@@ -40,4 +46,5 @@ export function App() {
 }
 
 export default App;
+
 
