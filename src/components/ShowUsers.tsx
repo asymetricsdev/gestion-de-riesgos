@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from "./functions";
@@ -28,38 +28,94 @@ const ShowUsers: React.FC = () => {
 
   const getUsers = async () => {
     try {
-      const response = await axios.get(URL);
+      const response: AxiosResponse<User[]> = await axios.get(URL);
       setUsers(response.data);
     } catch (error) {
-      showAlert("Error al obtener los usuarios", "error", "");
+      showAlert("Error al obtener los usuarios", "error");
     }
   };
 
-  const openModal = (op: string, id: string, name: string, email: string, priority: string) => {
-    setId(id);
-    setName(name);
-    setEmail(email);
-    setPriority(priority);
-    setTitle(op);
-
-    if (op === "1") {
-      setTitle("Registrar Usuario");
-    } else if (op === "2") {
-      setTitle("Editar Usuario");
-      setId(id);
-      setName(name);
-      setEmail(email);
-      setPriority(priority);
+  const openModal = (op: string, user?: User) => {
+    if (user) {
+      setId(user.id);
+      setName(user.name);
+      setEmail(user.email);
+      setPriority(user.priority.toString());
+    } else {
+      setId("");
+      setName("");
+      setEmail("");
+      setPriority("");
     }
-	window.setTimeout(() => {
-		document.getElementById("nombre")?.focus();
-	},500);
+    setTitle(op === "1" ? "Registrar Usuario" : "Editar Usuario");
+
+    setTimeout(() => {
+      document.getElementById("nombre")?.focus();
+    }, 500);
+    
   };
 
   const validar = () => {
-	var parametros = [name, email, priority];
-	var metodo = ["nombre", "email", "priority"];
-};
+    if (name.trim() === "") {
+      showAlert("Escribe el nombre", "warning", "nombre");
+      return;
+    }
+    if (email.trim() === "") {
+      showAlert("Escribe el email", "warning", "email");
+      return;
+    }
+    if (priority.trim() === "") {
+      showAlert("Escribe la prioridad", "warning", "priority");
+      return;
+    }
+
+    const parametros = { id, name: name.trim(), email: email.trim(), priority: priority.trim() };
+    const metodo = id ? "PUT" : "POST";
+    enviarSolicitud(metodo, parametros);
+  };
+
+  const enviarSolicitud = async (metodo: "POST" | "PUT", parametros: any) => {
+    try {
+      console.log(".....",`${URL}${id}`);
+      const response: AxiosResponse = await axios({
+        method: metodo,
+        url: metodo === "PUT" ? `${URL}` : URL,
+        data: parametros,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const { tipo, msj } = response.data;
+      showAlert(msj, tipo);
+
+      if (tipo === "success") {
+        document.getElementById("btnCerrar")?.click();
+        getUsers();
+      }
+    } catch (error) {
+      showAlert("Error al enviar la solicitud", "error");
+      console.log(error);
+    }
+  };
+
+  const deleteUser = async (id: string) => {
+    try {
+      const response: AxiosResponse = await axios.delete(`${id}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const { tipo, msj } = response.data;
+      showAlert(msj, tipo);
+
+      if (tipo === "success") {
+        getUsers();
+      }
+    } catch (error) {
+      showAlert("Error al eliminar el usuario", "error");
+      console.log(error);
+    }
+  };
 
   return (
     <div className="App">
@@ -67,7 +123,8 @@ const ShowUsers: React.FC = () => {
         <div className="row mt-3">
           <div className="col-md-4 offset-4">
             <div className="d-grid mx-auto">
-              <button onClick={() => openModal("1", "", "", "", "")}
+              <button
+                onClick={() => openModal("1")}
                 type="button"
                 className="btn btn-dark"
                 data-bs-toggle="modal"
@@ -99,11 +156,17 @@ const ShowUsers: React.FC = () => {
                       <td>{user.email}</td>
                       <td>{user.priority}</td>
                       <td className="text-center">
-                        <button onClick={() => openModal("2", user.id, user.name, user.email, user.priority)}
-							className="btn btn-primary m-2" data-bs-toggle="modal" data-bs-target="#modalUsers">
+                        <button
+                          onClick={() => openModal("2", user)}
+                          className="btn btn-primary m-2"
+                          data-bs-toggle="modal"
+                          data-bs-target="#modalUsers"
+                        >
                           <i className="fa-solid fa-edit"></i> Editar
                         </button>
-                        <button className="btn btn-danger" onClick={() => {
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => {
                             MySwal.fire({
                               title: "¿Estás seguro?",
                               text: "No podrás revertir esto",
@@ -113,11 +176,7 @@ const ShowUsers: React.FC = () => {
                               cancelButtonText: "Cancelar",
                             }).then((result) => {
                               if (result.isConfirmed) {
-                                MySwal.fire(
-                                  "Borrado",
-                                  "El usuario se eliminó",
-                                  "success"
-                                );
+                                deleteUser(user.id);
                               }
                             });
                           }}
@@ -192,15 +251,22 @@ const ShowUsers: React.FC = () => {
                     onChange={(e) => setPriority(e.target.value)}
                   />
                 </div>
-				<div className="d-grid col-6 mx-auto">
-					<button className="btn btn btn-success">
-				   <i className="fa-solid fa-floppy-disk m-2"></i>Guardar
-				</button>
-				</div>
+                <div className="d-grid col-6 mx-auto">
+                  <button onClick={validar} className="btn btn-success">
+                    <i className="fa-solid fa-floppy-disk m-2"></i>Guardar
+                  </button>
+                </div>
               </div>
-			  <div className="modal-footer">
-				<button type="button" className="btn btn-secondary m-2" data-bs-dismiss="modal">Cerrar</button>
-			  </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary m-2"
+                  data-bs-dismiss="modal"
+                  id="btnCerrar"
+                >
+                  Cerrar
+                </button>
+              </div>
             </div>
           </div>
         </div>
