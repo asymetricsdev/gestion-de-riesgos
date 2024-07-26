@@ -1,0 +1,65 @@
+/* Menu.css */
+
+.sidebar {
+    position: fixed; /* Fijo en la pantalla */
+    top: 78px;
+    left: 0px;
+    width: 80px; /* Ancho del sidebar cuando está cerrado */
+    height: 100vh; /* Altura completa de la ventana */
+    background-color: #343a40; /* Color de fondo */
+    transition: width 0.3s ease; /* Transición suave para el cambio de ancho */
+    z-index: 1000; /* Para asegurarse de que esté sobre otros elementos */
+    display: flex;
+    flex-direction: column;
+    padding-top: 1rem;
+    overflow-x: hidden; /* Oculta el desbordamiento horizontal */
+}
+
+.sidebar.open {
+    width: 250px; /* Ancho del sidebar cuando está abierto */
+}
+
+.sidebar .nav-link {
+    padding: 10px 15px;
+    white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+    overflow: hidden; /* Oculta el desbordamiento del texto */
+    text-overflow: ellipsis; /* Añade puntos suspensivos (...) para el desbordamiento */
+    color: white; /* Color del texto */
+}
+
+.me-2 {
+    margin-right: 10px;
+}
+
+.sidebar .nav-link i {
+    margin-right: 10px; /* Espacio entre el ícono y el texto */
+}
+
+.sidebar .nav-link span {
+    display: none; /* Ocultar el texto cuando el sidebar está cerrado */
+}
+
+.sidebar.open .nav-link span {
+    display: inline; /* Mostrar el texto cuando el sidebar está abierto */
+}
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
