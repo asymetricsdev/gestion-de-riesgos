@@ -57,7 +57,18 @@
     background: none;
 }
 
+.custom-button {
+    background-color: #009EE2; /* El color de fondo que deseas */
+    border: none; /* Opcional: elimina el borde del botón */
+    color: white; /* Opcional: cambia el color del texto/icono si es necesario */
+    padding: 0.4rem 1rem; /* Opcional: ajusta el padding si es necesario */
+    border-radius: 0.25rem; /* Opcional: ajusta el borde redondeado si es necesario */
+}
 
+.custom-button:hover {
+    background-color: #007BCC; 
+
+}
 
  
 

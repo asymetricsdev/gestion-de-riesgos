@@ -13,7 +13,7 @@ interface HeaderProps {
   
   return (
     <>
-      <Navbar bg="light" className="px-3">
+      <Navbar bg="light" className="px-3 border border-primary">
         <Navbar.Brand href="#">
           <img
             src={logo}
@@ -44,7 +44,7 @@ interface HeaderProps {
         </Navbar.Collapse>
       </Navbar>
       <button 
-        className="navbar-toggler always-visible" 
+        className="navbar-toggler always-visible custom-button" 
         type="button" 
         onClick={toggleMenu}
       >
