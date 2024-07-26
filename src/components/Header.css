@@ -5,7 +5,6 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
-    top: 0;
     width: 100%;
     z-index: 1000; /* Asegúrate de que esté encima del sidebar */
 }
@@ -39,26 +38,21 @@
     text-decoration: none;
 }
 
-.always-visible {
-    position: fixed;
-    left: 250px; /* Ajusta según el ancho del sidebar */
-    top: 15px; /* Ajusta según la altura deseada */
-    display: block;
+.navbar-toggler {
+    position: absolute; 
+    left: 250px;
+    top: 9px;
+    margin: 10px; 
     background: none;
     border: none;
     padding: 0;
     font-size: 1.5rem;
     cursor: pointer;
-    z-index: 1100; /* Asegúrate de que esté encima del sidebar */
-}
-
-.navbar-toggler {
-    border: none;
-    background: none;
+    z-index: 1100; 
 }
 
 .custom-button {
-    background-color: #009EE2; /* El color de fondo que deseas */
+    background-color: #009EE2; 
     border: none; /* Opcional: elimina el borde del botón */
     color: white; /* Opcional: cambia el color del texto/icono si es necesario */
     padding: 0.4rem 1rem; /* Opcional: ajusta el padding si es necesario */
@@ -67,21 +61,22 @@
 
 .custom-button:hover {
     background-color: #007BCC; 
-
 }
 
 .btn-custom-danger {
     background-color: #E6007D;
     border-color: #E6007D;
     color: #fff;
-  }
+}
   
-  .btn-custom-danger:hover {
+.btn-custom-danger:hover {
     background-color: #d1006f;
     border-color: #d1006f;
-  }
+    color: #fff;
+}
+
   
-.btn-custom-editar{
+.btn-custom-editar {
     background-color: #E6007D;
     border-color: #E6007D;
     color: #fff;
@@ -90,7 +85,28 @@
 .btn-custom-editar:hover {
     background-color: #d1006f;
     border-color: #d1006f;
+    color: #fff;
 }
 
- 
 
+.btn-guardar{
+    background-color: #E6007D;
+    border-color: #E6007D;
+    color: #fff;
+}
+
+.btn-guardar:hover {
+    background-color: #d1006f;
+    border-color: #d1006f;
+    color: #fff;
+}
+
+.modal-header {
+    background: linear-gradient(90deg, #009FE3 0%, #00CFFF 100%);
+    color: #fff;
+    text-align: center;
+}
+  
+.modal-content {
+    border: none;
+}

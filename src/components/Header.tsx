@@ -1,7 +1,7 @@
 import { Navbar, Nav } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle, faBell, faQuestionCircle, faUserCircle, faBars } from '@fortawesome/free-solid-svg-icons';
-import logo from '../img/logo-empresa.png'; 
+import logo from '../img/logo-asy.png'; 
 import './Header.css'; 
 
 
@@ -19,7 +19,7 @@ interface HeaderProps {
           <img
             src={logo}
             alt="ASYMETRICS"
-            style={{ width: '50px', height: 'auto' }} 
+            style={{ width: '18%', height: 'auto' }} 
           />
         </Navbar.Brand>
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">

@@ -5,6 +5,7 @@ import withReactContent from "sweetalert2-react-content";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { showAlert } from "./functions";
+import EncabezadoTabla from "./EncabezadoTabla";
 
 const MySwal = withReactContent(Swal);
 
@@ -61,7 +62,7 @@ const ShowUsers: React.FC = () => {
   return (
     <div className="App">
       <div className="container-fluid">
-        <div className="row mt-3">
+        <div className="row mt-5">
           <div className="col-md-4 offset-4">
             <div className="d-grid mx-auto">
               <button onClick={() => openModal("1", "", "", "", "")}
@@ -75,11 +76,17 @@ const ShowUsers: React.FC = () => {
             </div>
           </div>
         </div>
+        
         <div className="row mt-3">
           <div className="col-12 col-lg-8 offset-2">
+            <div className="tabla-contenedor">
+              <EncabezadoTabla title='Usuarios'/>
+            </div>
             <div className="table-responsive">
               <table className="table table-bordered">
-                <thead className="text-center" style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
+                <thead className="text-center" 
+                style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
+                color: '#fff' }}>
                   <tr>
                     <th>ID</th>
                     <th>Nombre</th>
@@ -139,7 +146,7 @@ const ShowUsers: React.FC = () => {
         >
           <div className="modal-dialog">
             <div className="modal-content">
-              <div className="modal-header">
+              <div className="modal-header text-white">
                 <label className="h5">{title}</label>
                 <button
                   type="button"
@@ -190,7 +197,7 @@ const ShowUsers: React.FC = () => {
                   />
                 </div>
                 <div className="d-grid col-6 mx-auto">
-                  <button className="btn btn btn-success">
+                  <button className="btn btn btn-guardar">
                     <i className="fa-solid fa-floppy-disk m-2"></i>Guardar
                   </button>
                 </div>

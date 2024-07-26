@@ -1,0 +1,24 @@
+.encabezado-tabla {
+    background: linear-gradient(90deg, #009FE3 0%, #00CFFF 100%);
+    color: white;
+    padding: 20px;
+    margin: 0; /* Asegurarse de que no haya margen para la alineación */
+    border-radius: 8px 8px 0 0; /* Opcional: para coincidir con el estilo */
+    text-align: center;
+    width: 100%; /* Asegurarse de que ocupe todo el ancho del contenedor */
+    box-sizing: border-box; /* Incluir padding y border en el ancho */
+  }
+  
+  .encabezado-tabla h2 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .tabla-contenedor {
+    width: 100%; /* Ajustar el ancho al 100% */
+    margin: 0 auto; /* Centrar el contenedor */
+    margin-top: 55px;
+    box-sizing: border-box; /* Incluir padding y border en el ancho */
+    overflow-x: auto; /* Asegurarse de que el contenido no se desborde */
+  }
+  

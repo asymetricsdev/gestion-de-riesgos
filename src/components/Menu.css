@@ -1,12 +1,12 @@
 /* Menu.css */
 
 .sidebar {
-    position: fixed; /* Fijo en la pantalla */
+    position:initial; /* Fijo en la pantalla */
     top: 80px;
     left: 0px;
     width: 80px; /* Ancho del sidebar cuando está cerrado */
     height: 100vh; /* Altura completa de la ventana */
-    background-color: #343a40; /* Color de fondo */
+    background-color: #3C4043; /* Color de fondo */
     transition: width 0.3s ease; /* Transición suave para el cambio de ancho */
     z-index: 1000; /* Para asegurarse de que esté sobre otros elementos */
     display: flex;
