@@ -1,11 +1,8 @@
-/* Menu.css */
-
 .sidebar {
-    position:initial; /* Fijo en la pantalla */
-    top: 80px;
-    left: 0px;
+    position: sticky; /* Asegura que el sidebar se mantenga en su lugar */
+    top: 0;
     width: 80px; /* Ancho del sidebar cuando está cerrado */
-    height: 100vh; /* Altura completa de la ventana */
+    min-height: 100vh; /* Asegura que el sidebar tenga al menos la altura de la ventana */
     background-color: #3C4043; /* Color de fondo */
     transition: width 0.3s ease; /* Transición suave para el cambio de ancho */
     z-index: 1000; /* Para asegurarse de que esté sobre otros elementos */
@@ -25,10 +22,10 @@
     overflow: hidden; /* Oculta el desbordamiento del texto */
     text-overflow: ellipsis; /* Añade puntos suspensivos (...) para el desbordamiento */
     color: white; /* Color del texto */
-}
-
-.me-2 {
-    margin-right: 10px;
+    display: flex; /* Para alinear iconos y texto horizontalmente */
+    align-items: center; /* Centra verticalmente el contenido */
+    transition: background-color 0.3s, color 0.3s; /* Transiciones suaves para hover */
+    text-decoration: none; /* Quita subrayado del texto */
 }
 
 .sidebar .nav-link i {
@@ -43,23 +40,13 @@
     display: inline; /* Mostrar el texto cuando el sidebar está abierto */
 }
 
+.sidebar .nav-link.active {
+    background-color: #009FE3; /* Color de fondo para el enlace activo */
+    color: white; /* Color del texto para el enlace activo */
+    border-radius: 5px; /* Opcional: para esquinas redondeadas */
+}
 
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.main-content {
+    flex-grow: 1; /* El contenido principal toma el espacio restante */
+    padding: 20px;
+}
