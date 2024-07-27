@@ -2,6 +2,6 @@
 
 export default function PerfilesPage() {
   return (
-    <div>PerfilesPage</div>
+    <div>Perfiles</div>
   )
 }

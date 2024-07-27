@@ -21,38 +21,38 @@ const Menu: React.FC<SidebarProps> = ({ isOpen }) => {
       <Nav defaultActiveKey="/home" className="flex-column">
         <NavLink to="/home" className="nav-link text-white d-flex align-items-center">
           <FontAwesomeIcon icon={faHome} className="me-2" />
-          <span className={`${isOpen ? 'd-inline' : 'd-none'}`}>Home</span>
+          <span>Home</span>
         </NavLink>
         <NavLink to="/matriz-de-peligro" className="nav-link text-white d-flex align-items-center">
           <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
-          <span className={`${isOpen ? 'd-inline' : 'd-none'}`}>Matriz de Peligro</span>
+          <span>Matriz de Peligro</span>
         </NavLink>
         <NavLink to="/planificador-de-actividad" className="nav-link text-white d-flex align-items-center">
           <FontAwesomeIcon icon={faCalendarAlt} className="me-2" />
-          <span className={`${isOpen ? 'd-inline' : 'd-none'}`}>Planificador de Actividad</span>
+          <span>Planificador de Actividad</span>
         </NavLink>
         <NavLink to="/matriz-legal" className="nav-link text-white d-flex align-items-center">
           <FontAwesomeIcon icon={faFileAlt} className="me-2" />
-          <span className={`${isOpen ? 'd-inline' : 'd-none'}`}>Matriz Legal</span>
+          <span>Matriz Legal</span>
         </NavLink>
         <div className="nav-link text-white d-flex align-items-center" onClick={toggleAdminSubmenu}>
-          <FontAwesomeIcon icon={ faUserTie} className="me-2" />
-          <span className={`${isOpen ? 'd-inline' : 'd-none'}`}>Administración</span>
+          <FontAwesomeIcon icon={ faUserTie } className="me-2" />
+          <span>Administración</span>
           <FontAwesomeIcon icon={isAdminOpen ? faChevronUp : faChevronDown} className="ms-auto" />
         </div>
         {isAdminOpen && (
-          <div className={`submenu ${isOpen ? 'd-block' : 'd-none'}`}>
+          <div className="submenu">
             <NavLink to="/admin/usuarios" className="nav-link text-white d-flex align-items-center">
-            <FontAwesomeIcon icon={ faUsers } className="me-2" />
-              Usuarios
+              <FontAwesomeIcon icon={faUsers} className="me-2" />
+              {isOpen && <span>Usuarios</span>}
             </NavLink>
             <NavLink to="/admin/perfiles" className="nav-link text-white d-flex align-items-center">
-            <FontAwesomeIcon icon={ faAddressCard } className="me-2" />
-              Perfiles
+              <FontAwesomeIcon icon={faAddressCard} className="me-2" />
+              {isOpen && <span>Perfiles</span>}
             </NavLink>
             <NavLink to="/admin/tareas" className="nav-link text-white d-flex align-items-center">
-            <FontAwesomeIcon icon={ faListCheck } className="me-2" />
-              Tareas
+              <FontAwesomeIcon icon={faListCheck} className="me-2" />
+              {isOpen && <span>Tareas</span>}
             </NavLink>
           </div>
         )}

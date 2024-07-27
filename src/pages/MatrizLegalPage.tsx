@@ -1,6 +1,6 @@
 
 export default function MatrizLegalPage() {
   return (
-    <div>MatrizLegalPage</div>
+    <div>Matriz Legal</div>
   )
 }

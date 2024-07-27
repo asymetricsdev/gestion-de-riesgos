@@ -29,9 +29,9 @@ export function App() {
                         </Col>
                         <Col xs={10}>
                             <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/matriz-peligro" element={<MatrizPeligro />} />
-                                <Route path="/planificador-actividad" element={<PlanificadorActividad />} />
+                                <Route path="/home" element={<Home />} />
+                                <Route path="/matriz-de-peligro" element={<MatrizPeligro />} />
+                                <Route path="/planificador-de-actividad" element={<PlanificadorActividad />} />
                                 <Route path="/matriz-legal" element={<MatrizLegal />} />
                                 <Route path="/admin/usuarios" element={<Usuarios />} />
                                 <Route path="/admin/perfiles" element={<Perfiles />} />
