@@ -3,7 +3,7 @@ import { Nav } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faExclamationTriangle, faCalendarAlt, faFileAlt, faChevronDown, faChevronUp, faUsers, faAddressCard, faListCheck, faUserTie } from '@fortawesome/free-solid-svg-icons';
 import { NavLink } from 'react-router-dom';
-import './Menu.css';
+import './MenuStyle.css';
 
 interface SidebarProps {
   isOpen: boolean;

@@ -1,5 +1,5 @@
 import React from "react";
-import './EncabezadoTabla.css';
+import './EncabezadoTablaStyle.css';
 
 interface EncabezadoTablaProps {
   title: string;

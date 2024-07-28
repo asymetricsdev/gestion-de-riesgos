@@ -2,7 +2,7 @@ import { Navbar, Nav } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle, faBell, faQuestionCircle, faUserCircle, faBars } from '@fortawesome/free-solid-svg-icons';
 import logo from '../img/logo-asy.png'; 
-import './Header.css'; 
+import './HeaderStyle.css'; 
 
 
 interface HeaderProps {

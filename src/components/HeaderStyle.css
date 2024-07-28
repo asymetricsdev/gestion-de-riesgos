@@ -102,7 +102,7 @@
 }
 
 .modal-header {
-    background: linear-gradient(90deg, #009FE3 0%, #00CFFF 100%);
+    background: linear-gradient(90deg, #009FE3 0%, #00CFFF 100%);;
     color: #fff;
     text-align: center;
 }
