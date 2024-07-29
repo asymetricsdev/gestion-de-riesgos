@@ -21,7 +21,7 @@ const ShowUsers: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [priority, setPriority] = useState<string>("");
   const [title, setTitle] = useState<string>("");
-
+  
   useEffect(() => {
     getUsers();
   }, []);
@@ -74,48 +74,52 @@ const ShowUsers: React.FC = () => {
     enviarSolicitud(metodo, parametros);
   };
 
-  const enviarSolicitud = async (metodo: "POST" | "PUT", parametros: any) => {
+  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-      console.log(".....",`${URL}${id}`);
-      const response: AxiosResponse = await axios({
-        method: metodo,
-        url: metodo === "PUT" ? `${URL}` : URL,
-        data: parametros,
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      const url = method === "PUT" && id ? `${URL}` : URL;
+      const response = await axios({
+        method,
+        url,
+        data,
+        headers: { "Content-Type": "application/json" },
       });
+  
       const { tipo, msj } = response.data;
       showAlert(msj, tipo);
-
+      getUsers();
       if (tipo === "success") {
-        document.getElementById("btnCerrar")?.click();
-        getUsers();
+        // Cierra el modal después de un segundo para permitir la actualización
+        setTimeout(() => {
+          const closeModalButton = document.getElementById("btnCerrar");
+          if (closeModalButton) {
+            closeModalButton.click();
+          }
+          getUsers(); // Actualiza la lista de usuarios
+        }, 500);
       }
     } catch (error) {
       showAlert("Error al enviar la solicitud", "error");
-      console.log(error);
+      console.error(error);
     }
   };
+  
+  
 
   const deleteUser = async (id: string) => {
     try {
-      const response: AxiosResponse = await axios.delete(`${id}`, {
+      await axios.delete(`${URL}${id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
-      const { tipo, msj } = response.data;
-      showAlert(msj, tipo);
-
-      if (tipo === "success") {
-        getUsers();
-      }
+      showAlert("Usuario eliminado correctamente", "success");
+      getUsers(); 
     } catch (error) {
       showAlert("Error al eliminar el usuario", "error");
-      console.log(error);
+      console.error(error);
     }
   };
+  
 
   return (
     <div className="App">
@@ -194,8 +198,8 @@ const ShowUsers: React.FC = () => {
         <div
           className="modal fade"
           id="modalUsers"
-          data-bs-backdrop="static"
-          data-bs-keyboard="false"
+          data-bs-backdrop="true"
+          data-bs-keyboard="true"
           aria-labelledby="staticBackdropLabel"
           aria-hidden="true"
         >
