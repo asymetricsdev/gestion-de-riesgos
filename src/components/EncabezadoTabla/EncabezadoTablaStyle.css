@@ -1,4 +1,9 @@
 .encabezado-tabla {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    position: relative;
     background: linear-gradient(90deg, #009FE3 0%, #00CFFF 100%);
     color: white;
     padding: 20px;
@@ -20,5 +25,13 @@
     margin-top: 55px;
     box-sizing: border-box; /* Incluir padding y border en el ancho */
     overflow-x: auto; /* Asegurarse de que el contenido no se desborde */
+  }
+
+  /*Posición botón agregar nuevo usuario*/
+  .action-button {
+    position: absolute;
+    right: 65px;
+    top: 50%;
+    transform: translateY(-50%);
   }
   

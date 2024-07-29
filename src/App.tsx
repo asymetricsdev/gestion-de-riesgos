@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import Menu from './components/Menu';
+import Header from './components/Header/Header';
+import Menu from './components/Menu/Menu';
 import Home from './pages/HomePage';
 import MatrizPeligro from './pages/MatrizPeligroPage';
 import PlanificadorActividad from './pages/PlanificadorActividadPage';

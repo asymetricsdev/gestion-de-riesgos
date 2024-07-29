@@ -1,4 +1,4 @@
-import ShowUsers from "../components/ShowUsers";
+import ShowUsers from "../components/ShowUsers/ShowUsers";
 
 
 export default function UsuariosPage() {

@@ -1,0 +1,20 @@
+
+.action-button {
+    background-color: #4285f4; /* Color azul */
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .action-button:hover {
+    background-color: #357ae8;
+  }
+  
