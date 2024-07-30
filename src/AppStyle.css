@@ -1,0 +1,18 @@
+.sidebar {
+    width: 85px;
+    transition: width 0.3s;
+}
+
+.sidebar.open {
+    width: 250px;
+}
+
+.main-content {
+    padding: 20px;
+    margin-top: -70px;
+    transition: margin-left 0.3s;
+}
+
+.main-content.with-sidebar {
+    margin-left: 250px;
+}

@@ -1,0 +1,112 @@
+.header-container {
+    background-color: white;
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    width: 100%;
+    z-index: 1000; /* Asegúrate de que esté encima del sidebar */
+}
+
+.custom-icon .fa-circle-user {
+    color: #E6007D;
+    font-size: 2rem; /* Ajusta el tamaño según lo necesites */
+}
+
+.custom-icon .fa-circle-info,
+.custom-icon .fa-bell,
+.custom-icon .fa-circle-question {
+    color: #E6007D;
+    margin: 0 0.1rem;
+    transition: color 0.3s ease;
+}
+
+.custom-icon:hover .fa-circle-info,
+.custom-icon:hover .fa-bell,
+.custom-icon:hover .fa-circle-question {
+    color: #ce0875; 
+}
+
+.nav-link {
+    color: black;
+    margin: 0 0.5rem;
+}
+
+.nav-link:hover {
+    color: black;
+    text-decoration: none;
+}
+
+.navbar-toggler {
+    position: absolute; 
+    left: 250px;
+    top: 9px;
+    margin: 10px; 
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 1100; 
+}
+
+.custom-button {
+    background-color: #009EE2; 
+    border: none; /* Opcional: elimina el borde del botón */
+    color: white; /* Opcional: cambia el color del texto/icono si es necesario */
+    padding: 0.4rem 1rem; /* Opcional: ajusta el padding si es necesario */
+    border-radius: 0.25rem; /* Opcional: ajusta el borde redondeado si es necesario */
+}
+
+.custom-button:hover {
+    background-color: #007BCC; 
+}
+
+.btn-custom-danger {
+    background-color: #E6007D;
+    border-color: #E6007D;
+    color: #fff;
+}
+  
+.btn-custom-danger:hover {
+    background-color: #d1006f;
+    border-color: #d1006f;
+    color: #fff;
+}
+
+  
+.btn-custom-editar {
+    background-color: #E6007D;
+    border-color: #E6007D;
+    color: #fff;
+}
+
+.btn-custom-editar:hover {
+    background-color: #d1006f;
+    border-color: #d1006f;
+    color: #fff;
+}
+
+
+.btn-guardar{
+    background-color: #E6007D;
+    border-color: #E6007D;
+    color: #fff;
+}
+
+.btn-guardar:hover {
+    background-color: #d1006f;
+    border-color: #d1006f;
+    color: #fff;
+}
+
+.modal-header {
+    background: linear-gradient(90deg, #009FE3 0%, #00CFFF 100%);;
+    color: #fff;
+    text-align: center;
+}
+  
+.modal-content {
+    border: none;
+}
