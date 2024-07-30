@@ -10,6 +10,7 @@ import Usuarios from './pages/UsuariosPage';
 import Perfiles from  './pages/PerfilesPage';
 import Tareas from './pages/TareasPage';
 import { Container, Row, Col } from 'react-bootstrap';
+import './AppStyle.css';
 
 export function App() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,10 +25,10 @@ export function App() {
             <BrowserRouter>
                 <Container fluid>
                     <Row>
-                        <Col xs={2} className="p-0">
-                            <Menu isOpen={isMenuOpen} />
+                        <Col xs={isMenuOpen ? 2 : 1} className="p-0">
+                            <Menu isOpen={isMenuOpen} toggleSidebar={toggleMenu} />
                         </Col>
-                        <Col xs={10}>
+                        <Col xs={isMenuOpen ? 10 : 11} className="main-content">
                             <Routes>
                                 <Route path="/home" element={<Home />} />
                                 <Route path="/matriz-de-peligro" element={<MatrizPeligro />} />
@@ -46,5 +47,3 @@ export function App() {
 }
 
 export default App;
-
-

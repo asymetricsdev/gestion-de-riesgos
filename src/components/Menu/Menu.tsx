@@ -7,9 +7,10 @@ import './MenuStyle.css';
 
 interface SidebarProps {
   isOpen: boolean;
+  toggleSidebar: () => void;
 }
 
-const Menu: React.FC<SidebarProps> = ({ isOpen }) => {
+const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
   const toggleAdminSubmenu = () => {
@@ -57,6 +58,9 @@ const Menu: React.FC<SidebarProps> = ({ isOpen }) => {
           </div>
         )}
       </Nav>
+      <button onClick={toggleSidebar} className="btn btn-toggle-sidebar">
+        {isOpen ? 'Cerrar' : 'Abrir'}
+      </button>
     </div>
   );
 };
