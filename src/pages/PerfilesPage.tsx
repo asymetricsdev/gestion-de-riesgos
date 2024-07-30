@@ -1,7 +1,9 @@
-
+import Profiles from '../components/Profiles/Profiles';
 
 export default function PerfilesPage() {
   return (
-    <div>Perfiles</div>
-  )
+    <div>
+      <Profiles />
+    </div>
+  );
 }
