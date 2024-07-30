@@ -5,14 +5,14 @@ import ActionButton from "../Boton/ActionButton";
 
 interface EncabezadoTablaProps {
   title: string;
-  onNewUserClick: () => void;
+  onClick: () => void;
 }
 
-const EncabezadoTabla: React.FC<EncabezadoTablaProps> = ({ title, onNewUserClick }) => {
+const EncabezadoTabla: React.FC<EncabezadoTablaProps> = ({ title, onClick }) => {
   return (
     <div className="encabezado-tabla">
       <h2 className="encabezado-titulo">{title}</h2>
-      <ActionButton onClick={onNewUserClick} />
+      <ActionButton onClick={onClick} />
     </div>
   );
 };

@@ -1,5 +1,5 @@
   import React, { useEffect, useState } from "react";
-  import axios from "axios";
+  import axios, { AxiosResponse } from "axios";
   import Swal from "sweetalert2";
   import withReactContent from "sweetalert2-react-content";
   import { showAlert } from '../functions';
@@ -33,38 +33,98 @@
 
     const getUsers = async () => {
       try {
-        const response = await axios.get(URL);
+        const response: AxiosResponse<User[]> = await axios.get(URL);
         setUsers(response.data);
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          // Mostrar el mensaje de error desde Axios
-          showAlert("Error al obtener los usuarios", "error", error.message);
-        } else {
-          // Mostrar un mensaje genérico de error
-          showAlert("Error al obtener los usuarios", "error", "Ocurrió un error inesperado");
-        }
+        showAlert("Error al obtener los usuarios", "error");
       }
     };
     
 
-    const openModal = (op: string, id: string, name: string, email: string, priority: string) => {
-      setId(id);
-      setName(name);
-      setEmail(email);
-      setPriority(priority);
-      setTitle(op === "1" ? "Registrar Usuario" : "Editar Usuario");
-
-      if (op === "2") {
-        setId(id);
-        setName(name);
-        setEmail(email);
-        setPriority(priority);
+    const openModal = (op: string, user?: User) => {
+      if (user) {
+        setId(user.id);
+        setName(user.name);
+        setEmail(user.email);
+        setPriority(user.priority.toString());
+      } else {
+        setId("");
+        setName("");
+        setEmail("");
+        setPriority("");
       }
-
-       //Manually trigger the modal display
-       const modal = new bootstrap.Modal(document.getElementById('modalUsers') as HTMLElement);
-       modal.show();
-     };
+      setTitle(op === "1" ? "Registrar Usuario" : "Editar Usuario");
+  
+      setTimeout(() => {
+        document.getElementById("nombre")?.focus();
+      }, 500);
+      
+    };
+  
+    const validar = () => {
+      if (name.trim() === "") {
+        showAlert("Escribe el nombre", "warning", "nombre");
+        return;
+      }
+      if (email.trim() === "") {
+        showAlert("Escribe el email", "warning", "email");
+        return;
+      }
+      if (priority.trim() === "") {
+        showAlert("Escribe la prioridad", "warning", "priority");
+        return;
+      }
+  
+      const parametros = { id, name: name.trim(), email: email.trim(), priority: priority.trim() };
+      const metodo = id ? "PUT" : "POST";
+      enviarSolicitud(metodo, parametros);
+    };
+  
+    const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+      try {
+        const url = method === "PUT" && id ? `${URL}` : URL;
+        const response = await axios({
+          method,
+          url,
+          data,
+          headers: { "Content-Type": "application/json" },
+        });
+    
+        const { tipo, msj } = response.data;
+        showAlert(msj, tipo);
+        getUsers();
+        if (tipo === "success") {
+          // Cierra el modal después de un segundo para permitir la actualización
+          setTimeout(() => {
+            const closeModalButton = document.getElementById("btnCerrar");
+            if (closeModalButton) {
+              closeModalButton.click();
+            }
+            getUsers(); // Actualiza la lista de usuarios
+          }, 500);
+        }
+      } catch (error) {
+        showAlert("Error al enviar la solicitud", "error");
+        console.error(error);
+      }
+    };
+    
+    
+  
+    const deleteUser = async (id: string) => {
+      try {
+        await axios.delete(`${URL}${id}`, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        showAlert("Usuario eliminado correctamente", "success");
+        getUsers(); 
+      } catch (error) {
+        showAlert("Error al eliminar el usuario", "error");
+        console.error(error);
+      }
+    };
 
     return (
       <div className="App">
@@ -72,7 +132,7 @@
           <div className="row mt-3">
             <div className="col-12">
               <div className="tabla-contenedor">
-                <EncabezadoTabla title='Usuarios' onNewUserClick={() => openModal("1", "", "", "", "")} />
+                <EncabezadoTabla title='Usuarios' onClick={() => openModal("1")} />
               </div>
               <div className="table-responsive">
                 <table className="table table-bordered">
@@ -95,10 +155,14 @@
                         <td>{user.email}</td>
                         <td>{user.priority}</td>
                         <td className="text-center">
-                          <button onClick={() => openModal("2", user.id, user.name, user.email, user.priority)}
-                            className="btn btn-custom-editar m-2">
-                            <i className="fa-solid fa-edit"></i>
-                          </button>
+                          <button
+                          onClick={() => openModal("2", user)}
+                          className="btn btn-custom-editar m-2"
+                          data-bs-toggle="modal"
+                          data-bs-target="#modalUsers"
+                        >
+                          <i className="fa-solid fa-edit"></i>
+                        </button>
                           <button className="btn btn-custom-danger" onClick={() => {
                             MySwal.fire({
                               title: "¿Estás seguro?",
@@ -109,11 +173,7 @@
                               cancelButtonText: "Cancelar",
                             }).then((result) => {
                               if (result.isConfirmed) {
-                                MySwal.fire(
-                                  "Borrado",
-                                  "El usuario se eliminó",
-                                  "success"
-                                );
+                                deleteUser(user.id);
                               }
                             });
                           }}
@@ -131,8 +191,8 @@
           <div
             className="modal fade"
             id="modalUsers"
-            data-bs-backdrop="static"
-            data-bs-keyboard="false"
+          data-bs-backdrop="true"
+          data-bs-keyboard="true"
             aria-labelledby="staticBackdropLabel"
             aria-hidden="true"
           >
@@ -189,13 +249,16 @@
                     />
                   </div>
                   <div className="d-grid col-6 mx-auto">
-                    <button className="btn btn btn-guardar">
-                      <i className="fa-solid fa-floppy-disk m-2"></i>Guardar
-                    </button>
+                  <button onClick={validar} className="btn btn-success">
+                    <i className="fa-solid fa-floppy-disk m-2"></i>Guardar
+                  </button>
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary m-2" data-bs-dismiss="modal">Cerrar</button>
+                  <button type="button" 
+                  className="btn btn-secondary m-2" 
+                  data-bs-dismiss="modal" 
+                  id="btnCerrar">Cerrar</button>
                 </div>
               </div>
             </div>
