@@ -6,7 +6,6 @@
   import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
   import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
   import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-  import * as bootstrap from 'bootstrap';
 
 
   const MySwal = withReactContent(Swal);
