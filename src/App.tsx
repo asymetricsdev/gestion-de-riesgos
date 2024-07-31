@@ -9,6 +9,7 @@ import MatrizLegal from './pages/MatrizLegalPage';
 import Usuarios from './pages/UsuariosPage';
 import Perfiles from  './pages/PerfilesPage';
 import Tareas from './pages/TareasPage';
+import Company from './pages/CompanyPage';
 import { Container, Row, Col } from 'react-bootstrap';
 import './AppStyle.css';
 
@@ -37,6 +38,7 @@ export function App() {
                                 <Route path="/admin/usuarios" element={<Usuarios />} />
                                 <Route path="/admin/perfiles" element={<Perfiles />} />
                                 <Route path="/admin/tareas" element={<Tareas />} />
+                                <Route path="/admin/company" element={<Company />} />
                             </Routes>
                         </Col>
                     </Row>
