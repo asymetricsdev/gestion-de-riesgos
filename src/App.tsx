@@ -10,6 +10,7 @@ import Usuarios from './pages/UsuariosPage';
 import Perfiles from  './pages/PerfilesPage';
 import Tareas from './pages/TareasPage';
 import Company from './pages/CompanyPage';
+import ActivitiesPage from './pages/ActivitiesPage';
 import { Container, Row, Col } from 'react-bootstrap';
 import './AppStyle.css';
 
@@ -33,7 +34,7 @@ export function App() {
                             <Routes>
                                 <Route path="/home" element={<Home />} />
                                 <Route path="/matriz-de-peligro" element={<MatrizPeligro />} />
-                                <Route path="/planificador-de-actividad" element={<PlanificadorActividad />} />
+                                <Route path="/planificador-de-actividad" element={<ActivitiesPage />} />
                                 <Route path="/matriz-legal" element={<MatrizLegal />} />
                                 <Route path="/admin/usuarios" element={<Usuarios />} />
                                 <Route path="/admin/perfiles" element={<Perfiles />} />
