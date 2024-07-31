@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -6,6 +6,7 @@ import { showAlert } from '../functions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
@@ -13,48 +14,78 @@ interface Company {
   id: string;
   name: string;
   description: string;
-  createDate: Date;
+  createDate: string;
+  // createDate: Date;
 }
 
-const Company: React.FC = () => {
+const Companies: React.FC = () => { 
   const URL = "https://asymetricsbackend.uk.r.appspot.com/company/";
-  const [Company, setCompany] = useState<Company[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]); 
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [createDate, setCreateDate] = useState<Date | null>(null);
+  const [createDate, setCreateDate] = useState<string>(""); 
+  // const [createDate, setCreateDate] = useState<Date | null>(null);
   const [title, setTitle] = useState<string>("");
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getCompany();
+    fetchCompanies();
+    if (modalRef.current) {
+      modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
+    }
+    return () => {
+      if (modalRef.current) {
+        modalRef.current.removeEventListener('hidden.bs.modal', handleModalHidden);
+      }
+    };
   }, []);
 
-  const getCompany = async () => {
+  const fetchCompanies = async () => {
     try {
       const response: AxiosResponse<Company[]> = await axios.get(URL);
-      setCompany(response.data);
+      const formattedCompanies = response.data.map((company) => ({
+        ...company,
+        createDate: new Date(company.createDate).toLocaleString(),
+      }));
+      setCompanies(formattedCompanies);
     } catch (error) {
       showAlert("Error al obtener los datos de Company", "error");
     }
   };
 
-  const openModal = (op: string, Company?: Company) => {
-    if (Company) {
-      setId(Company.id);
-      setName(Company.name);
-      setDescription(Company.description);
-      setCreateDate(new Date(Company.createDate));
+  const openModal = (op: string, company?: Company) => { 
+    if (company) {
+      setId(company.id);
+      setName(company.name);
+      setDescription(company.description);
+      // setCreateDate(new Date(profile.createDate));
+      setCreateDate(company.createDate);
     } else {
       setId("");
       setName("");
       setDescription("");
-      setCreateDate(null);
+      // setCreateDate(null);
+      setCreateDate("");
     }
     setTitle(op === "1" ? "Registrar Perfil" : "Editar Perfil");
 
     setTimeout(() => {
       document.getElementById("nombre")?.focus();
     }, 500);
+
+    if (modalRef.current) {
+      const modal = new bootstrap.Modal(modalRef.current);
+      modal.show();
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleModalHidden = () => {
+    setIsModalOpen(false);
+    const modals = document.querySelectorAll(".modal-backdrop");
+    modals.forEach((modal) => modal.parentNode?.removeChild(modal));
   };
 
   const validar = () => {
@@ -66,7 +97,7 @@ const Company: React.FC = () => {
       showAlert("Escribe la descripción", "warning", "description");
       return;
     }
-    if (!createDate || isNaN(createDate.getTime())) {
+    if (createDate.trim() === "") {
       showAlert("Escribe la fecha de creación", "warning", "createDate");
       return;
     }
@@ -75,7 +106,8 @@ const Company: React.FC = () => {
       id,
       name: name.trim(),
       description: description.trim(),
-      createDate: createDate || new Date(),
+      // createDate: createDate || new Date(),
+      createDate: createDate.trim(),
     };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
@@ -93,14 +125,14 @@ const Company: React.FC = () => {
 
       const { tipo, msj } = response.data;
       showAlert(msj, tipo);
-      getCompany();
+      fetchCompanies();
       if (tipo === "success") {
         setTimeout(() => {
           const closeModalButton = document.getElementById("btnCerrar");
           if (closeModalButton) {
             closeModalButton.click();
           }
-          getCompany();
+          fetchCompanies();
         }, 500);
       }
     } catch (error) {
@@ -117,7 +149,7 @@ const Company: React.FC = () => {
         }
       });
       showAlert("Perfil eliminado correctamente", "success");
-      getCompany();
+      fetchCompanies();
     } catch (error) {
       showAlert("Error al eliminar el perfil", "error");
       console.error(error);
@@ -145,15 +177,17 @@ const Company: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {Company.map((Company, i) => (
-                    <tr key={Company.id}>
+                  {companies.map((company, i) => (
+                    <tr key={company.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{Company.name}</td>
-                      <td>{Company.description}</td>
-                      <td>{new Date(Company.createDate).toLocaleString()}</td>
+                      <td>{company.name}</td>
+                      <td>{company.description}</td>
+                      {/* <td>{new Date(company.createDate).toLocaleString()}</td> */}
+                      {/* <td>{company.createDate}</td> */}
+                      <td>29/7/2024</td>
                       <td className="text-center">
                         <button
-                          onClick={() => openModal("2", Company)}
+                          onClick={() => openModal("2", company)}
                           className="btn btn-custom-editar m-2"
                           data-bs-toggle="modal"
                           data-bs-target="#modalCompany"
@@ -170,7 +204,7 @@ const Company: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteCompany(Company.id);
+                              deleteCompany(company.id);
                             }
                           });
                         }}>
@@ -236,12 +270,20 @@ const Company: React.FC = () => {
                     <i className="fa-solid fa-calendar"></i>
                   </span>
                   <input
+                    type="text"
+                    id="createDate"
+                    className="form-control"
+                    placeholder="Fecha de creación"
+                    value={createDate}
+                    onChange={(e) => setCreateDate(e.target.value)}
+                  />
+                  {/* <input
                     type="datetime-local"
                     id="createDate"
                     className="form-control"
                     value={createDate ? createDate.toISOString().substring(0, 16) : ""}
                     onChange={(e) => setCreateDate(e.target.value ? new Date(e.target.value) : null)}
-                  />
+                  /> */}
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
@@ -268,4 +310,4 @@ const Company: React.FC = () => {
   );
 };
 
-export default Company;
+export default Companies; // Cambié 'Company' a 'Companies'

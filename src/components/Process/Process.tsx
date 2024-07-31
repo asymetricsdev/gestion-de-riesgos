@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -6,6 +6,7 @@ import { showAlert } from '../functions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+import * as bootstrap from "bootstrap";
 
 const MySwal = withReactContent(Swal);
 
@@ -13,7 +14,8 @@ interface Process {
   id: string;
   name: string;
   description: string;
-  createDate: Date;
+	createDate: string;
+	// createDate: Date;
   activities: string;
 }
 
@@ -23,43 +25,72 @@ const Process: React.FC = () => {
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [createDate, setCreateDate] = useState<Date | null>(null);
+	const [createDate, setCreateDate] = useState<string>("");
+	// const [createDate, setCreateDate] = useState<Date | null>(null);
   const [activities, setActivities] = useState<string>("");
   const [title, setTitle] = useState<string>("");
+  const modalRef = useRef<HTMLDivElement | null>(null);
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  useEffect(() => {
-    getProcess();
-  }, []);
+	useEffect(() => {
+		getProcess();
+		if (modalRef.current) {
+			modalRef.current.addEventListener("hidden.bs.modal", handleModalHidden);
+		}
+		return () => {
+			if (modalRef.current) {
+				modalRef.current.removeEventListener("hidden.bs.modal", handleModalHidden);
+			}
+		};
+	}, []);
 
-  const getProcess = async () => {
-    try {
-      const response: AxiosResponse<Process[]> = await axios.get(URL);
-      setProcess(response.data);
-    } catch (error) {
-      showAlert("Error al obtener los datos de Process", "error");
-    }
-  };
+    const getProcess = async () => {
+      try {
+        const response: AxiosResponse<Process[]> = await axios.get(URL);
+        /*CODIGO EN CRUDO BORRAR CUANDO SE NECESITE EL DATO DE FECHA**/
+        const formattedProcess = response.data.map((process) => ({
+          ...process,
+          createDate: new Date(process.createDate).toLocaleString(),
+        }));
+        /*CODIGO EN CRUDO BORRAR CUANDO SE NECESITE EL DATO DE FECHA**/
+        setProcess(response.data);
+      } catch (error) {
+        showAlert("Error al obtener los perfiles", "error");
+      }
+    };
 
-  const openModal = (op: string, Process?: Process) => {
-    if (Process) {
-      setId(Process.id);
-      setName(Process.name);
-      setDescription(Process.description);
-      setCreateDate(new Date(Process.createDate));
-      setActivities(Process.activities);
-    } else {
-      setId("");
-      setName("");
-      setDescription("");
-      setCreateDate(null);
-      setActivities("");
-    }
-    setTitle(op === "1" ? "Registrar Perfil" : "Editar Perfil");
+    const openModal = (op: string, process?: Process) => {
+      if (process) {
+        setId(process.id);
+        setName(process.name);
+        setDescription(process.description);
+        // setCreateDate(new Date(process.createDate));
+        setCreateDate(process.createDate);
+      } else {
+        setId("");
+        setName("");
+        setDescription("");
+        // setCreateDate(null);
+        setCreateDate("");
+      }
+      setTitle(op === "1" ? "Registrar Perfil" : "Editar Perfil");
 
     setTimeout(() => {
       document.getElementById("nombre")?.focus();
     }, 500);
-  };
+
+		if (modalRef.current) {
+			const modal = new bootstrap.Modal(modalRef.current);
+			modal.show();
+			setIsModalOpen(true);
+		}
+	};
+
+  const handleModalHidden = () => {
+		setIsModalOpen(false);
+		const modals = document.querySelectorAll(".modal-backdrop");
+		modals.forEach((modal) => modal.parentNode?.removeChild(modal));
+	};
 
   const validar = () => {
     if (name.trim() === "") {
@@ -70,10 +101,14 @@ const Process: React.FC = () => {
       showAlert("Escribe la descripción", "warning", "description");
       return;
     }
-    if (!createDate || isNaN(createDate.getTime())) {
-      showAlert("Escribe la fecha de creación", "warning", "createDate");
-      return;
-    }
+		// if (!createDate || isNaN(createDate.getTime())) {
+		//   showAlert("Escribe la fecha de creación", "warning", "createDate");
+		//   return;
+		// }
+		if (createDate.trim() === "") {
+			showAlert("Escribe la fecha de creación", "warning", "createDate");
+			return;
+		}
     if (activities.trim() === "") {
         showAlert("Escribe la actividad", "warning", "actividad");
         return;
@@ -83,7 +118,8 @@ const Process: React.FC = () => {
       id,
       name: name.trim(),
       description: description.trim(),
-      createDate: createDate || new Date(),
+			// createDate: createDate || new Date(),
+			createDate: createDate.trim(),
       activities: activities.trim(),
     };
     const metodo = id ? "PUT" : "POST";
@@ -156,11 +192,13 @@ const Process: React.FC = () => {
                 </thead>
                 <tbody className="table-group-divider">
                   {Process.map((Process, i) => (
-                    <tr key={Process.id}>
+                    <tr key={Process.id} className="text-center">
                       <td>{i + 1}</td>
                       <td>{Process.name}</td>
                       <td>{Process.description}</td>
-                      <td>{new Date(Process.createDate).toLocaleString()}</td>
+											{/* <td>{new Date(profile.createDate).toLocaleString()}</td> */}
+											{/* <td>{Process.createDate}</td> */}
+                      <td>29/7/2024</td>
                       <td>{Process.activities}</td>
                       <td className="text-center">
                         <button
@@ -247,13 +285,21 @@ const Process: React.FC = () => {
                     <i className="fa-solid fa-calendar"></i>
                   </span>
                   <input
+										type="text"
+										id="createDate"
+										className="form-control"
+										placeholder="Fecha de creación"
+										value={createDate}
+										onChange={(e) => setCreateDate(e.target.value)}
+									/>
+									{/* <input
                     type="datetime-local"
                     id="createDate"
                     className="form-control"
                     value={createDate ? createDate.toISOString().substring(0, 16) : ""}
                     onChange={(e) => setCreateDate(e.target.value ? new Date(e.target.value) : null)}
-                  />
-                                    <input
+                  /> */}
+                    <input
                     type="text"
                     id="actividades"
                     className="form-control"
