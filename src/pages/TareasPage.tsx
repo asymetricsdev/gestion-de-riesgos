@@ -1,7 +1,9 @@
-
+import Process from '../components/Process/Process';
 
 export default function TareasPage() {
   return (
-    <div>Tareas</div>
+    <div>
+      <Process />
+    </div>
   )
 }

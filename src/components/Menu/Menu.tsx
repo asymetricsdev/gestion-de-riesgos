@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Nav } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faExclamationTriangle, faCalendarAlt, faFileAlt, faChevronDown, faChevronUp, faUsers, faAddressCard, faListCheck, faUserTie } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faExclamationTriangle, faCalendarAlt, faFileAlt, faChevronDown, faChevronUp, faUsers, faAddressCard, faListCheck, faUserTie, faBuilding } from '@fortawesome/free-solid-svg-icons';
 import { NavLink } from 'react-router-dom';
 import './MenuStyle.css';
 
@@ -54,6 +54,10 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <NavLink to="/admin/tareas" className="nav-link text-white d-flex align-items-center">
               <FontAwesomeIcon icon={faListCheck} className="me-2" />
               {isOpen && <span>Tareas</span>}
+            </NavLink>
+            <NavLink to="/admin/company" className="nav-link text-white d-flex align-items-center">
+              <FontAwesomeIcon icon={faBuilding} className="me-2" />
+              {isOpen && <span>Company</span>}
             </NavLink>
           </div>
         )}
