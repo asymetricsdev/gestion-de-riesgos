@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Nav } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faExclamationTriangle, faCalendarAlt, faFileAlt, faChevronDown, faChevronUp, faUsers, faAddressCard, faListCheck, faUserTie, faBuilding, faCheckCircle, faBolt } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faExclamationTriangle, faCalendarAlt, faFileAlt, faChevronDown, faChevronUp, faUsers, faAddressCard, faListCheck, faUserTie, faBuilding, faCheckCircle, faBolt, faPeopleRobbery, faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { NavLink } from 'react-router-dom';
 import './MenuStyle.css';
 
@@ -40,11 +40,15 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
               <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
               <span>Matriz de Peligro</span>
             </NavLink>
+            <NavLink to="/matriz-de-peligro/riesgos" className="nav-link text-white d-flex align-items-center">
+              <FontAwesomeIcon icon={faCircleExclamation} className="me-2" />
+              <span>Riesgos</span>
+            </NavLink>
             <NavLink to="/matriz-de-peligro/criticidad-de-peligro" className="nav-link text-white d-flex align-items-center">
               <FontAwesomeIcon icon={faBolt} className="me-2" />
               <span>Criticidad</span>
             </NavLink>
-            <NavLink to="/matriz-de-peligro/checker" className="nav-link text-white d-flex align-items-center">
+            <NavLink to="/matriz-de-peligro/comprobaciones" className="nav-link text-white d-flex align-items-center">
               <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
               <span>Checker</span>
             </NavLink>
@@ -80,6 +84,10 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <NavLink to="/admin/company" className="nav-link text-white d-flex align-items-center">
               <FontAwesomeIcon icon={faBuilding} className="me-2" />
               <span>Company</span>
+            </NavLink>
+            <NavLink to="/admin/actividades" className="nav-link text-white d-flex align-items-center">
+              <FontAwesomeIcon icon={faPeopleRobbery} className="me-2" />
+              <span>Actividades</span>
             </NavLink>
           </div>
         )}
