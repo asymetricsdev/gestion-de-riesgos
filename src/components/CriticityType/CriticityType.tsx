@@ -10,7 +10,7 @@ import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-interface Company {
+interface Criticity {
   id: string;
   name: string;
   description: string;
@@ -18,9 +18,9 @@ interface Company {
   // createDate: Date;
 }
 
-const Companies: React.FC = () => { 
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/company/";
-  const [companies, setCompanies] = useState<Company[]>([]); 
+const Criticalities: React.FC = () => { 
+  const URL = "https://asymetricsbackend.uk.r.appspot.com/criticity_type/";
+  const [criticalities, setCriticalities] = useState<Criticity[]>([]); 
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -31,7 +31,7 @@ const Companies: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    fetchCompanies();
+    getCriticalities();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -42,26 +42,26 @@ const Companies: React.FC = () => {
     };
   }, []);
 
-  const fetchCompanies = async () => {
+  const getCriticalities = async () => {
     try {
-      const response: AxiosResponse<Company[]> = await axios.get(URL);
-      const formattedCompanies = response.data.map((company) => ({
-        ...company,
-        createDate: new Date(company.createDate).toLocaleString(),
+      const response: AxiosResponse<Criticity[]> = await axios.get(URL);
+      const formattedCriticalities = response.data.map((criticity) => ({
+        ...criticity,
+        createDate: new Date(criticity.createDate).toLocaleString(),
       }));
-      setCompanies(formattedCompanies);
+      setCriticalities(formattedCriticalities);
     } catch (error) {
-      showAlert("Error al obtener los datos de Company", "error");
+      showAlert("Error al obtener los datos de Riesgos", "error");
     }
   };
 
-  const openModal = (op: string, company?: Company) => { 
-    if (company) {
-      setId(company.id);
-      setName(company.name);
-      setDescription(company.description);
+  const openModal = (op: string, criticity?: Criticity) => { 
+    if (criticity) {
+      setId(criticity.id);
+      setName(criticity.name);
+      setDescription(criticity.description);
       // setCreateDate(new Date(profile.createDate));
-      setCreateDate(company.createDate);
+      setCreateDate(criticity.createDate);
     } else {
       setId("");
       setName("");
@@ -69,7 +69,7 @@ const Companies: React.FC = () => {
       // setCreateDate(null);
       setCreateDate("");
     }
-    setTitle(op === "1" ? "Registrar Perfil" : "Editar Perfil");
+    setTitle(op === "1" ? "Registrar Actividad" : "Editar Actividad");
 
     setTimeout(() => {
       document.getElementById("nombre")?.focus();
@@ -125,14 +125,14 @@ const Companies: React.FC = () => {
 
       const { tipo, msj } = response.data;
       showAlert(msj, tipo);
-      fetchCompanies();
+      getCriticalities();
       if (tipo === "success") {
         setTimeout(() => {
           const closeModalButton = document.getElementById("btnCerrar");
           if (closeModalButton) {
             closeModalButton.click();
           }
-          fetchCompanies();
+          getCriticalities();
         }, 500);
       }
     } catch (error) {
@@ -141,17 +141,17 @@ const Companies: React.FC = () => {
     }
   };
 
-  const deleteCompany = async (id: string) => {
+  const deleteCriticity = async (id: string) => {
     try {
       await axios.delete(`${URL}${id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
-      showAlert("Perfil eliminado correctamente", "success");
-      fetchCompanies();
+      showAlert("Actividad eliminado correctamente", "success");
+      getCriticalities();
     } catch (error) {
-      showAlert("Error al eliminar el perfil", "error");
+      showAlert("Error al eliminar el Actividad", "error");
       console.error(error);
     }
   };
@@ -162,7 +162,7 @@ const Companies: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Company' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Criticity' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
@@ -177,20 +177,20 @@ const Companies: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {companies.map((company, i) => (
-                    <tr key={company.id} className="text-center">
+                  {criticalities.map((criticity, i) => (
+                    <tr key={criticity.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{company.name}</td>
-                      <td>{company.description}</td>
-                      {/* <td>{new Date(company.createDate).toLocaleString()}</td> */}
-                      {/* <td>{company.createDate}</td> */}
+                      <td>{criticity.name}</td>
+                      <td>{criticity.description}</td>
+                      {/* <td>{new Date(Criticity.createDate).toLocaleString()}</td> */}
+                      {/* <td>{Criticity.createDate}</td> */}
                       <td>29/7/2024</td>
                       <td className="text-center">
                         <button
-                          onClick={() => openModal("2", company)}
+                          onClick={() => openModal("2", criticity)}
                           className="btn btn-custom-editar m-2"
                           data-bs-toggle="modal"
-                          data-bs-target="#modalCompany"
+                          data-bs-target="#modalCriticity"
                         >
                           <i className="fa-solid fa-edit"></i>
                         </button>
@@ -204,7 +204,7 @@ const Companies: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteCompany(company.id);
+                              deleteCriticity(criticity.id);
                             }
                           });
                         }}>
@@ -220,7 +220,7 @@ const Companies: React.FC = () => {
         </div>
         <div
           className="modal fade"
-          id="modalCompany"
+          id="modalCriticity"
           data-bs-backdrop="true"
           data-bs-keyboard="true"
           aria-labelledby="staticBackdropLabel"
@@ -310,4 +310,4 @@ const Companies: React.FC = () => {
   );
 };
 
-export default Companies;
+export default Criticalities; 

@@ -1,15 +1,10 @@
- import React, { useEffect } from 'react';
-
-
+import Risks from "../components/RiskMatrix/RiskMatrix";
 
 export default function MatrizPeligroPage() {
-  
-
-
   return (
-    <div className="matriz-peligro-page">
-    
+    <div>
+      <Risks />
     </div>
-  );
+  )
 }
  

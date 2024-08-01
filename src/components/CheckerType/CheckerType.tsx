@@ -10,7 +10,7 @@ import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-interface Company {
+interface Check {
   id: string;
   name: string;
   description: string;
@@ -18,9 +18,9 @@ interface Company {
   // createDate: Date;
 }
 
-const Companies: React.FC = () => { 
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/company/";
-  const [companies, setCompanies] = useState<Company[]>([]); 
+const Checkings: React.FC = () => { 
+  const URL = "https://asymetricsbackend.uk.r.appspot.com/checker_type/";
+  const [checkings, setCheckings] = useState<Check[]>([]); 
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -31,7 +31,7 @@ const Companies: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    fetchCompanies();
+    getCheckings();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -42,26 +42,26 @@ const Companies: React.FC = () => {
     };
   }, []);
 
-  const fetchCompanies = async () => {
+  const getCheckings = async () => {
     try {
-      const response: AxiosResponse<Company[]> = await axios.get(URL);
-      const formattedCompanies = response.data.map((company) => ({
-        ...company,
-        createDate: new Date(company.createDate).toLocaleString(),
+      const response: AxiosResponse<Check[]> = await axios.get(URL);
+      const formattedCheckings = response.data.map((Check) => ({
+        ...Check,
+        createDate: new Date(Check.createDate).toLocaleString(),
       }));
-      setCompanies(formattedCompanies);
+      setCheckings(formattedCheckings);
     } catch (error) {
-      showAlert("Error al obtener los datos de Company", "error");
+      showAlert("Error al obtener los datos de Riesgos", "error");
     }
   };
 
-  const openModal = (op: string, company?: Company) => { 
-    if (company) {
-      setId(company.id);
-      setName(company.name);
-      setDescription(company.description);
+  const openModal = (op: string, Check?: Check) => { 
+    if (Check) {
+      setId(Check.id);
+      setName(Check.name);
+      setDescription(Check.description);
       // setCreateDate(new Date(profile.createDate));
-      setCreateDate(company.createDate);
+      setCreateDate(Check.createDate);
     } else {
       setId("");
       setName("");
@@ -69,7 +69,7 @@ const Companies: React.FC = () => {
       // setCreateDate(null);
       setCreateDate("");
     }
-    setTitle(op === "1" ? "Registrar Perfil" : "Editar Perfil");
+    setTitle(op === "1" ? "Registrar Actividad" : "Editar Actividad");
 
     setTimeout(() => {
       document.getElementById("nombre")?.focus();
@@ -125,14 +125,14 @@ const Companies: React.FC = () => {
 
       const { tipo, msj } = response.data;
       showAlert(msj, tipo);
-      fetchCompanies();
+      getCheckings();
       if (tipo === "success") {
         setTimeout(() => {
           const closeModalButton = document.getElementById("btnCerrar");
           if (closeModalButton) {
             closeModalButton.click();
           }
-          fetchCompanies();
+          getCheckings();
         }, 500);
       }
     } catch (error) {
@@ -141,17 +141,17 @@ const Companies: React.FC = () => {
     }
   };
 
-  const deleteCompany = async (id: string) => {
+  const deleteCheck = async (id: string) => {
     try {
       await axios.delete(`${URL}${id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
-      showAlert("Perfil eliminado correctamente", "success");
-      fetchCompanies();
+      showAlert("Actividad eliminado correctamente", "success");
+      getCheckings();
     } catch (error) {
-      showAlert("Error al eliminar el perfil", "error");
+      showAlert("Error al eliminar el Actividad", "error");
       console.error(error);
     }
   };
@@ -162,7 +162,7 @@ const Companies: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Company' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Check' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
@@ -177,20 +177,20 @@ const Companies: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {companies.map((company, i) => (
-                    <tr key={company.id} className="text-center">
+                  {checkings.map((check, i) => (
+                    <tr key={check.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{company.name}</td>
-                      <td>{company.description}</td>
-                      {/* <td>{new Date(company.createDate).toLocaleString()}</td> */}
-                      {/* <td>{company.createDate}</td> */}
+                      <td>{check.name}</td>
+                      <td>{check.description}</td>
+                      {/* <td>{new Date(Check.createDate).toLocaleString()}</td> */}
+                      {/* <td>{Check.createDate}</td> */}
                       <td>29/7/2024</td>
                       <td className="text-center">
                         <button
-                          onClick={() => openModal("2", company)}
+                          onClick={() => openModal("2", check)}
                           className="btn btn-custom-editar m-2"
                           data-bs-toggle="modal"
-                          data-bs-target="#modalCompany"
+                          data-bs-target="#modalCheck"
                         >
                           <i className="fa-solid fa-edit"></i>
                         </button>
@@ -204,7 +204,7 @@ const Companies: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteCompany(company.id);
+                              deleteCheck(check.id);
                             }
                           });
                         }}>
@@ -220,7 +220,7 @@ const Companies: React.FC = () => {
         </div>
         <div
           className="modal fade"
-          id="modalCompany"
+          id="modalCheck"
           data-bs-backdrop="true"
           data-bs-keyboard="true"
           aria-labelledby="staticBackdropLabel"
@@ -310,4 +310,4 @@ const Companies: React.FC = () => {
   );
 };
 
-export default Companies;
+export default Checkings; 
