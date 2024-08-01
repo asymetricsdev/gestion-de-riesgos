@@ -11,6 +11,7 @@ import Perfiles from  './pages/PerfilesPage';
 import Tareas from './pages/TareasPage';
 import Company from './pages/CompanyPage';
 import ActivitiesPage from './pages/ActivitiesPage';
+import Criticidad from './pages/CriticityPage';
 import { Container, Row, Col } from 'react-bootstrap';
 import './AppStyle.css';
 
@@ -34,6 +35,7 @@ export function App() {
                             <Routes>
                                 <Route path="/home" element={<Home />} />
                                 <Route path="/matriz-de-peligro" element={<MatrizPeligro />} />
+                                <Route path="/matriz-de-peligro/criticidad-de-peligro" element={<Criticidad />} />
                                 <Route path="/planificador-de-actividad" element={<ActivitiesPage />} />
                                 <Route path="/matriz-legal" element={<MatrizLegal />} />
                                 <Route path="/admin/usuarios" element={<Usuarios />} />
