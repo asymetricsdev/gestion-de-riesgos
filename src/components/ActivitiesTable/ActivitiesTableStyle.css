@@ -1,0 +1,32 @@
+ .table-container {
+    display: flex;
+    justify-content: space-between;
+    align-items:first baseline ;
+    margin: 50px;
+    flex-direction: column; 
+    margin-left: 50px; 
+    margin-right: 195px;
+ 
+  }
+
+  .table-responsives {
+    width: 75%;
+    max-height: 500px; 
+    overflow-x: auto;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+  } 
+  
+  #tableta {
+    min-width: 2500px; 
+  }
+   
+  .table th, .table td {
+    min-width: 100px; 
+    text-align: center;
+  }
+ 
+ 
+  
+
+  
