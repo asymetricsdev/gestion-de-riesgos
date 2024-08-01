@@ -1,7 +1,15 @@
+ import React, { useEffect } from 'react';
+
 
 
 export default function MatrizPeligroPage() {
+  
+
+
   return (
-    <div>Matriz de Peligro</div>
-  )
+    <div className="matriz-peligro-page">
+    
+    </div>
+  );
 }
+ 

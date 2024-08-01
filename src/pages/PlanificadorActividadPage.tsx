@@ -1,7 +1,18 @@
-
+import { ActivitiesTable }from '../components/ActivitiesTable/ActivitiesTable'
+import ActivityPlanner from "../components/ActivityPlanner/ActivityPlanner";
+import InfoCard from '../components/InfoCard/InfoCard';
 
 export default function PlanificadorActividadPage() {
   return (
-    <div>Planificador de Actividad</div>
+    <div>
+       <ActivityPlanner /> 
+       <InfoCard name="John Doe" rut="123456789" program="Program A" numberOfPeople={5} />
+       <ActivitiesTable title="Actividades" /> 
+      
+      
+    </div>
   )
+
+    
+  
 }

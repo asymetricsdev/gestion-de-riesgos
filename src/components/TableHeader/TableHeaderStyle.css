@@ -1,0 +1,33 @@
+.header-table {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  position: relative;
+  background: linear-gradient(90deg, #009FE3 0%, #00CFFF 100%);
+  color: white;
+  padding: 20px;
+  margin: 0; 
+  border-radius: 8px 8px 0 0; /* Opcional: para coincidir con el estilo */
+  text-align: center;
+  width: 75%; /*ancho del contenedor */
+  box-sizing: border-box; /*padding y border en el ancho */
+}
+
+.tabla-contenedor-header {
+  width: 100%; /* Ajustar el ancho al 100% */
+  margin: 0 auto; /* Centrar el contenedor */
+  margin-top: 55px;
+  box-sizing: border-box; /* Incluir padding y border en el ancho */
+  overflow-x: auto; /* Asegurarse de que el contenido no se desborde */
+}
+
+.Header-titulo {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+  
+
+
+  
