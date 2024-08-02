@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Nav } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faExclamationTriangle, faCalendarAlt, faFileAlt, faChevronDown, faChevronUp, faUsers, faAddressCard, faListCheck, faUserTie, faBuilding, faCheckCircle, faBolt, faPeopleRobbery, faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faExclamationTriangle, faCalendarAlt, faFileAlt, faChevronDown, faChevronUp, faUsers, 
+  faAddressCard, faListCheck, faUserTie, faBuilding, faCheckCircle, faBolt, faPeopleRobbery, 
+  faCircleExclamation, faSitemap, faCircleRadiation} from '@fortawesome/free-solid-svg-icons';
 import { NavLink } from 'react-router-dom';
 import './MenuStyle.css';
 
@@ -88,6 +90,14 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <NavLink to="/admin/actividades" className="nav-link text-white d-flex align-items-center">
               <FontAwesomeIcon icon={faPeopleRobbery} className="me-2" />
               <span>Actividades</span>
+            </NavLink>
+            <NavLink to="/admin/division" className="nav-link text-white d-flex align-items-center">
+              <FontAwesomeIcon icon={faSitemap} className="me-2" />
+              <span>Division</span>
+            </NavLink>
+            <NavLink to="/admin/peligro" className="nav-link text-white d-flex align-items-center">
+              <FontAwesomeIcon icon={faCircleRadiation} className="me-2" />
+              <span>Peligro</span>
             </NavLink>
           </div>
         )}

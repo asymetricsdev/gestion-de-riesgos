@@ -10,28 +10,26 @@ import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-interface Criticity {
+interface CriticityType {
   id: string;
   name: string;
   description: string;
   createDate: string;
-  // createDate: Date;
 }
 
-const Criticalities: React.FC = () => { 
+const CriticityType: React.FC = () => {
   const URL = "https://asymetricsbackend.uk.r.appspot.com/criticity_type/";
-  const [criticalities, setCriticalities] = useState<Criticity[]>([]); 
+  const [criticitytype, setCriticityType] = useState<CriticityType[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [createDate, setCreateDate] = useState<string>(""); 
-  // const [createDate, setCreateDate] = useState<Date | null>(null);
+  const [createDate, setCreateDate] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getCriticalities();
+    getUsers();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -42,38 +40,28 @@ const Criticalities: React.FC = () => {
     };
   }, []);
 
-  const getCriticalities = async () => {
+  const getUsers = async () => {
     try {
-      const response: AxiosResponse<Criticity[]> = await axios.get(URL);
-      const formattedCriticalities = response.data.map((criticity) => ({
-        ...criticity,
-        createDate: new Date(criticity.createDate).toLocaleString(),
-      }));
-      setCriticalities(formattedCriticalities);
+      const response: AxiosResponse<CriticityType[]> = await axios.get(URL);
+      setCriticityType(response.data);
     } catch (error) {
-      showAlert("Error al obtener los datos de Riesgos", "error");
+      showAlert("Error al obtener criticidad", "error");
     }
   };
 
-  const openModal = (op: string, criticity?: Criticity) => { 
-    if (criticity) {
-      setId(criticity.id);
-      setName(criticity.name);
-      setDescription(criticity.description);
-      // setCreateDate(new Date(profile.createDate));
-      setCreateDate(criticity.createDate);
+  const openModal = (op: string, criticitytype?: CriticityType) => {
+    if (criticitytype) {
+      setId(criticitytype.id);
+      setName(criticitytype.name);
+      setDescription(criticitytype.description);
+      setCreateDate(criticitytype.createDate);
     } else {
       setId("");
       setName("");
       setDescription("");
-      // setCreateDate(null);
       setCreateDate("");
     }
-    setTitle(op === "1" ? "Registrar Actividad" : "Editar Actividad");
-
-    setTimeout(() => {
-      document.getElementById("nombre")?.focus();
-    }, 500);
+    setTitle(op === "1" ? "Registrar División" : "Editar División");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -84,8 +72,8 @@ const Criticalities: React.FC = () => {
 
   const handleModalHidden = () => {
     setIsModalOpen(false);
-    const modals = document.querySelectorAll(".modal-backdrop");
-    modals.forEach((modal) => modal.parentNode?.removeChild(modal));
+    const modals = document.querySelectorAll('.modal-backdrop');
+    modals.forEach(modal => modal.parentNode?.removeChild(modal));
   };
 
   const validar = () => {
@@ -94,28 +82,24 @@ const Criticalities: React.FC = () => {
       return;
     }
     if (description.trim() === "") {
-      showAlert("Escribe la descripción", "warning", "description");
+      showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
     if (createDate.trim() === "") {
-      showAlert("Escribe la fecha de creación", "warning", "createDate");
+      showAlert("Escribe la fecha", "warning", "fecha");
       return;
     }
-
-    const parametros = {
-      id,
-      name: name.trim(),
-      description: description.trim(),
-      // createDate: createDate || new Date(),
-      createDate: createDate.trim(),
-    };
+  
+    // Asegúrate de que 'createDate' esté correctamente configurado en 'parametros'
+    const parametros = { id, name: name.trim(), description: description.trim(), createDate: createDate.trim() };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
+  
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-      const url = method === "PUT" && id ? `${URL}${id}` : URL;
+      const url = method === "PUT" && id ? `${URL}` : URL;
       const response = await axios({
         method,
         url,
@@ -125,14 +109,15 @@ const Criticalities: React.FC = () => {
 
       const { tipo, msj } = response.data;
       showAlert(msj, tipo);
-      getCriticalities();
+      getUsers();
       if (tipo === "success") {
+        // Cierra el modal después de un segundo para permitir la actualización
         setTimeout(() => {
           const closeModalButton = document.getElementById("btnCerrar");
           if (closeModalButton) {
             closeModalButton.click();
           }
-          getCriticalities();
+          getUsers(); // Actualiza la lista de usuarios
         }, 500);
       }
     } catch (error) {
@@ -141,17 +126,17 @@ const Criticalities: React.FC = () => {
     }
   };
 
-  const deleteCriticity = async (id: string) => {
+  const deleteUser = async (id: string) => {
     try {
       await axios.delete(`${URL}${id}`, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
-      showAlert("Actividad eliminado correctamente", "success");
-      getCriticalities();
+      showAlert("Usuario eliminado correctamente", "success");
+      getUsers(); 
     } catch (error) {
-      showAlert("Error al eliminar el Actividad", "error");
+      showAlert("Error al eliminar el usuario", "error");
       console.error(error);
     }
   };
@@ -162,38 +147,37 @@ const Criticalities: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Criticity' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Criticidad' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
-                <thead className="text-center"
-                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
+                <thead className="text-center" 
+                style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
+                color: '#fff' }}>
                   <tr>
                     <th>ID</th>
                     <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Fecha de Creación</th>
+                    <th>Descripción </th>
+                    <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {criticalities.map((criticity, i) => (
-                    <tr key={criticity.id} className="text-center">
+                  {criticitytype.map((criticitytype, i) => (
+                    <tr key={criticitytype.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{criticity.name}</td>
-                      <td>{criticity.description}</td>
-                      {/* <td>{new Date(Criticity.createDate).toLocaleString()}</td> */}
-                      {/* <td>{Criticity.createDate}</td> */}
-                      <td>29/7/2024</td>
+                      <td>{criticitytype.name}</td>
+                      <td>{criticitytype.description}</td>
+                      <td>{criticitytype.createDate}</td>
                       <td className="text-center">
                         <button
-                          onClick={() => openModal("2", criticity)}
-                          className="btn btn-custom-editar m-2"
-                          data-bs-toggle="modal"
-                          data-bs-target="#modalCriticity"
-                        >
-                          <i className="fa-solid fa-edit"></i>
-                        </button>
+                        onClick={() => openModal("2", criticitytype)}
+                        className="btn btn-custom-editar m-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalUsers"
+                      >
+                        <i className="fa-solid fa-edit"></i>
+                      </button>
                         <button className="btn btn-custom-danger" onClick={() => {
                           MySwal.fire({
                             title: "¿Estás seguro?",
@@ -204,10 +188,11 @@ const Criticalities: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteCriticity(criticity.id);
+                              deleteUser(criticitytype.id);
                             }
                           });
-                        }}>
+                        }}
+                        >
                           <FontAwesomeIcon icon={faCircleXmark} />
                         </button>
                       </td>
@@ -220,9 +205,10 @@ const Criticalities: React.FC = () => {
         </div>
         <div
           className="modal fade"
-          id="modalCriticity"
-          data-bs-backdrop="true"
-          data-bs-keyboard="true"
+          id="modalUsers"
+          ref={modalRef}
+        data-bs-backdrop="true"
+        data-bs-keyboard="true"
           aria-labelledby="staticBackdropLabel"
           aria-hidden="true"
         >
@@ -254,11 +240,11 @@ const Criticalities: React.FC = () => {
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-regular fa-envelope"></i>
+                    <i className="fa-regular fa-solid fa-file-alt"></i>
                   </span>
                   <input
                     type="text"
-                    id="description"
+                    id="descripcion"
                     className="form-control"
                     placeholder="Descripción"
                     value={description}
@@ -267,40 +253,34 @@ const Criticalities: React.FC = () => {
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-calendar"></i>
+                    <i className="fa-solid fa-calendar-days"></i>
                   </span>
                   <input
                     type="text"
                     id="createDate"
                     className="form-control"
-                    placeholder="Fecha de creación"
+                    placeholder="Fecha de Creación"
                     value={createDate}
                     onChange={(e) => setCreateDate(e.target.value)}
                   />
-                  {/* <input
-                    type="datetime-local"
-                    id="createDate"
-                    className="form-control"
-                    value={createDate ? createDate.toISOString().substring(0, 16) : ""}
-                    onChange={(e) => setCreateDate(e.target.value ? new Date(e.target.value) : null)}
-                  /> */}
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-solid fa-tasks"></i>
-                  </span>
-                </div>
-                <div className="d-grid col-6 mx-auto">
-                  <button onClick={validar} className="btn btn-success">
-                    <i className="fa-solid fa-floppy-disk m-2"></i>Guardar
-                  </button>
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button"
-                  className="btn btn-secondary m-2"
+                <button
+                  type="button"
+                  className="btn btn-secondary"
                   data-bs-dismiss="modal"
-                  id="btnCerrar">Cerrar</button>
+                  id="btnCerrar"
+                >
+                  Cerrar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={validar}
+                >
+                  Guardar
+                </button>
               </div>
             </div>
           </div>
@@ -310,4 +290,4 @@ const Criticalities: React.FC = () => {
   );
 };
 
-export default Criticalities; 
+export default CriticityType;
