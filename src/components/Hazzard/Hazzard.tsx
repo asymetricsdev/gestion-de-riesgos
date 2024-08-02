@@ -10,16 +10,17 @@ import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-interface CheckerType {
+interface Hazzard {
   id: string;
   name: string;
   description: string;
   createDate: string;
+ 
 }
 
-const CheckerType: React.FC = () => {
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/checker_type/";
-  const [checkertype, setCheckerType] = useState<CheckerType[]>([]);
+const Hazzard: React.FC = () => {
+  const URL = "https://asymetricsbackend.uk.r.appspot.com/hazzard/";
+  const [hazzard, setHazzard] = useState<Hazzard[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -42,26 +43,32 @@ const CheckerType: React.FC = () => {
 
   const getUsers = async () => {
     try {
-      const response: AxiosResponse<CheckerType[]> = await axios.get(URL);
-      setCheckerType(response.data);
+      const response: AxiosResponse<Hazzard[]> = await axios.get(URL);
+      const data = response.data.map(hazzard => ({
+        ...hazzard,
+       
+      }));
+      setHazzard(data);
     } catch (error) {
-      showAlert("Error al obtener division", "error");
+      showAlert("Error al obtener Peligro", "error");
     }
   };
 
-  const openModal = (op: string, checkertype?: CheckerType) => {
-    if (checkertype) {
-      setId(checkertype.id);
-      setName(checkertype.name);
-      setDescription(checkertype.description);
-      setCreateDate(checkertype.createDate);
+  const openModal = (op: string, hazzard?: Hazzard) => {
+    if (hazzard) {
+      setId(hazzard.id);
+      setName(hazzard.name);
+      setDescription(hazzard.description);
+      setCreateDate(hazzard.createDate);
+      
     } else {
       setId("");
       setName("");
       setDescription("");
       setCreateDate("");
+      
     }
-    setTitle(op === "1" ? "Registrar División" : "Editar División");
+    setTitle(op === "1" ? "Registrar Peligro" : "Editar Peligro");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -77,29 +84,36 @@ const CheckerType: React.FC = () => {
   };
 
   const validar = () => {
-    if (name.trim() === "") {
+    if (!name.trim()) {
       showAlert("Escribe el nombre", "warning", "nombre");
       return;
     }
-    if (description.trim() === "") {
+    if (!description.trim()) {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
-    if (createDate.trim() === "") {
+    if (!createDate.trim()) {
       showAlert("Escribe la fecha", "warning", "fecha");
       return;
     }
-  
-    // Asegúrate de que 'createDate' esté correctamente configurado en 'parametros'
-    const parametros = { id, name: name.trim(), description: description.trim(), createDate: createDate.trim() };
+    
+    
+
+    const parametros = { 
+      id, 
+      name: name.trim(), 
+      description: description.trim(), 
+      createDate: createDate.trim(),
+      
+    };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
-  
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-      const url = method === "PUT" && id ? `${URL}` : URL;
+      console.log("Sending data:", data); // Debug log
+      const url = method === "PUT" && id ? `${URL}${id}` : URL;
       const response = await axios({
         method,
         url,
@@ -107,37 +121,35 @@ const CheckerType: React.FC = () => {
         headers: { "Content-Type": "application/json" },
       });
 
+      console.log("Response:", response); // Debug log
+
       const { tipo, msj } = response.data;
       showAlert(msj, tipo);
       getUsers();
       if (tipo === "success") {
-        // Cierra el modal después de un segundo para permitir la actualización
         setTimeout(() => {
           const closeModalButton = document.getElementById("btnCerrar");
           if (closeModalButton) {
             closeModalButton.click();
           }
-          getUsers(); // Actualiza la lista de usuarios
         }, 500);
       }
     } catch (error) {
       showAlert("Error al enviar la solicitud", "error");
-      console.error(error);
+      console.error("Error sending request:", error); // Debug log
     }
   };
 
   const deleteUser = async (id: string) => {
     try {
       await axios.delete(`${URL}${id}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' }
       });
       showAlert("Usuario eliminado correctamente", "success");
-      getUsers(); 
+      getUsers();
     } catch (error) {
       showAlert("Error al eliminar el usuario", "error");
-      console.error(error);
+      console.error("Error deleting user:", error); // Debug log
     }
   };
 
@@ -147,37 +159,38 @@ const CheckerType: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Verificaciones' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Peligro' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center" 
-                style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
-                color: '#fff' }}>
+                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
+                  color: '#fff' }}>
                   <tr>
                     <th>ID</th>
                     <th>Nombre</th>
-                    <th>Descripción </th>
+                    <th>Descripción</th>
                     <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {checkertype.map((user, i) => (
-                    <tr key={user.id} className="text-center">
+                  {hazzard.map((haz, i) => (
+                    <tr key={haz.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{user.name}</td>
-                      <td>{user.description}</td>
-                      <td>{user.createDate}</td>
+                      <td>{haz.name}</td>
+                      <td>{haz.description}</td>
+                      <td>{haz.createDate}</td>
+
                       <td className="text-center">
                         <button
-                        onClick={() => openModal("2", user)}
-                        className="btn btn-custom-editar m-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalUsers"
-                      >
-                        <i className="fa-solid fa-edit"></i>
-                      </button>
+                          onClick={() => openModal("2", haz)}
+                          className="btn btn-custom-editar m-2"
+                          data-bs-toggle="modal"
+                          data-bs-target="#modalUsers"
+                        >
+                          <i className="fa-solid fa-edit"></i>
+                        </button>
                         <button className="btn btn-custom-danger" onClick={() => {
                           MySwal.fire({
                             title: "¿Estás seguro?",
@@ -188,7 +201,7 @@ const CheckerType: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteUser(user.id);
+                              deleteUser(haz.id);
                             }
                           });
                         }}
@@ -207,15 +220,18 @@ const CheckerType: React.FC = () => {
           className="modal fade"
           id="modalUsers"
           ref={modalRef}
-        data-bs-backdrop="true"
-        data-bs-keyboard="true"
-          aria-labelledby="staticBackdropLabel"
+          data-bs-backdrop="true"
+          data-bs-keyboard="false"
+          tabIndex={-1}
+          aria-labelledby="modalTitle"
           aria-hidden="true"
         >
           <div className="modal-dialog">
             <div className="modal-content">
-              <div className="modal-header text-white">
-                <label className="h5">{title}</label>
+              <div className="modal-header">
+                <h1 className="modal-title fs-5" id="modalTitle">
+                  {title}
+                </h1>
                 <button
                   type="button"
                   className="btn-close"
@@ -224,14 +240,13 @@ const CheckerType: React.FC = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
                     <i className="fa-solid fa-user"></i>
                   </span>
                   <input
                     type="text"
-                    id="nombre"
+                    id="name"
                     className="form-control"
                     placeholder="Nombre"
                     value={name}
@@ -240,11 +255,11 @@ const CheckerType: React.FC = () => {
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-regular fa-solid fa-file-alt"></i>
+                    <i className="fa-solid fa-envelope"></i>
                   </span>
                   <input
                     type="text"
-                    id="descripcion"
+                    id="description"
                     className="form-control"
                     placeholder="Descripción"
                     value={description}
@@ -253,13 +268,13 @@ const CheckerType: React.FC = () => {
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-calendar-days"></i>
+                    <i className="fa-solid fa-calendar"></i>
                   </span>
                   <input
                     type="text"
                     id="createDate"
                     className="form-control"
-                    placeholder="Fecha de Creación"
+                    placeholder="Fecha"
                     value={createDate}
                     onChange={(e) => setCreateDate(e.target.value)}
                   />
@@ -274,11 +289,7 @@ const CheckerType: React.FC = () => {
                 >
                   Cerrar
                 </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                >
+                <button type="button" className="btn btn-primary" onClick={validar}>
                   Guardar
                 </button>
               </div>
@@ -290,4 +301,4 @@ const CheckerType: React.FC = () => {
   );
 };
 
-export default CheckerType;
+export default Hazzard;

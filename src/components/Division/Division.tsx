@@ -10,16 +10,16 @@ import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-interface CheckerType {
+interface Division {
   id: string;
   name: string;
   description: string;
   createDate: string;
 }
 
-const CheckerType: React.FC = () => {
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/checker_type/";
-  const [checkertype, setCheckerType] = useState<CheckerType[]>([]);
+const Division: React.FC = () => {
+  const URL = "https://asymetricsbackend.uk.r.appspot.com/division/";
+  const [division, setDivision] = useState<Division[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -42,19 +42,19 @@ const CheckerType: React.FC = () => {
 
   const getUsers = async () => {
     try {
-      const response: AxiosResponse<CheckerType[]> = await axios.get(URL);
-      setCheckerType(response.data);
+      const response: AxiosResponse<Division[]> = await axios.get(URL);
+      setDivision(response.data);
     } catch (error) {
       showAlert("Error al obtener division", "error");
     }
   };
 
-  const openModal = (op: string, checkertype?: CheckerType) => {
-    if (checkertype) {
-      setId(checkertype.id);
-      setName(checkertype.name);
-      setDescription(checkertype.description);
-      setCreateDate(checkertype.createDate);
+  const openModal = (op: string, division?: Division) => {
+    if (division) {
+      setId(division.id);
+      setName(division.name);
+      setDescription(division.description);
+      setCreateDate(division.createDate);
     } else {
       setId("");
       setName("");
@@ -147,7 +147,7 @@ const CheckerType: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Verificaciones' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Division' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
@@ -163,7 +163,7 @@ const CheckerType: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {checkertype.map((user, i) => (
+                  {division.map((user, i) => (
                     <tr key={user.id} className="text-center">
                       <td>{i + 1}</td>
                       <td>{user.name}</td>
@@ -290,4 +290,4 @@ const CheckerType: React.FC = () => {
   );
 };
 
-export default CheckerType;
+export default Division;

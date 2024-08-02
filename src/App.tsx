@@ -14,7 +14,11 @@ import ActivitiesPage from './pages/ActivitiesPage';
 import Criticidad from './pages/CriticityPage';
 import Comprobaciones from './pages/CheckerPage';
 import { Container, Row, Col } from 'react-bootstrap';
+import Division from './components/Division/Division';
+import Peligro from './components/Hazzard/Hazzard';
 import './AppStyle.css';
+
+
 
 export function App() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,7 +39,7 @@ export function App() {
                         <Col xs={isMenuOpen ? 10 : 11} className="main-content">
                             <Routes>
                                 <Route path="/home" element={<Home />} />
-                                <Route path="/matriz-de-peligro" element={<PlanificadorActividad />} />
+                                <Route path="/matriz-de-peligro" element={<MatrizPeligro />} />
                                 <Route path="/matriz-de-peligro/riesgos" element={<MatrizPeligro />} />
                                 <Route path="/matriz-de-peligro/criticidad-de-peligro" element={<Criticidad />} />
                                 <Route path="/matriz-de-peligro/comprobaciones" element={<Comprobaciones />} />
@@ -46,6 +50,10 @@ export function App() {
                                 <Route path="/admin/tareas" element={<Tareas />} />
                                 <Route path="/admin/company" element={<Company />} />
                                 <Route path="/admin/actividades" element={<ActivitiesPage />} />
+                                <Route path="/admin/division" element={<Division />} />
+                                <Route path="/admin/peligro" element={<Peligro />} />
+                                
+                                
                             </Routes>
                         </Col>
                     </Row>

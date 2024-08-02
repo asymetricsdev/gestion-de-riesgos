@@ -1,9 +1,13 @@
-import Risks from "../components/RiskMatrix/RiskMatrix";
+import ActivityPlanner from "../components/ActivityPlanner/ActivityPlanner";
+import DangerTable from "../components/DangerTable/DangerTable";
+import Header from "../components/Header/Header";
 
 export default function MatrizPeligroPage() {
   return (
     <div>
-      <Risks />
+      <ActivityPlanner />
+      <DangerTable />
+      
     </div>
   )
 }
