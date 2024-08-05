@@ -16,6 +16,7 @@ import Comprobaciones from './pages/CheckerPage';
 import { Container, Row, Col } from 'react-bootstrap';
 import Division from './components/Division/Division';
 import Peligro from './components/Hazzard/Hazzard';
+import Ciudad from './components/City/City';
 import './AppStyle.css';
 
 
@@ -52,6 +53,7 @@ export function App() {
                                 <Route path="/admin/actividades" element={<ActivitiesPage />} />
                                 <Route path="/admin/division" element={<Division />} />
                                 <Route path="/admin/peligro" element={<Peligro />} />
+                                <Route path="/admin/ciudad" element={<Ciudad />} />
                                 
                                 
                             </Routes>
