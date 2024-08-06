@@ -1,4 +1,4 @@
-import './DangerHeadStyle.css';
+// import './DangerHeadStyle.css';
 
 interface DangerHeadProps {
     title: string;

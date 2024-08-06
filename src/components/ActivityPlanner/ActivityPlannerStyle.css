@@ -1,11 +1,46 @@
 .custom-margin {
-    margin-top: 50px; /* Ajusta este valor según tus necesidades */
-    border-radius: 10px;
+  margin-top: 50px; 
+  border-radius: 10px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.navbar-custom {
+  background-color: #F8F9FA; /* Fondo del submenú */
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 55px;
+  margin-bottom: 20px;
+  border: 2px solid #0D6EFD;
+}
+
+.navbar-nav .nav-item .nav-link {
+  color: #000000; /* Color del texto */
+  font-weight: bolder;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border-radius: 5px;
+}
+
+ .navbar-nav .nav-item .nav-link:hover {
+  background-color: #42b2e3; 
+  color: #ffffff;
+} 
+ 
+.navbar-nav .nav-item.active .nav-link {
+  background-color: #009EE2; 
+  color: #ffffff;
+} 
+
+/* Estilos de accesibilidad */
+ /* .navbar-nav .nav-item .nav-link:focus {
+  outline: 3px solid #42b2e3; 
+} */
+ 
+@media (max-width: 767px) {
+  .navbar-custom {
+    padding: 15px;
   }
-  
-  .full-width {
-    width: 100%;
-  }
-  
-  
-  
+}
