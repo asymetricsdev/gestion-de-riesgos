@@ -239,7 +239,9 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 )}
             </Nav>
             <button onClick={toggleSidebar} className="btn-sidebar">
-                <FontAwesomeIcon icon={isOpen ? faChevronLeft : faChevronRight} />
+                <OverlayTrigger placement="right" overlay={ isOpen ? renderTooltip('cerrar') : renderTooltip('abrir')}>
+                    <FontAwesomeIcon icon={isOpen ? faChevronLeft : faChevronRight} />
+                </OverlayTrigger>
             </button>
         </div>
 

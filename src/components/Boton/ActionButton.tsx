@@ -1,6 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import './ActionButtonStyle.css'; 
 
 interface ActionButtonProps {
@@ -8,13 +9,19 @@ interface ActionButtonProps {
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({ onClick }) => {
+  const renderTooltip = (props: any) => (
+    <Tooltip id="button-tooltip" {...props}>
+      Agregar datos
+    </Tooltip>
+  );
+
   return (
-    <button onClick={onClick} className="action-button">
-      <FontAwesomeIcon icon={faPlus} />
-    </button>
+    <OverlayTrigger placement="top" overlay={renderTooltip}>
+      <button onClick={onClick} className="action-button">
+        <FontAwesomeIcon icon={faPlus} />
+      </button>
+    </OverlayTrigger>
   );
 };
 
 export default ActionButton;
-
-
