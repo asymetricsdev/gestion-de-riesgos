@@ -4,7 +4,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faExclamationTriangle, faCalendarAlt, faFileAlt, faChevronDown, faChevronUp, faUsers, 
   faAddressCard, faListCheck, faUserTie, faBuilding, faCheckCircle, faBolt, faPeopleRobbery, 
   faCircleExclamation, faSitemap, faCircleRadiation,
-  faCity} from '@fortawesome/free-solid-svg-icons';
+  faCity,
+  faPoundSign,
+  faUserSecret,
+  faUserGear} from '@fortawesome/free-solid-svg-icons';
 import { NavLink } from 'react-router-dom';
 import './MenuStyle.css';
 
@@ -103,6 +106,10 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             <NavLink to="/admin/ciudad" className="nav-link text-white d-flex align-items-center">
               <FontAwesomeIcon icon={faCity} className="me-2" />
               <span>Ciudad</span>
+            </NavLink>
+            <NavLink to="/admin/posicion" className="nav-link text-white d-flex align-items-center">
+              <FontAwesomeIcon icon={faUserGear} className="me-2" />
+              <span>Posicion</span>
             </NavLink>
           </div>
         )}

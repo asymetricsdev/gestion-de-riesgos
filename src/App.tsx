@@ -17,7 +17,9 @@ import { Container, Row, Col } from 'react-bootstrap';
 import Division from './components/Division/Division';
 import Peligro from './components/Hazzard/Hazzard';
 import Ciudad from './components/City/City';
+import Posicion from './components/Position/Position';
 import './AppStyle.css';
+
 
 
 
@@ -54,6 +56,7 @@ export function App() {
                                 <Route path="/admin/division" element={<Division />} />
                                 <Route path="/admin/peligro" element={<Peligro />} />
                                 <Route path="/admin/ciudad" element={<Ciudad />} />
+                                <Route path="/admin/posicion" element={<Posicion />} />
                                 
                                 
                             </Routes>
