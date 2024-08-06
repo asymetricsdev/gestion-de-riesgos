@@ -5,6 +5,7 @@ import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
 
@@ -153,6 +154,18 @@ const City: React.FC = () => {
     }
   };
 
+  const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-edit" {...props}>
+		  Editar
+		</Tooltip>
+	  );
+	  
+	  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-delete" {...props}>
+		  Eliminar
+		</Tooltip>
+	  );
+
   return (
     <div className="App">
       <div className="container-fluid">
@@ -183,6 +196,7 @@ const City: React.FC = () => {
                       <td>{cit.createDate}</td>
 
                       <td className="text-center">
+                        <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button
                           onClick={() => openModal("2", cit)}
                           className="btn btn-custom-editar m-2"
@@ -191,6 +205,8 @@ const City: React.FC = () => {
                         >
                           <i className="fa-solid fa-edit"></i>
                         </button>
+                      </OverlayTrigger>
+                      <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
                         <button className="btn btn-custom-danger" onClick={() => {
                           MySwal.fire({
                             title: "¿Estás seguro?",
@@ -208,6 +224,7 @@ const City: React.FC = () => {
                         >
                           <FontAwesomeIcon icon={faCircleXmark} />
                         </button>
+                      </OverlayTrigger>
                       </td>
                     </tr>
                   ))}

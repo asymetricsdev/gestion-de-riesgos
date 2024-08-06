@@ -6,6 +6,7 @@ import { showAlert } from '../functions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
@@ -15,6 +16,7 @@ interface User {
   name: string;
   email: string;
   priority: string;
+  
 }
 
 const ShowUsers: React.FC = () => {
@@ -109,13 +111,12 @@ const ShowUsers: React.FC = () => {
       showAlert(msj, tipo);
       getUsers();
       if (tipo === "success") {
-        // Cierra el modal después de un segundo para permitir la actualización
         setTimeout(() => {
           const closeModalButton = document.getElementById("btnCerrar");
           if (closeModalButton) {
             closeModalButton.click();
           }
-          getUsers(); // Actualiza la lista de usuarios
+          getUsers();
         }, 500);
       }
     } catch (error) {
@@ -138,6 +139,18 @@ const ShowUsers: React.FC = () => {
       console.error(error);
     }
   };
+
+  const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+    <Tooltip id="button-tooltip-edit" {...props}>
+      Editar
+    </Tooltip>
+  );
+  
+  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+    <Tooltip id="button-tooltip-delete" {...props}>
+      Eliminar
+    </Tooltip>
+  );
 
   return (
     <div className="App">
@@ -168,31 +181,35 @@ const ShowUsers: React.FC = () => {
                       <td>{user.email}</td>
                       <td>{user.priority}</td>
                       <td className="text-center">
-                        <button
-                        onClick={() => openModal("2", user)}
-                        className="btn btn-custom-editar m-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalUsers"
-                      >
-                        <i className="fa-solid fa-edit"></i>
-                      </button>
-                        <button className="btn btn-custom-danger" onClick={() => {
-                          MySwal.fire({
-                            title: "¿Estás seguro?",
-                            text: "No podrás revertir esto",
-                            icon: "warning",
-                            showCancelButton: true,
-                            confirmButtonText: "Sí, bórralo",
-                            cancelButtonText: "Cancelar",
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              deleteUser(user.id);
-                            }
-                          });
-                        }}
-                        >
-                          <FontAwesomeIcon icon={faCircleXmark} />
-                        </button>
+                        <OverlayTrigger placement="top" overlay={renderEditTooltip}>
+                          <button
+                            onClick={() => openModal("2", user)}
+                            className="btn btn-custom-editar m-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalUsers"
+                          >
+                            <i className="fa-solid fa-edit"></i>
+                          </button>
+                        </OverlayTrigger>
+                        <OverlayTrigger placement="top" overlay={renderDeleteTooltip}>
+                          <button className="btn btn-custom-danger" onClick={() => {
+                            MySwal.fire({
+                              title: "¿Estás seguro?",
+                              text: "No podrás revertir esto",
+                              icon: "warning",
+                              showCancelButton: true,
+                              confirmButtonText: "Sí, bórralo",
+                              cancelButtonText: "Cancelar",
+                            }).then((result) => {
+                              if (result.isConfirmed) {
+                                deleteUser(user.id);
+                              }
+                            });
+                          }}
+                          >
+                            <FontAwesomeIcon icon={faCircleXmark} />
+                          </button>
+                        </OverlayTrigger>
                       </td>
                     </tr>
                   ))}
