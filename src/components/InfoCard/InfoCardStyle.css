@@ -1,25 +1,31 @@
 .info-card-container {
-    position: relative;
-    right: -60px;
-    width: 60%;
-    margin-top: 82px;
-    margin-bottom: 5px;
-  }
-  
-  .info-card {
-    background-color: #f5f5f5;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-    color: #333;
-  }
-  
-  .info-card p {
-    margin: 0;
-    padding: 0 10px;
-  }
-  
+  position: relative;
+  right: 180px;
+  width: 100%;
+  max-width: 600px;
+  margin: 45px auto;
+  margin-top: 50px;
+  padding: 0 15px;
+}
+
+.info-card {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 16px;
+  color: #333;
+}
+
+.info-card p {
+  margin: 0;
+  padding: 3px 0;
+}
+
+/* Mejora de la accesibilidad */
+.info-card strong {
+  color: #000;
+}

@@ -41,9 +41,6 @@ export function App() {
                             <Routes>
                                 <Route path="/home" element={<Home />} />
                                 <Route path="/matriz-de-peligro" element={<MatrizPeligro />} />
-                                <Route path="/matriz-de-peligro/riesgos" element={<MatrizPeligro />} />
-                                <Route path="/matriz-de-peligro/criticidad-de-peligro" element={<Criticidad />} />
-                                <Route path="/matriz-de-peligro/comprobaciones" element={<Comprobaciones />} />
                                 <Route path="/planificador-de-actividad" element={< PlanificadorActividad/>} />
                                 <Route path="/matriz-legal" element={<MatrizLegal />} />
                                 <Route path="/admin/usuarios" element={<Usuarios />} />
@@ -53,9 +50,10 @@ export function App() {
                                 <Route path="/admin/actividades" element={<ActivitiesPage />} />
                                 <Route path="/admin/division" element={<Division />} />
                                 <Route path="/admin/peligro" element={<Peligro />} />
+                                <Route path="/admin/matriz-de-peligro/riesgos" element={<MatrizPeligro />} />
+                                <Route path="/admin/matriz-de-peligro/criticidad-de-peligro" element={<Criticidad />} />
+                                <Route path="/admin/matriz-de-peligro/comprobaciones" element={<Comprobaciones />} />
                                 <Route path="/admin/ciudad" element={<Ciudad />} />
-                                
-                                
                             </Routes>
                         </Col>
                     </Row>

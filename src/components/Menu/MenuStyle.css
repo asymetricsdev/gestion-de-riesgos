@@ -65,3 +65,25 @@
     margin-right: 10px;
 }
 
+/* MenuStyle.css */
+.btn-sidebar {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%; 
+    padding: 0.5rem; 
+  }
+  
+.btn-sidebar:focus {
+    
+    outline: none;
+}
+
+.sidebar.open .btn-sidebar {
+    justify-content: flex-end;
+}
+  
