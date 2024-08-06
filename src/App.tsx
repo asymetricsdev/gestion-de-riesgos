@@ -18,6 +18,7 @@ import Division from './components/Division/Division';
 import Peligro from './components/Hazzard/Hazzard';
 import Ciudad from './components/City/City';
 import './AppStyle.css';
+import Process from './components/Process/Process';
 
 
 
@@ -45,7 +46,7 @@ export function App() {
                                 <Route path="/matriz-legal" element={<MatrizLegal />} />
                                 <Route path="/admin/usuarios" element={<Usuarios />} />
                                 <Route path="/admin/perfiles" element={<Perfiles />} />
-                                <Route path="/admin/tareas" element={<Tareas />} />
+                                <Route path="/admin/tareas" element={<Process />} />
                                 <Route path="/admin/company" element={<Company />} />
                                 <Route path="/admin/actividades" element={<ActivitiesPage />} />
                                 <Route path="/admin/division" element={<Division />} />
