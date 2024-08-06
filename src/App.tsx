@@ -16,6 +16,7 @@ import Comprobaciones from './pages/CheckerPage';
 import { Container, Row, Col } from 'react-bootstrap';
 import Division from './components/Division/Division';
 import Peligro from './components/Hazzard/Hazzard';
+import Ciudad from './components/City/City';
 import './AppStyle.css';
 
 
@@ -52,6 +53,7 @@ export function App() {
                                 <Route path="/admin/matriz-de-peligro/riesgos" element={<MatrizPeligro />} />
                                 <Route path="/admin/matriz-de-peligro/criticidad-de-peligro" element={<Criticidad />} />
                                 <Route path="/admin/matriz-de-peligro/comprobaciones" element={<Comprobaciones />} />
+                                <Route path="/admin/ciudad" element={<Ciudad />} />
                             </Routes>
                         </Col>
                     </Row>
