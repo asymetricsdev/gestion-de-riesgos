@@ -17,8 +17,10 @@ import { Container, Row, Col } from 'react-bootstrap';
 import Division from './components/Division/Division';
 import Peligro from './components/Hazzard/Hazzard';
 import Ciudad from './components/City/City';
+import Posicion from './components/Position/Position';
 import './AppStyle.css';
 import Process from './components/Process/Process';
+
 
 
 
@@ -55,6 +57,8 @@ export function App() {
                                 <Route path="/admin/matriz-de-peligro/criticidad-de-peligro" element={<Criticidad />} />
                                 <Route path="/admin/matriz-de-peligro/comprobaciones" element={<Comprobaciones />} />
                                 <Route path="/admin/ciudad" element={<Ciudad />} />
+                                <Route path="/admin/posicion" element={<Posicion />} />
+
                             </Routes>
                         </Col>
                     </Row>

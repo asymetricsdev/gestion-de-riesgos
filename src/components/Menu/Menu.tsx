@@ -244,7 +244,6 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 </OverlayTrigger>
             </button>
         </div>
-
     );
 }
 
