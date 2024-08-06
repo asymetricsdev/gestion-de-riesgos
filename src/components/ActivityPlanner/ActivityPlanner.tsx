@@ -1,10 +1,14 @@
-import React from 'react';
 import './ActivityPlannerStyle.css'; 
 
 export default function ActivityPlanner() {
   return (
-    <div className="container-fluid">
-      <nav className="navbar navbar-expand-lg navbar-light custom-margin full-width" style={{backgroundColor: '#e3f2fd'}}>
+    <div className="container-fluid custom-margin">
+      <nav className="navbar navbar-expand-lg navbar-light navbar-custom">
+        <button className="navbar-toggler" type="button" data-toggle="collapse" 
+        data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
+        aria-expanded="false" aria-label="Toggle navigation">
+          <span className="navbar-toggler-icon"></span>
+        </button>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav mr-auto">
             <li className="nav-item active">
@@ -23,5 +27,5 @@ export default function ActivityPlanner() {
         </div>
       </nav>
     </div>
-  )
+  );
 }

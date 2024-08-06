@@ -5,6 +5,7 @@ import withReactContent from "sweetalert2-react-content";
 import { showAlert } from "../functions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from "bootstrap";
 
@@ -171,6 +172,18 @@ const Profiles: React.FC = () => {
 		}
 	};
 
+	const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-edit" {...props}>
+		  Editar
+		</Tooltip>
+	  );
+	  
+	  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-delete" {...props}>
+		  Eliminar
+		</Tooltip>
+	  );
+
 	return (
 		<div className="App">
 			<div className="container-fluid">
@@ -207,6 +220,7 @@ const Profiles: React.FC = () => {
 											<td>{profile.createDate}</td>
 											<td>{profile.tasks}</td>
 											<td className="text-center">
+												<OverlayTrigger placement="top" overlay={renderEditTooltip}>
 												<button
 													onClick={() => openModal("2", profile)}
 													className="btn btn-custom-editar m-2"
@@ -215,6 +229,8 @@ const Profiles: React.FC = () => {
 												>
 													<i className="fa-solid fa-edit"></i>
 												</button>
+												</OverlayTrigger>
+												<OverlayTrigger placement="top" overlay={renderDeleteTooltip}>
 												<button
 													className="btn btn-custom-danger"
 													onClick={() => {
@@ -234,6 +250,7 @@ const Profiles: React.FC = () => {
 												>
 													<FontAwesomeIcon icon={faCircleXmark} />
 												</button>
+												</OverlayTrigger>
 											</td>
 										</tr>
 									))}

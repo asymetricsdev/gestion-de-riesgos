@@ -19,6 +19,7 @@ import Peligro from './components/Hazzard/Hazzard';
 import Ciudad from './components/City/City';
 import Posicion from './components/Position/Position';
 import './AppStyle.css';
+import Process from './components/Process/Process';
 
 
 
@@ -43,22 +44,21 @@ export function App() {
                             <Routes>
                                 <Route path="/home" element={<Home />} />
                                 <Route path="/matriz-de-peligro" element={<MatrizPeligro />} />
-                                <Route path="/matriz-de-peligro/riesgos" element={<MatrizPeligro />} />
-                                <Route path="/matriz-de-peligro/criticidad-de-peligro" element={<Criticidad />} />
-                                <Route path="/matriz-de-peligro/comprobaciones" element={<Comprobaciones />} />
                                 <Route path="/planificador-de-actividad" element={< PlanificadorActividad/>} />
                                 <Route path="/matriz-legal" element={<MatrizLegal />} />
                                 <Route path="/admin/usuarios" element={<Usuarios />} />
                                 <Route path="/admin/perfiles" element={<Perfiles />} />
-                                <Route path="/admin/tareas" element={<Tareas />} />
+                                <Route path="/admin/tareas" element={<Process />} />
                                 <Route path="/admin/company" element={<Company />} />
                                 <Route path="/admin/actividades" element={<ActivitiesPage />} />
                                 <Route path="/admin/division" element={<Division />} />
                                 <Route path="/admin/peligro" element={<Peligro />} />
+                                <Route path="/admin/matriz-de-peligro/riesgos" element={<MatrizPeligro />} />
+                                <Route path="/admin/matriz-de-peligro/criticidad-de-peligro" element={<Criticidad />} />
+                                <Route path="/admin/matriz-de-peligro/comprobaciones" element={<Comprobaciones />} />
                                 <Route path="/admin/ciudad" element={<Ciudad />} />
                                 <Route path="/admin/posicion" element={<Posicion />} />
-                                
-                                
+
                             </Routes>
                         </Col>
                     </Row>
