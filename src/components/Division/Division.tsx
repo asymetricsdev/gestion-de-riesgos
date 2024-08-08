@@ -224,8 +224,8 @@ const Division: React.FC = () => {
           className="modal fade"
           id="modalUsers"
           ref={modalRef}
-        data-bs-backdrop="true"
-        data-bs-keyboard="true"
+          data-bs-backdrop="true"
+          data-bs-keyboard="true"
           aria-labelledby="staticBackdropLabel"
           aria-hidden="true"
         >

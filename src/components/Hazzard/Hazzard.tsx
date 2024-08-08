@@ -16,7 +16,6 @@ interface Hazzard {
   name: string;
   description: string;
   createDate: string;
- 
 }
 
 const Hazzard: React.FC = () => {
@@ -45,29 +44,35 @@ const Hazzard: React.FC = () => {
   const getUsers = async () => {
     try {
       const response: AxiosResponse<Hazzard[]> = await axios.get(URL);
-      const data = response.data.map(hazzard => ({
-        ...hazzard,
-       
-      }));
-      setHazzard(data);
+      setHazzard(response.data);
     } catch (error) {
       showAlert("Error al obtener Peligro", "error");
     }
   };
 
+  //CREATEDATE
+    const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  
   const openModal = (op: string, hazzard?: Hazzard) => {
     if (hazzard) {
       setId(hazzard.id);
       setName(hazzard.name);
       setDescription(hazzard.description);
-      setCreateDate(hazzard.createDate);
-      
+      setCreateDate(formatDate(hazzard.createDate));
+      //const formattedDate = formatDate(hazzard.createDate);
+      //setCreateDate(formattedDate);
     } else {
       setId("");
       setName("");
       setDescription("");
       setCreateDate("");
-      
     }
     setTitle(op === "1" ? "Registrar Peligro" : "Editar Peligro");
 
@@ -85,34 +90,31 @@ const Hazzard: React.FC = () => {
   };
 
   const validar = () => {
-    if (!name.trim()) {
-      showAlert("Escribe el nombre", "warning", "nombre");
+    if (name.trim() === "") {
+      showAlert("Escribe el nombre", "warning", "nombre de Peligro");
       return;
     }
-    if (!description.trim()) {
+    if (description.trim() === "") {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
-    if (!createDate.trim()) {
+    if (createDate.trim() === "") {
       showAlert("Escribe la fecha", "warning", "fecha");
       return;
     }
-    
-    const parametros = { 
-      id, 
-      name: name.trim(), 
-      description: description.trim(), 
-      createDate: createDate.trim(),
-      
-    };
+
+    const date = new Date(createDate);
+    const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  
+    const parametros = { id, name: name.trim(), description: description.trim(), createDate: createDate.trim() };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
+  
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-      console.log("Sending data:", data); // Debug log
-      const url = method === "PUT" && id ? `${URL}${id}` : URL;
+      const url = method === "PUT" && id ? `${URL}` : URL;
       const response = await axios({
         method,
         url,
@@ -120,35 +122,37 @@ const Hazzard: React.FC = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      console.log("Response:", response); // Debug log
-
       const { tipo, msj } = response.data;
       showAlert(msj, tipo);
       getUsers();
       if (tipo === "success") {
+        // Cierra el modal después de un segundo para permitir la actualización
         setTimeout(() => {
           const closeModalButton = document.getElementById("btnCerrar");
           if (closeModalButton) {
             closeModalButton.click();
           }
+          getUsers(); // Actualiza la lista de usuarios
         }, 500);
       }
     } catch (error) {
       showAlert("Error al enviar la solicitud", "error");
-      console.error("Error sending request:", error); // Debug log
+      console.error(error);
     }
   };
 
   const deleteUser = async (id: string) => {
     try {
       await axios.delete(`${URL}${id}`, {
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       showAlert("Usuario eliminado correctamente", "success");
-      getUsers();
+      getUsers(); 
     } catch (error) {
       showAlert("Error al eliminar el usuario", "error");
-      console.error("Error deleting user:", error); // Debug log
+      console.error(error);
     }
   };
 
@@ -164,7 +168,6 @@ const Hazzard: React.FC = () => {
 		</Tooltip>
 	  );
 
-
   return (
     <div className="App">
       <div className="container-fluid">
@@ -176,36 +179,35 @@ const Hazzard: React.FC = () => {
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center" 
-                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
-                  color: '#fff' }}>
+                style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
+                color: '#fff' }}>
                   <tr>
                     <th>ID</th>
                     <th>Nombre</th>
-                    <th>Descripción</th>
+                    <th>Descripción </th>
                     <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {hazzard.map((haz, i) => (
-                    <tr key={haz.id} className="text-center">
+                  {hazzard.map((hazz, i) => (
+                    <tr key={hazz.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{haz.name}</td>
-                      <td>{haz.description}</td>
-                      <td>{haz.createDate}</td>
-
+                      <td>{hazz.name}</td>
+                      <td>{hazz.description}</td>
+                      <td>{hazz.createDate}</td>
                       <td className="text-center">
-                        <OverlayTrigger placement="top" overlay={renderEditTooltip}>
+                        <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button
-                          onClick={() => openModal("2", haz)}
-                          className="btn btn-custom-editar m-2"
-                          data-bs-toggle="modal"
-                          data-bs-target="#modalUsers"
-                        >
-                          <i className="fa-solid fa-edit"></i>
-                        </button>
-                        </OverlayTrigger>
-                        <OverlayTrigger placement="top" overlay={renderDeleteTooltip}>
+                        onClick={() => openModal("2", hazz)}
+                        className="btn btn-custom-editar m-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalUsers"
+                      >
+                        <i className="fa-solid fa-edit"></i>
+                      </button>
+                      </OverlayTrigger>
+                      <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
                         <button className="btn btn-custom-danger" onClick={() => {
                           MySwal.fire({
                             title: "¿Estás seguro?",
@@ -216,14 +218,13 @@ const Hazzard: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteUser(haz.id);
+                              deleteUser(hazz.id);
                             }
                           });
-                        }}
-                        >
+                        }}>
                           <FontAwesomeIcon icon={faCircleXmark} />
                         </button>
-                        </OverlayTrigger>
+                      </OverlayTrigger>
                       </td>
                     </tr>
                   ))}
@@ -232,22 +233,11 @@ const Hazzard: React.FC = () => {
             </div>
           </div>
         </div>
-        <div
-          className="modal fade"
-          id="modalUsers"
-          ref={modalRef}
-          data-bs-backdrop="true"
-          data-bs-keyboard="false"
-          tabIndex={-1}
-          aria-labelledby="modalTitle"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog">
+        <div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>
+          <div className="modal-dialog modal-dialog-top modal-md">
             <div className="modal-content">
               <div className="modal-header">
-                <h1 className="modal-title fs-5" id="modalTitle">
-                  {title}
-                </h1>
+                <h5 className="modal-title">{title}</h5>
                 <button
                   type="button"
                   className="btn-close"
@@ -256,44 +246,43 @@ const Hazzard: React.FC = () => {
                 ></button>
               </div>
               <div className="modal-body">
+                <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-user"></i>
+                    <i className="fa-solid fa-circle-radiation"></i>
                   </span>
                   <input
                     type="text"
-                    id="name"
+                    id="nombre"
                     className="form-control"
-                    placeholder="Nombre"
+                    placeholder="Nombre Peligro"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-envelope"></i>
+                    <i className="fa-regular fa-solid fa-file-alt"></i>
                   </span>
                   <input
                     type="text"
-                    id="description"
+                    id="descripcion"
                     className="form-control"
                     placeholder="Descripción"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-solid fa-calendar"></i>
-                  </span>
-                  <input
-                    type="text"
-                    id="createDate"
-                    className="form-control"
-                    placeholder="Fecha"
-                    value={createDate}
-                    onChange={(e) => setCreateDate(e.target.value)}
-                  />
+                <div className="col-md-12 mb-3">
+                    <div className="form-group">
+                      <input
+                        type="date"
+                        id="createDate"
+                        className="form-control"
+                        value={createDate}
+                        onChange={(e) => setCreateDate(e.target.value)}
+                      />
+                 </div>
                 </div>
               </div>
               <div className="modal-footer">
@@ -305,7 +294,11 @@ const Hazzard: React.FC = () => {
                 >
                   Cerrar
                 </button>
-                <button type="button" className="btn btn-primary" onClick={validar}>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={validar}
+                >
                   Guardar
                 </button>
               </div>
