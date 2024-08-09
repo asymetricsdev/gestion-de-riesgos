@@ -23,7 +23,8 @@ import {
 	faUserSecret,
 	faUserGear,
     faChevronLeft,
-    faChevronRight
+    faChevronRight,
+    faChartLine
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { NavLink } from 'react-router-dom';
@@ -232,6 +233,18 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                             <OverlayTrigger placement="right" overlay={renderTooltip('Checker')}>
                                 <NavLink to="/admin/matriz-de-peligro/comprobaciones" className="nav-link text-white d-flex align-items-center">
                                     <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
+                        {isOpen ? (
+                            <NavLink to="/admin/actividad" className="nav-link text-white d-flex align-items-center">
+                                <FontAwesomeIcon icon={faCheckCircle} className="me-2" />
+                                <span>Actividad</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Actividad')}>
+                                <NavLink to="/admin/actividad" className="nav-link text-white d-flex align-items-center">
+                                    <FontAwesomeIcon icon={faChartLine} className="me-2" />
                                 </NavLink>
                             </OverlayTrigger>
                         )}
