@@ -23,8 +23,6 @@ import Process from './components/Process/Process';
 import Actividad from './components/ActividadTabla/ActividadTabla';
 
 
-
-
 export function App() {
     const [isMenuOpen, setIsMenuOpen] = useState(true);
 
