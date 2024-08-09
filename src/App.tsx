@@ -8,7 +8,6 @@ import PlanificadorActividad from './pages/PlanificadorActividadPage';
 import MatrizLegal from './pages/MatrizLegalPage';
 import Usuarios from './pages/UsuariosPage';
 import Perfiles from  './pages/PerfilesPage';
-import Tareas from './pages/TareasPage';
 import Company from './pages/CompanyPage';
 import ActivitiesPage from './pages/ActivitiesPage';
 import Criticidad from './pages/CriticityPage';
@@ -19,7 +18,7 @@ import Peligro from './components/Hazzard/Hazzard';
 import Ciudad from './components/City/City';
 import Posicion from './components/Position/Position';
 import './AppStyle.css';
-import Process from './components/Process/Process';
+import Procesos from './components/Process/Process';
 import Actividad from './components/ActividadTabla/ActividadTabla';
 
 
@@ -47,7 +46,7 @@ export function App() {
                                 <Route path="/matriz-legal" element={<MatrizLegal />} />
                                 <Route path="/admin/usuarios" element={<Usuarios />} />
                                 <Route path="/admin/perfiles" element={<Perfiles />} />
-                                <Route path="/admin/tareas" element={<Process />} />
+                                <Route path="/admin/procesos" element={<Procesos />} />
                                 <Route path="/admin/company" element={<Company />} />
                                 <Route path="/admin/actividades" element={<ActivitiesPage />} />
                                 <Route path="/admin/division" element={<Division />} />
