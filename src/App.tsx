@@ -26,7 +26,7 @@ import Actividad from './components/ActividadTabla/ActividadTabla';
 
 
 export function App() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(true);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
