@@ -74,7 +74,7 @@ const Process: React.FC = () => {
         // setCreateDate(null);
         setCreateDate("");
       }
-      setTitle(op === "1" ? "Registrar Perfil" : "Editar Perfil");
+      setTitle(op === "1" ? "Registrar Proceso" : "Editar Proceso");
 
     setTimeout(() => {
       document.getElementById("nombre")?.focus();

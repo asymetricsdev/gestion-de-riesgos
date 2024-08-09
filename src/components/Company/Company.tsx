@@ -70,7 +70,7 @@ const Companies: React.FC = () => {
       // setCreateDate(null);
       setCreateDate("");
     }
-    setTitle(op === "1" ? "Registrar Perfil" : "Editar Perfil");
+    setTitle(op === "1" ? "Registrar Compañia" : "Editar Compañia");
 
     setTimeout(() => {
       document.getElementById("nombre")?.focus();

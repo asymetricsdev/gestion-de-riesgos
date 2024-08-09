@@ -62,7 +62,7 @@ const CriticityType: React.FC = () => {
       setDescription("");
       setCreateDate("");
     }
-    setTitle(op === "1" ? "Registrar División" : "Editar División");
+    setTitle(op === "1" ? "Registrar Criticidad" : "Editar Criticidad");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);

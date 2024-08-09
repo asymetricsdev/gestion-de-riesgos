@@ -70,7 +70,7 @@ const Risks: React.FC = () => {
       // setCreateDate(null);
       setCreateDate("");
     }
-    setTitle(op === "1" ? "Registrar Actividad" : "Editar Actividad");
+    setTitle(op === "1" ? "Registrar Riesgo" : "Editar Riesgo");
 
     setTimeout(() => {
       document.getElementById("nombre")?.focus();
