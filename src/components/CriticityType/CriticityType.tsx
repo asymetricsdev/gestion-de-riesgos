@@ -79,7 +79,7 @@ const CriticityType: React.FC = () => {
 
   const validar = () => {
     if (name.trim() === "") {
-      showAlert("Escribe el nombre", "warning", "nombre");
+      showAlert("Escribe el nombre de la criticidad", "warning", "nombre");
       return;
     }
     if (description.trim() === "") {
