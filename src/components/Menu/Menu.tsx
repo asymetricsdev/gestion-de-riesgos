@@ -114,13 +114,13 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                             </OverlayTrigger>
                         )}
                         {isOpen ? (
-                            <NavLink to="/admin/tareas" className="nav-link text-white d-flex align-items-center">
+                            <NavLink to="/admin/procesos" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-list-check"></i>
-                                <span>Tareas</span>
+                                <span>Procesos</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Tareas')}>
-                                <NavLink to="/admin/tareas" className="nav-link text-white d-flex align-items-center">
+                                <NavLink to="/admin/procesos" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-list-check"></i>
                                 </NavLink>
                             </OverlayTrigger>
