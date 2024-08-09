@@ -20,6 +20,7 @@ import Ciudad from './components/City/City';
 import Posicion from './components/Position/Position';
 import './AppStyle.css';
 import Process from './components/Process/Process';
+import Actividad from './components/ActividadTabla/ActividadTabla';
 
 
 
@@ -58,6 +59,7 @@ export function App() {
                                 <Route path="/admin/matriz-de-peligro/comprobaciones" element={<Comprobaciones />} />
                                 <Route path="/admin/ciudad" element={<Ciudad />} />
                                 <Route path="/admin/posicion" element={<Posicion />} />
+                                <Route path="admin/actividad" element={<Actividad />} />
 
                             </Routes>
                         </Col>
