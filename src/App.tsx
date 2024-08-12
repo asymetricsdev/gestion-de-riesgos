@@ -20,12 +20,12 @@ import Posicion from './components/Position/Position';
 import './AppStyle.css';
 import Process from './components/Process/Process';
 import CargaImagenes from './components/CargaImagenes/CargaImagenes';
-
-
+import Procesos from './components/Process/Process';
+import Actividad from './components/ActividadTabla/ActividadTabla';
 
 
 export function App() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(true);
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -48,7 +48,7 @@ export function App() {
                                 <Route path="/matriz-legal" element={<MatrizLegal />} />
                                 <Route path="/admin/usuarios" element={<Usuarios />} />
                                 <Route path="/admin/perfiles" element={<Perfiles />} />
-                                <Route path="/admin/tareas" element={<Process />} />
+                                <Route path="/admin/procesos" element={<Procesos />} />
                                 <Route path="/admin/company" element={<Company />} />
                                 <Route path="/admin/actividades" element={<ActivitiesPage />} />
                                 <Route path="/admin/division" element={<Division />} />
@@ -58,6 +58,7 @@ export function App() {
                                 <Route path="/admin/matriz-de-peligro/comprobaciones" element={<Comprobaciones />} />
                                 <Route path="/admin/ciudad" element={<Ciudad />} />
                                 <Route path="/admin/posicion" element={<Posicion />} />
+                                <Route path="admin/actividad" element={<Actividad />} />
 
                             </Routes>
                         </Col>

@@ -17,7 +17,7 @@ interface Process {
   description: string;
 	createDate: string;
 	// createDate: Date;
-  activities: string;
+  //activities: string;
 }
 
 const Process: React.FC = () => {
@@ -74,7 +74,7 @@ const Process: React.FC = () => {
         // setCreateDate(null);
         setCreateDate("");
       }
-      setTitle(op === "1" ? "Registrar Perfil" : "Editar Perfil");
+      setTitle(op === "1" ? "Registrar Proceso" : "Editar Proceso");
 
     setTimeout(() => {
       document.getElementById("nombre")?.focus();
@@ -110,10 +110,10 @@ const Process: React.FC = () => {
 			showAlert("Escribe la fecha de creación", "warning", "createDate");
 			return;
 		}
-    if (activities.trim() === "") {
+    /* if (activities.trim() === "") {
         showAlert("Escribe la actividad", "warning", "actividad");
         return;
-      }
+    } */
 
     const parametros = {
       id,
@@ -121,7 +121,7 @@ const Process: React.FC = () => {
       description: description.trim(),
 			// createDate: createDate || new Date(),
 			createDate: createDate.trim(),
-      activities: activities.trim(),
+      //activities: activities.trim(),
     };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
@@ -188,7 +188,7 @@ const Process: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Process' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Procesos' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
@@ -199,7 +199,6 @@ const Process: React.FC = () => {
                     <th>Nombre</th>
                     <th>Descripción</th>
                     <th>Fecha de Creación</th>
-                    <th>Actividades</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -212,7 +211,6 @@ const Process: React.FC = () => {
 											{/* <td>{new Date(profile.createDate).toLocaleString()}</td> */}
 											{/* <td>{Process.createDate}</td> */}
                       <td>29/7/2024</td>
-                      <td>{Process.activities}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip}>
                         <button

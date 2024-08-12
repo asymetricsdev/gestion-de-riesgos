@@ -97,7 +97,7 @@ const Profiles: React.FC = () => {
 
 	const validar = () => {
 		if (name.trim() === "") {
-			showAlert("Escribe el nombre", "warning", "nombre");
+			showAlert("Escribe el nombre del proceso", "warning", "nombre");
 			return;
 		}
 		if (description.trim() === "") {
@@ -113,7 +113,7 @@ const Profiles: React.FC = () => {
 			return;
 		}
 		if (tasks.trim() === "") {
-			showAlert("Escribe las tareas", "warning", "tasks");
+			showAlert("Escribe las procesos", "warning", "tasks");
 			return;
 		}
 
