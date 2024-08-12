@@ -18,6 +18,8 @@ import Peligro from './components/Hazzard/Hazzard';
 import Ciudad from './components/City/City';
 import Posicion from './components/Position/Position';
 import './AppStyle.css';
+import Process from './components/Process/Process';
+import CargaImagenes from './components/CargaImagenes/CargaImagenes';
 import Procesos from './components/Process/Process';
 import Actividad from './components/ActividadTabla/ActividadTabla';
 
