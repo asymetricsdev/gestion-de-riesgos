@@ -8,7 +8,6 @@ import PlanificadorActividad from './pages/PlanificadorActividadPage';
 import MatrizLegal from './pages/MatrizLegalPage';
 import Usuarios from './pages/UsuariosPage';
 import Perfiles from  './pages/PerfilesPage';
-import Tareas from './pages/TareasPage';
 import Company from './pages/CompanyPage';
 import ActivitiesPage from './pages/ActivitiesPage';
 import Criticidad from './pages/CriticityPage';
@@ -20,6 +19,7 @@ import Ciudad from './components/City/City';
 import Posicion from './components/Position/Position';
 import './AppStyle.css';
 import Process from './components/Process/Process';
+import CargaImagenes from './components/CargaImagenes/CargaImagenes';
 
 
 
