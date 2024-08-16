@@ -3,11 +3,9 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
-import CargaImagenes from '../CargaImagenes/CargaImagenes';
 
 const MySwal = withReactContent(Swal);
 
@@ -16,18 +14,15 @@ interface CheckerType {
   name: string;
   description: string;
   createDate: string;
-  imageUrl?: string; // Agregamos el campo para almacenar la URL de la imagen
 }
 
 const CheckerType: React.FC = () => {
   const URL = "https://asymetricsbackend.uk.r.appspot.com/checker_type/";
-  const [checkertype, setCheckerType] = useState<CheckerType[]>([]);
+  const [checker, setChecker] = useState<CheckerType[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [createDate, setCreateDate] = useState<string>("");
   const [title, setTitle] = useState<string>("");
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -46,27 +41,24 @@ const CheckerType: React.FC = () => {
   const getUsers = async () => {
     try {
       const response: AxiosResponse<CheckerType[]> = await axios.get(URL);
-      setCheckerType(response.data);
+      setChecker(response.data);
     } catch (error) {
-      showAlert("Error al obtener division", "error");
+      showAlert("Error al obtener Tipo de Verificación", "error");
     }
   };
 
-  const openModal = (op: string, checkertype?: CheckerType) => {
-    if (checkertype) {
-      setId(checkertype.id);
-      setName(checkertype.name);
-      setDescription(checkertype.description);
-      setCreateDate(checkertype.createDate);
-      setUploadedImageUrl(checkertype.imageUrl || null);
+  
+  const openModal = (op: string, checker?: CheckerType) => {
+    if (checker) {
+      setId(checker.id);
+      setName(checker.name);
+      setDescription(checker.description);
     } else {
       setId("");
       setName("");
       setDescription("");
-      setCreateDate("");
-      setUploadedImageUrl(null);
     }
-    setTitle(op === "1" ? "Registrar División" : "Editar División");
+    setTitle(op === "1" ? "Registrar Tipo de Verificación" : "Editar Tipo de Verificación");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -83,56 +75,49 @@ const CheckerType: React.FC = () => {
 
   const validar = () => {
     if (name.trim() === "") {
-      showAlert("Escribe el nombre", "warning", "nombre");
+      showAlert("Escribe el nombre de la verificación", "warning", "nombre de la verificación");
       return;
     }
     if (description.trim() === "") {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
-    if (createDate.trim() === "") {
-      showAlert("Escribe la fecha", "warning", "fecha");
-      return;
-    }
-
-    const parametros = { 
-      id, 
-      name: name.trim(), 
-      description: description.trim(), 
-      createDate: createDate.trim(),
-      imageUrl: uploadedImageUrl // Añadimos la URL de la imagen a los parámetros
-    };
+    
+    const parametros = { id, name: name.trim(), description: description.trim() };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-      const url = method === "PUT" && id ? `${URL}${id}` : URL;
-      const response = await axios({
-        method,
-        url,
-        data,
-        headers: { "Content-Type": "application/json" },
-      });
+        // Si es una petición PUT, se añade el ID al final de la URL
+        const url = method === "PUT" && id ? `${URL}${id}` : URL;
+        const response = await axios({
+            method,
+            url,
+            data,
+            headers: { "Content-Type": "application/json" },
+        });
 
-      const { tipo, msj } = response.data;
-      showAlert(msj, tipo);
-      getUsers();
-      if (tipo === "success") {
-        setTimeout(() => {
-          const closeModalButton = document.getElementById("btnCerrar");
-          if (closeModalButton) {
-            closeModalButton.click();
-          }
-          getUsers(); 
-        }, 500);
-      }
+        const { tipo, msj } = response.data;
+        showAlert(msj, tipo);
+        getUsers();
+        if (tipo === "success") {
+            // Cierra el modal después de un segundo para permitir la actualización
+            setTimeout(() => {
+                const closeModalButton = document.getElementById("btnCerrar");
+                if (closeModalButton) {
+                    closeModalButton.click();
+                }
+                getUsers(); 
+            }, 500);
+        }
     } catch (error) {
-      showAlert("Error al enviar la solicitud", "error");
-      console.error(error);
+        showAlert("Error al enviar la solicitud", "error");
+        console.error(error);
     }
-  };
+};
+
 
   const deleteUser = async (id: string) => {
     try {
@@ -141,20 +126,30 @@ const CheckerType: React.FC = () => {
           'Content-Type': 'application/json'
         }
       });
-      showAlert("Usuario eliminado correctamente", "success");
+      showAlert("Proceso eliminado correctamente", "success");
       getUsers(); 
     } catch (error) {
-      showAlert("Error al eliminar el usuario", "error");
+      showAlert("Error al eliminar el proceso", "error");
       console.error(error);
     }
   };
 
-  const handleImageUpload = (imageUrl: string) => {
-    setUploadedImageUrl(imageUrl);
-    const updatedCheckertype = checkertype.map(item =>
-      item.id === id ? { ...item, imageUrl } : item
-    );
-    setCheckerType(updatedCheckertype);
+  const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-edit" {...props}>
+		  Editar
+		</Tooltip>
+	  );
+	  
+	  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-delete" {...props}>
+		  Eliminar
+		</Tooltip>
+	  );
+
+    // Función para formatear la fecha y eliminar la hora
+    const formatDate = (dateString: string) => {
+    // Solo toma la parte de la fecha (YYYY-MM-DD)
+    return dateString.split('T')[0];
   };
 
   return (
@@ -163,7 +158,7 @@ const CheckerType: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Verificaciones' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Tipo de Verificación' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
@@ -171,7 +166,7 @@ const CheckerType: React.FC = () => {
                 style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
                 color: '#fff' }}>
                   <tr>
-                    <th>ID</th>
+                    <th>N°</th>
                     <th>Nombre</th>
                     <th>Descripción </th>
                     <th>Fecha</th>
@@ -179,30 +174,24 @@ const CheckerType: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {checkertype.map((user, i) => (
-                    <tr key={user.id} className="text-center">
+                  {checker.map((check, i) => (
+                    <tr key={check.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{user.name}</td>
-                      <td>
-                        {user.description}
-                        {user.imageUrl && (
-                          <div>
-                            <a href={user.imageUrl} download className="btn btn-primary mt-3">
-                              Descargar Imagen
-                            </a>
-                          </div>
-                        )}
-                      </td>
-                      <td>{user.createDate}</td>
+                      <td>{check.name}</td>
+                      <td>{check.description}</td>
+                      <td>{formatDate(check.createDate)}</td>
                       <td className="text-center">
+                        <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button
-                        onClick={() => openModal("2", user)}
+                        onClick={() => openModal("2", check)}
                         className="btn btn-custom-editar m-2"
                         data-bs-toggle="modal"
                         data-bs-target="#modalUsers"
                       >
                         <i className="fa-solid fa-edit"></i>
                       </button>
+                      </OverlayTrigger>
+                      <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
                         <button className="btn btn-custom-danger" onClick={() => {
                           MySwal.fire({
                             title: "¿Estás seguro?",
@@ -213,13 +202,13 @@ const CheckerType: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteUser(user.id);
+                              deleteUser(check.id);
                             }
                           });
-                        }}
-                        >
-                          <FontAwesomeIcon icon={faCircleXmark} />
+                        }}>
+                          <i className="fa-solid fa-circle-xmark"></i>
                         </button>
+                      </OverlayTrigger>
                       </td>
                     </tr>
                   ))}
@@ -228,19 +217,11 @@ const CheckerType: React.FC = () => {
             </div>
           </div>
         </div>
-        <div
-          className="modal fade"
-          id="modalUsers"
-          ref={modalRef}
-        data-bs-backdrop="true"
-        data-bs-keyboard="true"
-          aria-labelledby="staticBackdropLabel"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog">
+        <div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>
+          <div className="modal-dialog modal-dialog-top modal-md">
             <div className="modal-content">
-              <div className="modal-header text-white">
-                <label className="h5">{title}</label>
+              <div className="modal-header">
+                <h5 className="modal-title w-100">{title}</h5>
                 <button
                   type="button"
                   className="btn-close"
@@ -252,13 +233,13 @@ const CheckerType: React.FC = () => {
                 <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-user"></i>
+                  <i className="fa-solid fa-check-circle"></i>
                   </span>
                   <input
                     type="text"
                     id="nombre"
                     className="form-control"
-                    placeholder="Nombre"
+                    placeholder="Nombre de la Verificación"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -277,25 +258,7 @@ const CheckerType: React.FC = () => {
                   />
                 </div>
                 <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-solid fa-calendar-days"></i>
-                  </span>
-                  <input
-                    type="text"
-                    id="createDate"
-                    className="form-control"
-                    placeholder="Fecha de Creación"
-                    value={createDate}
-                    onChange={(e) => setCreateDate(e.target.value)}
-                  />
                 </div>
-                <CargaImagenes 
-  onUploadSuccess={(base64Image) => {
-    // Aquí puedes manejar la imagen en base64
-    console.log('Imagen en base64:', base64Image);
-  }} 
-/>
-
               </div>
               <div className="modal-footer">
                 <button
@@ -319,6 +282,7 @@ const CheckerType: React.FC = () => {
         </div>
       </div>
     </div>
+  
   );
 };
 
