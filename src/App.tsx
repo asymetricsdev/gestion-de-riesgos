@@ -18,10 +18,9 @@ import Peligro from './components/Hazzard/Hazzard';
 import Ciudad from './components/City/City';
 import Posicion from './components/Position/Position';
 import './AppStyle.css';
-import Process from './components/Process/Process';
-import CargaImagenes from './components/CargaImagenes/CargaImagenes';
 import Procesos from './components/Process/Process';
 import Actividad from './components/ActividadTabla/ActividadTabla';
+import Tareas from './components/Tareas/Tareas';
 
 
 export function App() {
@@ -59,6 +58,7 @@ export function App() {
                                 <Route path="/admin/ciudad" element={<Ciudad />} />
                                 <Route path="/admin/posicion" element={<Posicion />} />
                                 <Route path="admin/actividad" element={<Actividad />} />
+                                <Route path="admin/tareas" element={<Tareas />} />
 
                             </Routes>
                         </Col>

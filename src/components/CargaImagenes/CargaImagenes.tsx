@@ -1,7 +1,7 @@
-
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Swal from 'sweetalert2';
+import { showAlert } from '../functions';
 import withReactContent from 'sweetalert2-react-content';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
@@ -10,14 +10,29 @@ import './CargaImagenes.css';
 const MySwal = withReactContent(Swal);
 
 interface CargaImagenesProps {
+  onFileUpload: (base64: string) => void;
   uploadUrl: string;
-  onUploadSuccess: (file: { base64: string, type: string }) => void;
+  onUploadSuccess: (url: string) => void;
+  fileExtension?: string;
+  onImageUpload: (base64: string, fileType: string) => void;
+  file: (base64: string, fileType: string) => void;
 }
 
-const CargaImagenes: React.FC<CargaImagenesProps> = ({ uploadUrl, onUploadSuccess }) => {
+const CargaImagenes: React.FC<CargaImagenesProps> = ({ onFileUpload, uploadUrl, onUploadSuccess, onImageUpload, file }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [uploadedFiles, setUploadedFiles] = useState<{ base64: string, type: string }[]>([]);
+  const [fileExtension, setFileExtension] = useState<string>("");
+
+  const extractFileExtension = (file: File): string => {
+    const extensionMap: { [key: string]: string } = {
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      'image/gif': 'gif',
+      'application/pdf': 'pdf',
+    };
+    return extensionMap[file.type] || 'unknown';
+  };
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -29,8 +44,12 @@ const CargaImagenes: React.FC<CargaImagenesProps> = ({ uploadUrl, onUploadSucces
         const base64 = reader.result as string;
         const fileType = acceptedFiles[0].type;
         const file = { base64, type: fileType };
+
+        const extension = extractFileExtension(acceptedFiles[0]);
+        setFileExtension(extension);
+
         setUploadedFiles(prevFiles => [...prevFiles, file]);
-        onUploadSuccess(file);
+        onUploadSuccess(file.base64);
         setLoading(false);
 
         setTimeout(() => {
@@ -61,7 +80,7 @@ const CargaImagenes: React.FC<CargaImagenesProps> = ({ uploadUrl, onUploadSucces
         {isDragActive ? (
           <p>Carga los archivos acá ...</p>
         ) : (
-          <p>Arrastre y suelte algunos archivos aquí o haga clic para seleccionar archivos</p>
+          <p>Puede arrastrar y soltar archivos aquí para añadirlos</p>
         )}
 
         {loading ? (
@@ -77,18 +96,11 @@ const CargaImagenes: React.FC<CargaImagenesProps> = ({ uploadUrl, onUploadSucces
           )
         )}
       </div>
+      <p className='text-parrafo-dropzone mt-1'>Tamaño máximo de archivo: 500kb, número máximo de archivos: 2</p>
+      <p><strong>Tipo de Archivos aceptados</strong>: .jpeg, .jpg, .png, .gif, .pdf</p>
 
-      {/* Mostrar los archivos subidos */}
       {uploadedFiles.length > 0 && (
         <div>
-          <h3>Archivos Subidos:</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Vista Previa</th>
-                <th>Descargar Imagen o Doc.</th>
-              </tr>
-            </thead>
             <tbody>
               {uploadedFiles.map((file, index) => (
                 <tr key={index}>
@@ -103,7 +115,7 @@ const CargaImagenes: React.FC<CargaImagenesProps> = ({ uploadUrl, onUploadSucces
                   </td>
                   <td>
                     <button type="button"
-                  className="btn btn-custom-editar m-2" onClick={() => {
+                     className="btn btn-custom-editar m-2" onClick={() => {
                       const link = document.createElement('a');
                       link.href = file.base64;
                       link.download = `archivo_${index + 1}${file.type.startsWith('image/') ? '.png' : '.pdf'}`;
@@ -115,10 +127,8 @@ const CargaImagenes: React.FC<CargaImagenesProps> = ({ uploadUrl, onUploadSucces
                 </tr>
               ))}
             </tbody>
-          </table>
         </div>
       )}
-
     </div>
   );
 };

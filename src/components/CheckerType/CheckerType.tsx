@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
-import CargaImagenes from '../CargaImagenes/CargaImagenes';
 
 const MySwal = withReactContent(Swal);
 
@@ -16,7 +15,6 @@ interface CheckerType {
   name: string;
   description: string;
   createDate: string;
-  imageUrl?: string; // Agregamos el campo para almacenar la URL de la imagen
 }
 
 const CheckerType: React.FC = () => {
@@ -27,7 +25,6 @@ const CheckerType: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [createDate, setCreateDate] = useState<string>("");
   const [title, setTitle] = useState<string>("");
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -58,13 +55,11 @@ const CheckerType: React.FC = () => {
       setName(checkertype.name);
       setDescription(checkertype.description);
       setCreateDate(checkertype.createDate);
-      setUploadedImageUrl(checkertype.imageUrl || null);
     } else {
       setId("");
       setName("");
       setDescription("");
       setCreateDate("");
-      setUploadedImageUrl(null);
     }
     setTitle(op === "1" ? "Registrar División" : "Editar División");
 
@@ -100,7 +95,6 @@ const CheckerType: React.FC = () => {
       name: name.trim(), 
       description: description.trim(), 
       createDate: createDate.trim(),
-      imageUrl: uploadedImageUrl // Añadimos la URL de la imagen a los parámetros
     };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
@@ -149,13 +143,6 @@ const CheckerType: React.FC = () => {
     }
   };
 
-  const handleImageUpload = (imageUrl: string) => {
-    setUploadedImageUrl(imageUrl);
-    const updatedCheckertype = checkertype.map(item =>
-      item.id === id ? { ...item, imageUrl } : item
-    );
-    setCheckerType(updatedCheckertype);
-  };
 
   return (
     <div className="App">
@@ -185,13 +172,6 @@ const CheckerType: React.FC = () => {
                       <td>{user.name}</td>
                       <td>
                         {user.description}
-                        {user.imageUrl && (
-                          <div>
-                            <a href={user.imageUrl} download className="btn btn-primary mt-3">
-                              Descargar Imagen
-                            </a>
-                          </div>
-                        )}
                       </td>
                       <td>{user.createDate}</td>
                       <td className="text-center">
@@ -289,13 +269,6 @@ const CheckerType: React.FC = () => {
                     onChange={(e) => setCreateDate(e.target.value)}
                   />
                 </div>
-                <CargaImagenes 
-  onUploadSuccess={(base64Image) => {
-    // Aquí puedes manejar la imagen en base64
-    console.log('Imagen en base64:', base64Image);
-  }} 
-/>
-
               </div>
               <div className="modal-footer">
                 <button
