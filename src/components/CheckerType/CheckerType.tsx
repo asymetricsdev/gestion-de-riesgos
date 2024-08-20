@@ -47,17 +47,16 @@ const CheckerType: React.FC = () => {
     }
   };
 
-  const openModal = (op: string, checkertype?: CheckerType) => {
-    if (checkertype) {
-      setId(checkertype.id);
-      setName(checkertype.name);
-      setDescription(checkertype.description);
-      setCreateDate(checkertype.createDate);
+  
+  const openModal = (op: string, checker?: CheckerType) => {
+    if (checker) {
+      setId(checker.id);
+      setName(checker.name);
+      setDescription(checker.description);
     } else {
       setId("");
       setName("");
       setDescription("");
-
     }
     setTitle(op === "1" ? "Registrar Tipo de Verificación" : "Editar Tipo de Verificación");
 
@@ -83,7 +82,8 @@ const CheckerType: React.FC = () => {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
-
+    
+    const parametros = { id, name: name.trim(), description: description.trim() };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
@@ -134,6 +134,24 @@ const CheckerType: React.FC = () => {
     }
   };
 
+  const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-edit" {...props}>
+		  Editar
+		</Tooltip>
+	  );
+	  
+	  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-delete" {...props}>
+		  Eliminar
+		</Tooltip>
+	  );
+
+    // Función para formatear la fecha y eliminar la hora
+    const formatDate = (dateString: string) => {
+    // Solo toma la parte de la fecha (YYYY-MM-DD)
+    return dateString.split('T')[0];
+  };
+
   return (
     <div className="App">
       <div className="container-fluid">
@@ -159,11 +177,9 @@ const CheckerType: React.FC = () => {
                   {checker.map((check, i) => (
                     <tr key={check.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{user.name}</td>
-                      <td>
-                        {user.description}
-                      </td>
-                      <td>{user.createDate}</td>
+                      <td>{check.name}</td>
+                      <td>{check.description}</td>
+                      <td>{formatDate(check.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button
@@ -250,6 +266,8 @@ const CheckerType: React.FC = () => {
                   className="btn btn-secondary"
                   data-bs-dismiss="modal"
                   id="btnCerrar"
+                >
+                  Cerrar
                 </button>
                 <button
                   type="button"
@@ -266,8 +284,6 @@ const CheckerType: React.FC = () => {
     </div>
   
   );
-                >
-                  Cerrar
 };
 
 export default CheckerType;
