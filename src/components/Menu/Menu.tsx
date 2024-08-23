@@ -233,6 +233,18 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                                 </NavLink>
                             </OverlayTrigger>
                         )}
+                        {isOpen ? (
+                            <NavLink to="/admin/empleado" className="nav-link text-white d-flex align-items-center">
+                               <i className="fa-solid fa-id-card-clip"></i>
+                                <span>Empleados</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Actividad')}>
+                                <NavLink to="/admin/empleado" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-id-card-clip"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
                     </div>
                 )}
             </Nav>
