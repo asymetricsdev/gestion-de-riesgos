@@ -227,13 +227,14 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                                 <span>Tareas</span>
                             </NavLink>
                         ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Actividad')}>
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Tareas')}>
                                 <NavLink to="/admin/tareas" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-bars-progress"></i>
                                 </NavLink>
                             </OverlayTrigger>
                         )}
                         {isOpen ? (
+
                             <NavLink to="/admin/empleado" className="nav-link text-white d-flex align-items-center">
                                <i className="fa-solid fa-id-card-clip"></i>
                                 <span>Empleados</span>
@@ -245,6 +246,20 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                                 </NavLink>
                             </OverlayTrigger>
                         )}
+
+                            <NavLink to="/admin/ciudad" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-tree-city"></i>
+                                <span>Ciudad</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Ciudad')}>
+                                <NavLink to="/admin/ciudad" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-tree-city"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
+                        
+
                     </div>
                 )}
             </Nav>

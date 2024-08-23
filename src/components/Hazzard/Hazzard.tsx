@@ -74,11 +74,13 @@ const Hazzard: React.FC = () => {
     try {
       const response: AxiosResponse<Hazzard[]> = await axios.get(URL);
       setHazzard(response.data);
+      console.log("Datos de Hazzard:", response.data);
     } catch (error) {
       showAlert("Error al obtener los peligros", "error");
     }
   };
   
+
   const getCriticityType = async () => {
     try {
       const response = await axios.get<CriticityType[]>('https://asymetricsbackend.uk.r.appspot.com/criticity_type/');
@@ -153,9 +155,11 @@ const Hazzard: React.FC = () => {
     // Tipado explícito para los parámetros a enviar
     const parametros: HazzardData = {
         name: name.trim(),
-        criticityTypeId: selectedCriticityTypeId,  
-        checkerId: selectedCheckerId                       
+        criticityTypeId: selectedCriticityTypeId,  // Enviando el objeto completo
+        checkerId: selectedCheckerId                       // Enviando el objeto completo
     };
+
+    console.log("Datos a enviar:", parametros);
 
 
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
