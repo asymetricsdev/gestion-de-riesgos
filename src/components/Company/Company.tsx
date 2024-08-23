@@ -10,10 +10,19 @@ import * as bootstrap from 'bootstrap';
 const MySwal = withReactContent(Swal);
 
 interface Company {
-  id: string;
+  id: string;                  
   name: string;
   description: string;
+  createDate: string;  
+  updateDate: string; 
+  divisions: Division[];
 }
+
+interface Division {
+  id: number;
+  name: string;
+}
+
 
 const Company: React.FC = () => {
 
@@ -22,6 +31,8 @@ const Company: React.FC = () => {
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [createDate, setCreateDate] = useState<string>("");
+  const [updateDate, setUpdateDate] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -53,10 +64,14 @@ const Company: React.FC = () => {
       setId(company.id);
       setName(company.name);
       setDescription(company.description);
+      setCreateDate(company.createDate);
+      setUpdateDate(company.updateDate);
     } else {
       setId("");
       setName("");
       setDescription("");
+      setCreateDate("");
+      setUpdateDate("");
     }
     setTitle(op === "1" ? "Registrar Compañia" : "Editar Compañia");
 
@@ -82,8 +97,16 @@ const Company: React.FC = () => {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
+    if (createDate.trim() === "") {
+      showAlert("Escribe la descripción", "warning", "crear Fecha");
+      return;
+    }
+    if (updateDate.trim() === "") {
+      showAlert("Escribe la descripción", "warning", "actualizar Fecha");
+      return;
+    }
     
-    const parametros = { id, name: name.trim(), description: description.trim() };
+    const parametros = { id, name: name.trim(), description: description.trim(), createDate:createDate.trim(), updateDate:updateDate.trim() };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
@@ -124,10 +147,10 @@ const Company: React.FC = () => {
           'Content-Type': 'application/json'
         }
       });
-      showAlert("Proceso eliminado correctamente", "success");
+      showAlert("Compañia eliminado correctamente", "success");
       getUsers(); 
     } catch (error) {
-      showAlert("Error al eliminar el proceso", "error");
+      showAlert("Error al eliminar la compañia", "error");
       console.error(error);
     }
   };
@@ -161,7 +184,9 @@ const Company: React.FC = () => {
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    <th>Descripción </th>
+                    <th>Descripción</th>
+                    <th>Crear Fecha</th>
+                    <th>Actualizar Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -171,6 +196,8 @@ const Company: React.FC = () => {
                       <td>{i + 1}</td>
                       <td>{comp.name}</td>
                       <td>{comp.description}</td>
+                      <td>{comp.createDate}</td>
+                      <td>{comp.updateDate}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button
@@ -249,6 +276,30 @@ const Company: React.FC = () => {
                   />
                 </div>
                 <div className="input-group mb-3">
+                  <span className="input-group-text">
+                  <i className="fa-solid fa-calendar"></i>
+                  </span>
+                  <input
+                    type="date"
+                    id="descripcion"
+                    className="form-control"
+                    placeholder="Fecha de Creación"
+                    value={createDate}
+                    onChange={(e) => setCreateDate(e.target.value)}
+                  />
+                </div>
+                <div className="input-group mb-3">
+                  <span className="input-group-text">
+                  <i className="fa-solid fa-calendar-days"></i>
+                  </span>
+                  <input
+                    type="date"
+                    id="descripcion"
+                    className="form-control"
+                    placeholder="Actualizar Fecha"
+                    value={updateDate}
+                    onChange={(e) => setUpdateDate(e.target.value)}
+                  />
                 </div>
               </div>
               <div className="modal-footer">

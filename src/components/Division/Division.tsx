@@ -3,34 +3,64 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
 
+
 const MySwal = withReactContent(Swal);
 
 interface Division {
-  id: string;
+	id: number;
+	name: string;
+	description: string;
+	createDate: string;
+	updateDate: string;
+	company: Company; // Cambiado a objeto
+	city: City;
+  }
+
+interface Company {
+  id: number;
   name: string;
   description: string;
-  createDate: string;
+  createDate?: string;
+  updateDate?: string;
+}
+
+interface City {
+  id: number;
+  name: string;
+  description: string;
+  createDate?: string;
+  updateDate?: string;
+}
+
+interface DivisionData {
+  name: string;
+  description: string;
+  companyTypeId: number;
+  cityId: number;
 }
 
 const Division: React.FC = () => {
   const URL = "https://asymetricsbackend.uk.r.appspot.com/division/";
   const [division, setDivision] = useState<Division[]>([]);
-  const [id, setId] = useState<string>("");
+  const [company, setCompanyType] = useState<Company[]>([]);
+  const [city, setCity] = useState<City[]>([]);
+  const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [createDate, setCreateDate] = useState<string>("");
+  const [selectedCompanyTypeId, setSelectedCompanyTypeId] = useState<number>(0);
+  const [selectedCityId, setSelectedCityId] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getUsers();
+    getDivision();
+    getCompanyType();
+    getCity();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -41,28 +71,51 @@ const Division: React.FC = () => {
     };
   }, []);
 
-  const getUsers = async () => {
+  const getDivision = async () => {
     try {
       const response: AxiosResponse<Division[]> = await axios.get(URL);
       setDivision(response.data);
+      console.log("Datos de Division:", response.data);
     } catch (error) {
-      showAlert("Error al obtener division", "error");
+      showAlert("Error al obtener los peligros", "error");
+    }
+  };
+  
+
+  const getCompanyType = async () => {
+    try {
+      const response = await axios.get<Company[]>('https://asymetricsbackend.uk.r.appspot.com/company/');
+      setCompanyType(response.data);
+    } catch (error) {
+      showAlert("Error al obtener las compañias", "error");
+    }
+  };
+
+  const getCity = async () => {
+    try {
+      const response = await axios.get<City[]>('https://asymetricsbackend.uk.r.appspot.com/city/');
+      setCity(response.data);
+    } catch (error) {
+      showAlert("Error al obtener los tipos de verificación", "error");
     }
   };
 
   const openModal = (op: string, division?: Division) => {
-    if (division) {
+    if (op === "1") {
+      setId(null);
+      setName("");
+      setDescription("");
+      setSelectedCompanyTypeId(0);
+      setSelectedCityId(0);
+      setTitle("Registrar Division");
+    } else if (op === "2" && division) {
       setId(division.id);
       setName(division.name);
       setDescription(division.description);
-      setCreateDate(division.createDate);
-    } else {
-      setId("");
-      setName("");
-      setDescription("");
-      setCreateDate("");
+      setSelectedCompanyTypeId(division.company.id); 
+      setSelectedCityId(division.city.id);
+      setTitle("Editar Division");
     }
-    setTitle(op === "1" ? "Registrar División" : "Editar División");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -77,234 +130,285 @@ const Division: React.FC = () => {
     modals.forEach(modal => modal.parentNode?.removeChild(modal));
   };
 
-  const validar = () => {
-    if (name.trim() === "") {
-      showAlert("Escribe el nombre", "warning", "nombre");
-      return;
-    }
-    if (description.trim() === "") {
-      showAlert("Escribe la descripción", "warning", "descripción");
-      return;
-    }
-    if (createDate.trim() === "") {
-      showAlert("Escribe la fecha", "warning", "fecha");
-      return;
-    }
+const validar = (): void => {
+	if (name.trim() === "") {
+	  showAlert("Escribe el nombre de la Division", "warning");
+	  return;
+	}
+	if (selectedCompanyTypeId === 0) {
+	  showAlert("Selecciona una Compañia", "warning");
+	  return;
+	}
+	if (selectedCityId === 0) {
+	  showAlert("Selecciona una Ciudad", "warning");
+	  return;
+	}
   
-    // Asegúrate de que 'createDate' esté correctamente configurado en 'parametros'
-    const parametros = { id, name: name.trim(), description: description.trim(), createDate: createDate.trim() };
-    const metodo = id ? "PUT" : "POST";
-    enviarSolicitud(metodo, parametros);
+	// Tipado para los objetos seleccionados
+	const selectedCompanyType: Company | undefined = company.find(
+	  (ct) => ct.id === selectedCompanyTypeId
+	);
+	const selectedCity: City | undefined = city.find((c) => c.id === selectedCityId);
+  
+	if (!selectedCompanyType) {
+	  showAlert("La Compañia seleccionada no se encontró", "warning");
+	  return;
+	}
+  
+	if (!selectedCity) {
+	  showAlert("La Ciudad seleccionada no se encontró", "warning");
+	  return;
+	}
+  
+	const parametros: DivisionData = {
+	  name: name.trim(),
+	  description: description.trim(),
+	  companyTypeId: selectedCompanyTypeId,
+	  cityId: selectedCityId,
+	};
+  
+	console.log("Datos a enviar:", parametros);
+  
+	const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
+	enviarSolicitud(metodo, parametros);
   };
   
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+  const enviarSolicitud = async (method: "POST" | "PUT", data: DivisionData) => {
     try {
-      const url = method === "PUT" && id ? `${URL}` : URL;
+    //   const url = method === "PUT" && id ? `${URL}${id}/` : URL;
+	const url = method === "PUT" && id ? `${URL}${id}/` : URL;
       const response = await axios({
         method,
         url,
         data,
         headers: { "Content-Type": "application/json" },
       });
-
-      const { tipo, msj } = response.data;
-      showAlert(msj, tipo);
-      getUsers();
-      if (tipo === "success") {
-        // Cierra el modal después de un segundo para permitir la actualización
-        setTimeout(() => {
-          const closeModalButton = document.getElementById("btnCerrar");
-          if (closeModalButton) {
-            closeModalButton.click();
-          }
-          getUsers(); // Actualiza la lista de usuarios
-        }, 500);
+  
+      showAlert("Operación realizada con éxito", "success");
+      getDivision();
+      if (modalRef.current) {
+        const modal = bootstrap.Modal.getInstance(modalRef.current);
+        modal?.hide();
       }
     } catch (error) {
-      showAlert("Error al enviar la solicitud", "error");
-      console.error(error);
+      if (axios.isAxiosError(error) && error.response) {
+        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+      } else {
+        showAlert("Error al realizar la solicitud", "error");
+      }
     }
   };
 
-  const deleteUser = async (id: string) => {
+
+  const deleteDivision = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}`, {
+      await axios.delete(`${URL}${id}/`, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
-      showAlert("Usuario eliminado correctamente", "success");
-      getUsers(); 
+      showAlert("Division eliminada correctamente", "success");
+      getDivision();
     } catch (error) {
-      showAlert("Error al eliminar el usuario", "error");
-      console.error(error);
+      showAlert("Error al eliminar la Division", "error");
     }
   };
 
   const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-		<Tooltip id="button-tooltip-edit" {...props}>
-		  Editar
-		</Tooltip>
-	  );
-	  
-	  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-		<Tooltip id="button-tooltip-delete" {...props}>
-		  Eliminar
-		</Tooltip>
-	  );
+    <Tooltip id="button-tooltip-edit" {...props}>
+      Editar
+    </Tooltip>
+  );
+
+  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+    <Tooltip id="button-tooltip-delete" {...props}>
+      Eliminar
+    </Tooltip>
+  );
+
+  const formatDate = (dateString: string) => {
+    return dateString.split('T')[0];
+  };
 
   return (
-    <div className="App">
-      <div className="container-fluid">
-        <div className="row mt-3">
-          <div className="col-12">
-            <div className="tabla-contenedor">
-              <EncabezadoTabla title='Division' onClick={() => openModal("1")} />
-            </div>
-            <div className="table-responsive">
-              <table className="table table-bordered">
-                <thead className="text-center" 
-                style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
-                color: '#fff' }}>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Descripción </th>
-                    <th>Fecha</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="table-group-divider">
-                  {division.map((user, i) => (
-                    <tr key={user.id} className="text-center">
-                      <td>{i + 1}</td>
-                      <td>{user.name}</td>
-                      <td>{user.description}</td>
-                      <td>{user.createDate}</td>
-                      <td className="text-center">
-                        <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
-                        <button
-                        onClick={() => openModal("2", user)}
-                        className="btn btn-custom-editar m-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalUsers"
-                      >
-                        <i className="fa-solid fa-edit"></i>
-                      </button>
-                      </OverlayTrigger>
-                      <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
-                        <button className="btn btn-custom-danger" onClick={() => {
-                          MySwal.fire({
-                            title: "¿Estás seguro?",
-                            text: "No podrás revertir esto",
-                            icon: "warning",
-                            showCancelButton: true,
-                            confirmButtonText: "Sí, bórralo",
-                            cancelButtonText: "Cancelar",
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              deleteUser(user.id);
-                            }
-                          });
-                        }}
-                        >
-                          <FontAwesomeIcon icon={faCircleXmark} />
-                        </button>
-                      </OverlayTrigger>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <div
-          className="modal fade"
-          id="modalUsers"
-          ref={modalRef}
-          data-bs-backdrop="true"
-          data-bs-keyboard="true"
-          aria-labelledby="staticBackdropLabel"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header text-white">
-                <label className="h5">{title}</label>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div className="modal-body">
-                <input type="hidden" id="id" />
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-solid fa-user"></i>
-                  </span>
-                  <input
-                    type="text"
-                    id="nombre"
-                    className="form-control"
-                    placeholder="Nombre"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-regular fa-solid fa-file-alt"></i>
-                  </span>
-                  <input
-                    type="text"
-                    id="descripcion"
-                    className="form-control"
-                    placeholder="Descripción"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-solid fa-calendar-days"></i>
-                  </span>
-                  <input
-                    type="text"
-                    id="createDate"
-                    className="form-control"
-                    placeholder="Fecha de Creación"
-                    value={createDate}
-                    onChange={(e) => setCreateDate(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                  id="btnCerrar"
-                >
-                  Cerrar
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                >
-                  Guardar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+		<div className="App">
+			<div className="container-fluid">
+				<div className="row mt-3">
+					<div className="col-12">
+						<div className="tabla-contenedor">
+							<EncabezadoTabla title="Division" onClick={() => openModal("1")} />
+						</div>
+						<div className="table-responsive">
+							<table className="table table-bordered">
+								<thead
+									className="text-center"
+									style={{
+										background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
+										color: "#fff",
+									}}>
+									<tr>
+										<th>N°</th>
+										<th>Nombre</th>
+										<th>Descripción</th>
+										<th>Compañia</th>
+										<th>Ciudad</th>
+										<th>Crear Fecha</th>
+										<th>Actualizar Fecha</th>
+										<th>Acciones</th>
+									</tr>
+								</thead>
+								<tbody className="table-group-divider">
+									{division.map((div, i) => (
+										<tr key={JSON.stringify(div)} className="text-center">
+											<td>{i + 1}</td>
+											<td>{div.name}</td>
+											<td>{div.description}</td>
+											<td>Compañia</td>
+											<td>Ciudad</td>
+											{/* <td>{div.companyTypeId.id}</td>
+											<td>{div.cityId}</td> */}
+											<td>{div.createDate}</td>
+											<td>{div.updateDate}</td>
+											<td className="text-center">
+												<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
+													<button
+														onClick={() => openModal("2", div)}
+														className="btn btn-custom-editar m-2">
+														<i className="fa-solid fa-edit"></i>
+													</button>
+												</OverlayTrigger>
+												<OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+													<button
+														className="btn btn-custom-danger"
+														onClick={() => {
+															MySwal.fire({
+																title: "¿Estás seguro?",
+																text: "No podrás revertir esto",
+																icon: "warning",
+																showCancelButton: true,
+																confirmButtonText: "Sí, bórralo",
+																cancelButtonText: "Cancelar",
+															}).then((result) => {
+																if (result.isConfirmed) {
+																	deleteDivision(div.id);
+																}
+															});
+														}}>
+														<i className="fa-solid fa-circle-xmark"></i>
+													</button>
+												</OverlayTrigger>
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div
+					className="modal fade"
+					id="modalDivision"
+					tabIndex={-1}
+					aria-hidden="true"
+					ref={modalRef}>
+					<div className="modal-dialog modal-dialog-top modal-md">
+						<div className="modal-content">
+							<div className="modal-header">
+								<h5 className="modal-title w-100">{title}</h5>
+								<button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+							</div>
+							<div className="modal-body">
+								<div className="mb-3">
+									<div className="input-group">
+										<span className="input-group-text">
+											<i className="fa-solid fa-list-check"></i>
+										</span>
+										<input
+											type="text"
+											id="nombre"
+											className="form-control"
+											placeholder="Nombre de la División"
+											value={name}
+											onChange={(e) => setName(e.target.value)}
+										/>
+									</div>
+								</div>
+								<div className="mb-3">
+									<div className="input-group">
+										<span className="input-group-text">
+											<i className="fa-regular fa-file-alt"></i>
+										</span>
+										<input
+											type="text"
+											id="description"
+											className="form-control"
+											placeholder="Descripción"
+											value={description}
+											onChange={(e) => setDescription(e.target.value)}
+										/>
+									</div>
+								</div>
+
+								<div className="mb-3">
+									<label htmlFor="Company" className="form-label">
+										Compañias
+									</label>
+									<select
+										id="Company"
+										className="form-select"
+										value={selectedCompanyTypeId}
+										onChange={(e) => setSelectedCompanyTypeId(Number(e.target.value))}
+									>
+										<option value={0}>Selecciona la Compañia</option>
+										{company.map((com) => (
+											<option key={com.id} value={com.id}>
+												{com.description + " - " + com.name}
+											</option>
+										))}
+									</select>
+								</div>
+								<div className="mb-3">
+									<label htmlFor="City" className="form-label">
+										Ciudad
+									</label>
+									<select
+										id="City"
+										className="form-select"
+										value={selectedCityId}
+										onChange={(e) => setSelectedCityId(Number(e.target.value))}>
+										<option value={0}>Selecciona la Ciudad</option>
+										{city.map((cit) => (
+											<option key={cit.id} value={cit.id}>
+												{cit.name}
+											</option>
+										))}
+									</select>
+								</div>
+							</div>
+							<div className="modal-footer">
+								<button
+									type="button"
+									className="btn btn-secondary"
+									data-bs-dismiss="modal"
+									id="btnCerrar"
+								>
+									Cerrar
+								</button>
+								<button type="button" className="btn btn-primary" onClick={validar}>
+									Guardar
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default Division;
+
+
+
+

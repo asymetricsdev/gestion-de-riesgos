@@ -9,7 +9,7 @@ import { faDownload, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
 import { useDropzone } from 'react-dropzone';
-import '../CargaImagenes/CargaImagenes.css'; 
+import '../CargaImagenes/CargaImagenes.css';
 
 const MySwal = withReactContent(Swal);
 
@@ -22,11 +22,20 @@ interface Tareas {
   file: string;
   base64: string;
   type: string;
+  taskType: null;
 }
 
 interface FileData {
   base64: string;
   type: string;
+}
+
+interface TaskType {
+	id: number;
+	name: string;
+	description: string;
+	createDate?: string;
+	updateDate?: string;
 }
 
 function Tareas() {
@@ -39,6 +48,7 @@ function Tareas() {
 	const [version, setVersion] = useState<string>("");
 	const [fileExtension, setFileExtension] = useState<string>("");
 	const [file, setFile] = useState<{ base64: string; type: string }[]>([]);
+	const [taskType, setTaskType] = useState<string | null>(null);
 	const [title, setTitle] = useState<string>("");
 	const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
 	const [dataGuardada, setDataGuardada] = useState(false);
@@ -73,6 +83,7 @@ function Tareas() {
 		setVersion("");
 		setFileExtension("");
 		setFile([]);
+		setTaskType(null);
 		setUploadedImageUrl(null);
 		setDataGuardada(false);
 		setUploadedFiles([]);
@@ -94,8 +105,9 @@ function Tareas() {
     name: string;
     description: string;
     version: string;
-    file: string | null; 
+    file: string | null;
     fileExtension: string;
+	taskType: string | null;
   }) => {
     try {
       const url = method === "PUT" && data.id ? `${URL}${data.id}` : URL;
@@ -107,6 +119,7 @@ function Tareas() {
         version: data.version,
         file: data.file,
         fileExtension: data.fileExtension,
+		taskType: data.taskType,
       };
 
       const response = await axios({
@@ -147,7 +160,8 @@ function Tareas() {
       description,
       version,
       file: file.length > 0 ? file[0].base64 : null,
-      fileExtension
+      fileExtension,
+	  taskType,
     });
   };
 
@@ -178,6 +192,7 @@ function Tareas() {
 			setVersion(tarea.version);
 			setFileExtension(tarea.fileExtension);
 			setFile([{ base64: tarea.file || "", type: tarea.fileExtension }]);
+			setTaskType(tarea.taskType);
 		}
 		setTitle(op === "1" ? "Registrar Tarea" : "Editar Tarea");
 
@@ -187,19 +202,55 @@ function Tareas() {
 		}
 	};
 
+	// const onDrop = useCallback((acceptedFiles: File[]) => {
+	// 	if (acceptedFiles.length > 0) {
+	// 		const file = acceptedFiles[0];
+	// 		setSelectedFile(file);
+
+	// 		const reader = new FileReader();
+	// 		reader.onload = async () => {
+	// 			const base64 = reader.result as string;
+	// 			handleImageUpload(base64);
+	// 		};
+	// 		reader.readAsDataURL(file);
+	// 	}
+	// }, []);
+
+	// const extractFileExtension = (base64: string): string => {
+	// 	const extensionMap: { [key: string]: string } = {
+	// 		"image/jpeg": "jpg",
+	// 		"image/png": "png",
+	// 		"application/pdf": "pdf",
+	// 	};
+	// 	const type = base64.split(";")[0].split(":")[1];
+	// 	return extensionMap[type] || "unknown";
+	// };
+
 	const onDrop = useCallback((acceptedFiles: File[]) => {
 		if (acceptedFiles.length > 0) {
-			const file = acceptedFiles[0];
-			setSelectedFile(file);
+		  const file = acceptedFiles[0];
 
-			const reader = new FileReader();
-			reader.onload = async () => {
-				const base64 = reader.result as string;
-				handleImageUpload(base64);
-			};
-			reader.readAsDataURL(file);
+		  const reader = new FileReader();
+		  reader.onload = () => {
+			const base64 = reader.result as string;
+			const extension = extractFileExtension(base64);
+
+			setFile([{ base64: removeBase64Prefix(base64), type: extension }]);
+			setFileExtension(extension);
+			setUploadedImageUrl(base64);
+			setTaskType(file.type);
+		  };
+		  reader.readAsDataURL(file);
 		}
-	}, []);
+	  }, []);
+
+	const { getRootProps, getInputProps, isDragActive } = useDropzone({
+		onDrop,
+		accept: {
+			"image/*": [".jpeg", ".jpg", ".png", ".gif"],
+			"application/pdf": [".pdf"],
+		},
+	});
 
 	const extractFileExtension = (base64: string): string => {
 		const extensionMap: { [key: string]: string } = {
@@ -210,14 +261,6 @@ function Tareas() {
 		const type = base64.split(";")[0].split(":")[1];
 		return extensionMap[type] || "unknown";
 	};
-
-	const { getRootProps, getInputProps, isDragActive } = useDropzone({
-		onDrop,
-		accept: {
-			"image/*": [".jpeg", ".jpg", ".png", ".gif"],
-			"application/pdf": [".pdf"],
-		},
-	});
 
   const handleImageUpload = async (base64: string) => {
     try {
@@ -367,7 +410,6 @@ function Tareas() {
 								type="button"
 								className="btn-close"
 								data-bs-dismiss="modal"
-								aria-label="Close"
 							></button>
 						</div>
 						<div className="modal-body">
@@ -471,3 +513,636 @@ function Tareas() {
 export default Tareas;
 
 
+
+// import React, { useEffect, useState, useRef, useCallback } from "react";
+// import axios, { AxiosResponse } from "axios";
+// import Swal from "sweetalert2";
+// import withReactContent from "sweetalert2-react-content";
+// import { showAlert } from "../functions";
+// import { OverlayTrigger, Tooltip } from "react-bootstrap";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faDownload, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+// import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+// import * as bootstrap from "bootstrap";
+// import { useDropzone } from "react-dropzone";
+// import "../CargaImagenes/CargaImagenes.css";
+
+// const MySwal = withReactContent(Swal);
+
+// interface Tareas {
+// 	updateDate(updateDate: any): unknown;
+// 	createDate(createDate: any): unknown;
+// 	id: string;
+// 	name: string;
+// 	description: string;
+// 	version: string;
+// 	fileExtension: string;
+// 	file: string;
+// 	base64: string;
+// 	type: string;
+// 	taskType: TaskType;
+// }
+
+// interface FileData {
+// 	base64: string;
+// 	type: string;
+// }
+
+// interface TaskType {
+// 	id: number;
+// 	name: string;
+// 	description: string;
+// 	createDate?: string;
+// 	updateDate?: string;
+// }
+
+// function Tareas() {
+// 	const URL = "https://asymetricsbackend.uk.r.appspot.com/task/";
+
+// 	const [tareas, setTareas] = useState<Tareas[]>([]);
+// 	const [id, setId] = useState<string>("");
+// 	const [name, setName] = useState<string>("");
+// 	const [description, setDescription] = useState<string>("");
+// 	const [version, setVersion] = useState<string>("");
+// 	const [fileExtension, setFileExtension] = useState<string>("");
+// 	const [file, setFile] = useState<{ base64: string; type: string }[]>([]);
+// 	const [taskType, setTaskType] = useState<TaskType[]>([]);
+// 	const [selectedTaskType, setSelectedTaskType] = useState<string | number | undefined>(undefined);
+// 	const [title, setTitle] = useState<string>("");
+// 	const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+// 	const [dataGuardada, setDataGuardada] = useState(false);
+// 	const [uploadedFiles, setUploadedFiles] = useState<{ base64: string; type: string }[]>([]);
+// 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
+// 	const modalRef = useRef<HTMLDivElement | null>(null);
+
+// 	useEffect(() => {
+// 		fetchTareas();
+// 		fetchTaskTypes();
+
+// 		if (modalRef.current) {
+// 			modalRef.current.addEventListener("hidden.bs.modal", handleModalHidden);
+// 		}
+
+// 		return () => {
+// 			if (modalRef.current) {
+// 				modalRef.current.removeEventListener("hidden.bs.modal", handleModalHidden);
+// 			}
+// 		};
+// 	}, []);
+
+// 	const fetchTareas = async () => {
+// 		try {
+// 			const response: AxiosResponse<Tareas[]> = await axios.get(URL);
+// 			setTareas(response.data);
+// 		} catch (error) {
+// 			showAlert("Error al obtener Tareas", "error");
+// 			console.error(error);
+// 		}
+// 	};
+
+// 	const fetchTaskTypes = async () => {
+// 		try {
+// 			const response = await axios.get<TaskType[]>(
+// 				"https://asymetricsbackend.uk.r.appspot.com/task_type/"
+// 			);
+// 			setTaskType(response.data);
+// 		} catch (error) {
+// 			showAlert("Error al obtener compañías", "error");
+// 		}
+// 	};
+
+// 	const handleModalHidden = () => {
+// 		resetForm();
+// 		const modals = document.querySelectorAll(".modal-backdrop");
+// 		modals.forEach((modal) => modal.parentNode?.removeChild(modal));
+// 	};
+
+// 	const resetForm = () => {
+// 		setId("");
+// 		setName("");
+// 		setDescription("");
+// 		setVersion("");
+// 		setFileExtension("");
+// 		setFile([]);
+// 		setSelectedTaskType(undefined); // Reset selected task type
+// 		setUploadedImageUrl(null);
+// 		setDataGuardada(false);
+// 		setUploadedFiles([]);
+// 		setSelectedFile(null);
+// 	};
+
+// 	const enviarSolicitud = async (
+// 		method: "POST" | "PUT",
+// 		data: {
+// 			id: string;
+// 			name: string;
+// 			description: string;
+// 			version: string;
+// 			file: string | null;
+// 			fileExtension: string;
+// 			taskType: string | null; // Adjusted to accept string
+// 		}
+// 	) => {
+// 		try {
+// 			const url = method === "PUT" && data.id ? `${URL}${data.id}` : URL;
+
+// 			const requestData = {
+// 				id: data.id,
+// 				name: data.name,
+// 				description: data.description,
+// 				version: data.version,
+// 				file: data.file,
+// 				fileExtension: data.fileExtension,
+// 				taskType: data.taskType,
+// 			};
+// 			console.log(requestData);
+
+// 			const response = await axios({
+// 				method,
+// 				url,
+// 				data: requestData,
+// 				headers: { "Content-Type": "application/json" },
+// 			});
+
+// 			const { tipo, msj } = response.data;
+// 			Swal.fire(msj, tipo);
+// 			fetchTareas();
+// 		} catch (error) {
+// 			console.error(error);
+// 			Swal.fire({
+// 				title: "Error",
+// 				text: "Error al enviar la solicitud.",
+// 				icon: "error",
+// 				confirmButtonText: "OK",
+// 			});
+// 		}
+// 	};
+
+// 	const validar = () => {
+// 		if (
+// 			!name ||
+// 			!description ||
+// 			!version ||
+// 			file.length === 0 ||
+// 			!fileExtension ||
+// 			!selectedTaskType
+// 		) {
+// 			Swal.fire({
+// 				title: "Datos Incompletos",
+// 				text: "Por favor, completa todos los campos antes de guardar.",
+// 				icon: "warning",
+// 				confirmButtonText: "OK",
+// 			});
+// 			return;
+// 		}
+
+// 		enviarSolicitud("POST", {
+// 			id,
+// 			name,
+// 			description,
+// 			version,
+// 			file: file.length > 0 ? file[0].base64 : null,
+// 			fileExtension,
+// 			taskType: selectedTaskType !== null ? selectedTaskType.toString() : null, // Convert to string or set to null
+// 		});
+// 	};
+
+// 	const clearFiles = () => {
+// 		setFile([]);
+// 		setUploadedImageUrl(null);
+// 	};
+
+// 	const deleteUser = async (id: string) => {
+// 		try {
+// 			await axios.delete(`${URL}${id}`, {
+// 				headers: { "Content-Type": "application/json" },
+// 			});
+// 			showAlert("Tarea eliminada correctamente", "success");
+// 			fetchTareas();
+// 		} catch (error) {
+// 			showAlert("Error al eliminar la tarea", "error");
+// 			console.error(error);
+// 		}
+// 	};
+
+// 	const openModal = (op: string, tarea?: Tareas) => {
+// 		resetForm();
+// 		if (tarea) {
+// 			setId(tarea.id);
+// 			setName(tarea.name);
+// 			setDescription(tarea.description);
+// 			setVersion(tarea.version);
+// 			setFileExtension(tarea.fileExtension);
+// 			setFile([{ base64: tarea.file || "", type: tarea.fileExtension }]);
+// 			setSelectedTaskType(tarea.taskType.id.toString()); // Set the selected task type ID as a string
+// 		}
+// 		setTitle(op === "1" ? "Registrar Tarea" : "Editar Tarea");
+
+// 		if (modalRef.current) {
+// 			const modal = new bootstrap.Modal(modalRef.current);
+// 			modal.show();
+// 		}
+// 	};
+
+// 	// const onDrop = useCallback((acceptedFiles: File[]) => {
+// 	// 	if (acceptedFiles.length > 0) {
+// 	// 		const file = acceptedFiles[0];
+// 	// 		setSelectedFile(file);
+
+// 	// 		const reader = new FileReader();
+// 	// 		reader.onload = async () => {
+// 	// 			const base64 = reader.result as string;
+// 	// 			handleImageUpload(base64);
+// 	// 		};
+// 	// 		reader.readAsDataURL(file);
+// 	// 	}
+// 	// }, []);
+
+// 	const extractFileExtension = (base64: string): string => {
+// 		const extensionMap: { [key: string]: string } = {
+// 			"image/jpeg": "jpg",
+// 			"image/png": "png",
+// 			"application/pdf": "pdf",
+// 		};
+// 		const type = base64.split(";")[0].split(":")[1];
+// 		return extensionMap[type] || "unknown";
+// 	};
+
+// 	function removeBase64Prefix(base64: string): string {
+// 		// Your logic to remove the prefix
+// 		return base64.startsWith('data:') ? base64.split(',')[1] : base64;
+// 	}
+	
+
+// 	const handleImageUpload = async (base64: string) => {
+// 		try {
+// 			if (!selectedFile) {
+// 				Swal.fire({
+// 					title: "Error",
+// 					text: "No se ha seleccionado un archivo válido.",
+// 					icon: "error",
+// 					confirmButtonText: "OK",
+// 				});
+// 				return;
+// 			}
+
+// 			// Limpia el prefijo de base64 antes de añadir el archivo
+// 			const cleanedBase64 = removeBase64Prefix(base64) || ""; // Fallback to an empty string if undefined
+// 			if (cleanedBase64) {
+// 				setFile([...file, { base64: cleanedBase64, type: fileExtension }]);
+// 				setUploadedImageUrl(base64);
+// 			} else {
+// 				// Handle the error case, e.g., show an error message
+// 				console.error("Failed to clean base64 prefix.");
+// 			}
+
+// 			// Verifica si el archivo ya ha sido subido
+// 			const fileExists = file.some((f) => f.base64 === cleanedBase64);
+
+// 			if (fileExists) {
+// 				Swal.fire({
+// 					title: "Imagen Duplicada",
+// 					text: "La imagen ya está cargada.",
+// 					icon: "warning",
+// 					confirmButtonText: "OK",
+// 				});
+// 				return;
+// 			}
+
+// 			setFile([...file, { base64: cleanedBase64, type: fileExtension }]);
+// 			setUploadedImageUrl(base64);
+
+// 			Swal.fire({
+// 				title: "Imagen subida correctamente",
+// 				icon: "success",
+// 				confirmButtonText: "OK",
+// 			});
+// 		} catch (error) {
+// 			console.error("Error uploading image:", error);
+// 			Swal.fire({
+// 				title: "Error",
+// 				text: "Hubo un error al subir la imagen.",
+// 				icon: "error",
+// 				confirmButtonText: "OK",
+// 			});
+// 		}
+// 	};
+
+// 	const onDrop = useCallback((acceptedFiles: File[]) => {
+// 		if (acceptedFiles.length > 0) {
+// 			const file = acceptedFiles[0];
+// 			setSelectedFile(file);
+
+// 			const reader = new FileReader();
+
+// 			reader.onload = async () => {
+// 				const result = reader.result;
+// 				if (typeof result === "string") {
+// 					await handleImageUpload(result);
+// 				} else {
+// 					Swal.fire({
+// 						title: "Error",
+// 						text: "No se pudo leer el archivo como base64.",
+// 						icon: "error",
+// 						confirmButtonText: "OK",
+// 					});
+// 				}
+// 			};
+
+// 			reader.onerror = () => {
+// 				Swal.fire({
+// 					title: "Error",
+// 					text: "Error al leer el archivo.",
+// 					icon: "error",
+// 					confirmButtonText: "OK",
+// 				});
+// 			};
+
+// 			reader.readAsDataURL(file);
+// 		}
+// 	}, []);
+
+// 	// const onDrop = useCallback((acceptedFiles: File[]) => {
+// 	// 	if (acceptedFiles.length > 0) {
+// 	// 		const file = acceptedFiles[0];
+// 	// 		setSelectedFile(file);
+
+// 	// 		const reader = new FileReader();
+
+// 	// 		// Verifica que el archivo sea un Blob válido
+// 	// 		if (file instanceof Blob) {
+// 	// 			reader.onload = async () => {
+// 	// 				const base64 = reader.result as string | null;
+
+// 	// 				if (base64) {  // Asegúrate de que base64 no sea null
+// 	// 					await handleImageUpload(base64);
+// 	// 				} else {
+// 	// 					Swal.fire({
+// 	// 						title: "Error",
+// 	// 						text: "No se pudo leer el archivo como base64.",
+// 	// 						icon: "error",
+// 	// 						confirmButtonText: "OK",
+// 	// 					});
+// 	// 				}
+// 	// 			};
+// 	// 			reader.readAsDataURL(file);
+// 	// 		} else {
+// 	// 			Swal.fire({
+// 	// 				title: "Error",
+// 	// 				text: "El archivo seleccionado no es válido.",
+// 	// 				icon: "error",
+// 	// 				confirmButtonText: "OK",
+// 	// 			});
+// 	// 		}
+// 	// 	}
+// 	// }, []);
+
+// 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
+// 		onDrop,
+// 		accept: {
+// 			"image/*": [".jpeg", ".jpg", ".png", ".gif"],
+// 			"application/pdf": [".pdf"],
+// 		},
+// 	});
+
+// 	// function removeBase64Prefix(base64: string) {
+// 	// 	throw new Error("Function not implemented.");
+// 	// }
+
+// 	const handleDownload = (base64: string, type: string) => {
+// 		const link = document.createElement("a");
+// 		link.href = base64;
+// 		link.download = `downloaded_file.${type}`;
+// 		document.body.appendChild(link);
+// 		link.click();
+// 		document.body.removeChild(link);
+// 	};
+
+// 	return (
+// 		<div className="App">
+// 			<div className="container-fluid">
+// 				<div className="row mt-3">
+// 					<div className="col-12">
+// 						<div className="tabla-contenedor">
+// 							<EncabezadoTabla title="Tareas" onClick={() => openModal("1")} />
+// 						</div>
+// 					</div>
+// 					<div className="table-responsive">
+// 						<table className="table table-bordered">
+// 							<thead
+// 								className="text-center"
+// 								style={{
+// 									background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
+// 									color: "#fff",
+// 								}}
+// 							>
+// 								<tr>
+// 									<th>ID</th>
+// 									<th>Nombre</th>
+// 									<th>Descripción</th>
+// 									<th>Versión</th>
+// 									<th>Archivo</th>
+// 									<th>Acciones</th>
+// 								</tr>
+// 							</thead>
+// 							<tbody className="table-group-divider">
+// 								{tareas.map((tarea) => (
+// 									<tr key={tarea.id}>
+// 										<td>{tarea.id}</td>
+// 										<td>{tarea.name}</td>
+// 										<td>{tarea.description}</td>
+// 										<td>{tarea.version}</td>
+// 										<td>
+// 											{" "}
+// 											<OverlayTrigger
+// 												overlay={
+// 													<Tooltip id={`tooltip-download-${tarea.id}`}>Descargar Archivo</Tooltip>
+// 												}
+// 											>
+// 												<a
+// 													href={`data:${tarea.fileExtension};base64,${tarea.file}`}
+// 													download={`tarea_${tarea.id}.${tarea.fileExtension}`}
+// 													className="btn btn-custom-editar m-2"
+// 												>
+// 													<FontAwesomeIcon icon={faDownload} /> Descargar
+// 												</a>
+// 											</OverlayTrigger>
+// 										</td>
+// 										<td>
+// 											<OverlayTrigger placement="top" overlay={<Tooltip>Editar</Tooltip>}>
+// 												<button
+// 													onClick={() => openModal("2", tarea)}
+// 													className="btn btn-custom-editar m-2"
+// 												>
+// 													<i className="fa-solid fa-edit"></i>
+// 												</button>
+// 											</OverlayTrigger>
+// 											<OverlayTrigger placement="top" overlay={<Tooltip>Eliminar</Tooltip>}>
+// 												<button
+// 													className="btn btn-custom-danger"
+// 													onClick={() => {
+// 														MySwal.fire({
+// 															title: "¿Estás seguro?",
+// 															text: "No podrás revertir esto",
+// 															icon: "warning",
+// 															showCancelButton: true,
+// 															confirmButtonText: "Sí, bórralo",
+// 															cancelButtonText: "Cancelar",
+// 														}).then((result) => {
+// 															if (result.isConfirmed) {
+// 																deleteUser(tarea.id);
+// 															}
+// 														});
+// 													}}
+// 												>
+// 													<FontAwesomeIcon icon={faCircleXmark} />
+// 												</button>
+// 											</OverlayTrigger>
+// 										</td>
+// 									</tr>
+// 								))}
+// 							</tbody>
+// 						</table>
+// 					</div>
+// 				</div>
+// 			</div>
+
+// 			<div
+// 				className="modal fade"
+// 				id="modalTarea"
+// 				tabIndex={-1}
+// 				aria-labelledby="modalTareaLabel"
+// 				aria-hidden="true"
+// 				ref={modalRef}
+// 			>
+// 				<div className="modal-dialog modal-lg">
+// 					<div className="modal-content">
+// 						<div className="modal-header">
+// 							<h5 className="modal-title" id="exampleModalLabel">
+// 								{title}
+// 							</h5>
+// 							<button
+// 								type="button"
+// 								className="btn-close"
+// 								data-bs-dismiss="modal"
+// 								aria-label="Close"
+// 							></button>
+// 						</div>
+// 						<div className="modal-body">
+// 							<div className="input-group mb-3">
+// 								<span className="input-group-text">
+// 									<i className="fa-solid fa-user"></i>
+// 								</span>
+// 								<input
+// 									type="text"
+// 									id="name"
+// 									className="form-control"
+// 									placeholder="Escribe el nombre"
+// 									value={name}
+// 									onChange={(e) => setName(e.target.value)}
+// 								/>
+// 							</div>
+// 							<div className="input-group mb-3">
+// 								<span className="input-group-text">
+// 									<i className="fa-solid fa-envelope"></i>
+// 								</span>
+// 								<input
+// 									type="text"
+// 									id="description"
+// 									className="form-control"
+// 									placeholder="Escribe la descripción"
+// 									value={description}
+// 									onChange={(e) => setDescription(e.target.value)}
+// 								/>
+// 							</div>
+// 							<div className="input-group mb-3">
+// 								<span className="input-group-text">
+// 									<i className="fa-solid fa-mobile"></i>
+// 								</span>
+// 								<input
+// 									type="text"
+// 									id="version"
+// 									className="form-control"
+// 									placeholder="Escribe la versión"
+// 									value={version}
+// 									onChange={(e) => setVersion(e.target.value)}
+// 								/>
+// 							</div>
+// 							<div className="mb-3">
+// 								<label htmlFor="selectedTaskTypeId" className="form-label text-primary">
+// 									<strong>Tareas</strong>
+// 								</label>
+// 								<select
+// 									id="selectedTaskTypeId"
+// 									className="form-select"
+// 									value={selectedTaskType}
+// 									onChange={(e) => setSelectedTaskType(e.target.value)}
+// 								>
+// 									{taskType.map((task: TaskType) => (
+// 										<option key={task.id} value={task.id.toString()}>
+// 											{" "}
+// 											{task.description + " - " + task.name}
+// 										</option>
+// 									))}
+// 								</select>
+// 							</div>
+
+// 							<div className="modal-body">
+// 								<div className="container">
+// 									<div className="col-md-12">
+// 										<div {...getRootProps()} className="dropzone">
+// 											<input {...getInputProps()} />
+// 											{isDragActive ? (
+// 												<p>Carga los archivos acá ...</p>
+// 											) : (
+// 												<p>Puede arrastrar y soltar archivos aquí para añadirlos</p>
+// 											)}
+// 										</div>
+// 										<p className="text-parrafo-dropzone mt-1">
+// 											Tamaño máximo de archivo: 500kb, número máximo de archivos: 2
+// 										</p>
+// 									</div>
+// 									{uploadedImageUrl && (
+// 										<div className="uploaded-image-preview">
+// 											<h6>Archivo subido:</h6>
+// 											{uploadedImageUrl.startsWith("data:image/") && (
+// 												<img src={uploadedImageUrl} alt="Vista previa" />
+// 											)}
+// 										</div>
+// 									)}
+// 									<div className="mb-3">
+// 										{uploadedFiles.length > 0 && (
+// 											<div>
+// 												<h6>Archivos subidos:</h6>
+// 												<ul>
+// 													{uploadedFiles.map((file, index) => (
+// 														<li key={index}>{`Archivo ${index + 1}: ${file.type}`}</li>
+// 													))}
+// 												</ul>
+// 											</div>
+// 										)}
+// 									</div>
+// 								</div>
+// 							</div>
+// 						</div>
+// 						<div className="modal-footer">
+// 							<button
+// 								type="button"
+// 								className="btn btn-secondary"
+// 								id="btnCerrar"
+// 								data-bs-dismiss="modal"
+// 							>
+// 								Cerrar
+// 							</button>
+// 							<button type="button" className="btn btn-primary" onClick={validar}>
+// 								Guardar
+// 							</button>
+// 						</div>
+// 					</div>
+// 				</div>
+// 			</div>
+// 		</div>
+// 	);
+// }
+
+// export default Tareas;

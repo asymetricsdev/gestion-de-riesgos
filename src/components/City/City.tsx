@@ -15,8 +15,14 @@ interface City {
   id: string;
   name: string;
   description: string;
-  createDate: string;
- 
+  createDate: string;  
+  updateDate: string; 
+  divisions: Division[];
+}
+
+interface Division {
+  id: number;
+  name: string;
 }
 
 const City: React.FC = () => {
@@ -26,6 +32,8 @@ const City: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [createDate, setCreateDate] = useState<string>("");
+  const [updateDate, setUpdateDate] = useState<string>("");
+  const [divisions, setDivisions] = useState<Division[]>([]);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -55,19 +63,22 @@ const City: React.FC = () => {
     }
   };
 
-  const openModal = (op: string, City?: City) => {
-    if (City) {
-      setId(City.id);
-      setName(City.name);
-      setDescription(City.description);
-      setCreateDate(City.createDate);
+  const openModal = (op: string, city?: City) => {
+    if (city) {
+      setId(city.id);
+      setName(city.name);
+      setDescription(city.description);
+      setCreateDate(city.createDate);
+      setUpdateDate(city.updateDate);
+      setDivisions(city.divisions || []);
       
     } else {
       setId("");
       setName("");
       setDescription("");
       setCreateDate("");
-      
+      setUpdateDate("");
+      setDivisions([]);
     }
     setTitle(op === "1" ? "Registrar Ciudad" : "Editar Ciudad");
 
@@ -146,10 +157,10 @@ const City: React.FC = () => {
       await axios.delete(`${URL}${id}`, {
         headers: { 'Content-Type': 'application/json' }
       });
-      showAlert("Usuario eliminado correctamente", "success");
+      showAlert("Ciudad eliminada correctamente", "success");
       getUsers();
     } catch (error) {
-      showAlert("Error al eliminar el usuario", "error");
+      showAlert("Error al eliminar la Ciudad", "error");
       console.error("Error deleting user:", error); // Debug log
     }
   };
@@ -183,7 +194,8 @@ const City: React.FC = () => {
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
-                    <th>Fecha</th>
+                    <th>Crear Fecha</th>
+                    <th>Actualizar Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -194,7 +206,7 @@ const City: React.FC = () => {
                       <td>{cit.name}</td>
                       <td>{cit.description}</td>
                       <td>{cit.createDate}</td>
-
+                      <td>{cit.updateDate}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button
@@ -259,7 +271,7 @@ const City: React.FC = () => {
               <div className="modal-body">
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-user"></i>
+                  <i className="fa-solid fa-list-check"></i>
                   </span>
                   <input
                     type="text"
@@ -272,7 +284,7 @@ const City: React.FC = () => {
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-envelope"></i>
+                  <i className="fa-regular fa-solid fa-file-alt"></i>
                   </span>
                   <input
                     type="text"
@@ -288,12 +300,25 @@ const City: React.FC = () => {
                     <i className="fa-solid fa-calendar"></i>
                   </span>
                   <input
-                    type="text"
+                    type="date"
                     id="createDate"
                     className="form-control"
                     placeholder="Fecha"
                     value={createDate}
                     onChange={(e) => setCreateDate(e.target.value)}
+                  />
+                </div>
+                <div className="input-group mb-3">
+                  <span className="input-group-text">
+                  <i className="fa-solid fa-calendar-days"></i>
+                  </span>
+                  <input
+                    type="date"
+                    id="descripcion"
+                    className="form-control"
+                    placeholder="Actualizar Fecha"
+                    value={updateDate}
+                    onChange={(e) => setUpdateDate(e.target.value)}
                   />
                 </div>
               </div>
