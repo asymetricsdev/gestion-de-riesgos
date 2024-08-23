@@ -21,6 +21,7 @@ import './AppStyle.css';
 import Procesos from './components/Process/Process';
 import Actividad from './components/ActividadTabla/ActividadTabla';
 import Tareas from './components/Tareas/Tareas';
+import Empleado from './components/EmpleadoTabla/Empleado';
 
 
 export function App() {
@@ -59,7 +60,11 @@ export function App() {
                                 <Route path="/admin/posicion" element={<Posicion />} />
                                 <Route path="admin/actividad" element={<Actividad />} />
                                 <Route path="admin/tareas" element={<Tareas />} />
+
+                                <Route path="admin/empleado" element={<Empleado />} />
+
                                 <Route path="admin/tareas" element={<Ciudad />} />
+
 
                             </Routes>
                         </Col>
