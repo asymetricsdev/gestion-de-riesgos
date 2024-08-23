@@ -3,34 +3,63 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
 
+
 const MySwal = withReactContent(Swal);
 
+interface CriticityType {
+  id: number;
+  name: string;
+  description: string;
+  createDate?: string;
+  updateDate?: string;
+}
+
+interface Checker {
+  id: number;
+  name: string;
+  description: string;
+  createDate?: string;
+  updateDate?: string;
+}
+
 interface Hazzard {
-  id: string;
+  id: number;
   name: string;
   description: string;
   createDate: string;
+  updateDate: string;
+  criticityType: CriticityType; // Cambiado a objeto
+  checker: Checker;
+}
+
+interface HazzardData {
+  name: string;
+  criticityTypeId: number;
+  checkerId: number;
 }
 
 const Hazzard: React.FC = () => {
   const URL = "https://asymetricsbackend.uk.r.appspot.com/hazzard/";
   const [hazzard, setHazzard] = useState<Hazzard[]>([]);
-  const [id, setId] = useState<string>("");
+  const [criticityType, setCriticityType] = useState<CriticityType[]>([]);
+  const [checker, setChecker] = useState<Checker[]>([]);
+  const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [createDate, setCreateDate] = useState<string>("");
+  const [selectedCriticityTypeId, setSelectedCriticityTypeId] = useState<number>(0);
+  const [selectedCheckerId, setSelectedCheckerId] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getUsers();
+    getHazzard();
+    getCriticityType();
+    getChecker();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -41,40 +70,51 @@ const Hazzard: React.FC = () => {
     };
   }, []);
 
-  const getUsers = async () => {
+  const getHazzard = async () => {
     try {
       const response: AxiosResponse<Hazzard[]> = await axios.get(URL);
       setHazzard(response.data);
+      console.log("Datos de Hazzard:", response.data);
     } catch (error) {
-      showAlert("Error al obtener Peligro", "error");
+      showAlert("Error al obtener los peligros", "error");
+    }
+  };
+  
+
+  const getCriticityType = async () => {
+    try {
+      const response = await axios.get<CriticityType[]>('https://asymetricsbackend.uk.r.appspot.com/criticity_type/');
+      setCriticityType(response.data);
+    } catch (error) {
+      showAlert("Error al obtener los tipos de criticidad", "error");
     }
   };
 
-  //CREATEDATE
-    const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  const getChecker = async () => {
+    try {
+      const response = await axios.get<Checker[]>('https://asymetricsbackend.uk.r.appspot.com/checker/');
+      setChecker(response.data);
+    } catch (error) {
+      showAlert("Error al obtener los tipos de verificación", "error");
+    }
   };
-  
+
   const openModal = (op: string, hazzard?: Hazzard) => {
-    if (hazzard) {
+    if (op === "1") {
+      setId(null);
+      setName("");
+      setDescription("");
+      setSelectedCriticityTypeId(0);
+      setSelectedCheckerId(0);
+      setTitle("Registrar Peligro");
+    } else if (op === "2" && hazzard) {
       setId(hazzard.id);
       setName(hazzard.name);
       setDescription(hazzard.description);
-      setCreateDate(formatDate(hazzard.createDate));
-      //const formattedDate = formatDate(hazzard.createDate);
-      //setCreateDate(formattedDate);
-    } else {
-      setId("");
-      setName("");
-      setDescription("");
-      setCreateDate("");
+      setSelectedCriticityTypeId(hazzard.criticityType.id); 
+      setSelectedCheckerId(hazzard.checker.id);
+      setTitle("Editar Peligro");
     }
-    setTitle(op === "1" ? "Registrar Peligro" : "Editar Peligro");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -89,84 +129,97 @@ const Hazzard: React.FC = () => {
     modals.forEach(modal => modal.parentNode?.removeChild(modal));
   };
 
-  const validar = () => {
+  const validar = (): void => {
     if (name.trim() === "") {
-      showAlert("Escribe el nombre", "warning", "nombre de Peligro");
-      return;
+        showAlert("Escribe el nombre del peligro", "warning");
+        return;
     }
-    if (description.trim() === "") {
-      showAlert("Escribe la descripción", "warning", "descripción");
-      return;
+    if (selectedCriticityTypeId === 0) {
+        showAlert("Selecciona un tipo de criticidad", "warning");
+        return;
     }
-    if (createDate.trim() === "") {
-      showAlert("Escribe la fecha", "warning", "fecha");
-      return;
+    if (selectedCheckerId === 0) {
+        showAlert("Selecciona un tipo de verificación", "warning");
+        return;
     }
 
-    const date = new Date(createDate);
-    const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  
-    const parametros = { id, name: name.trim(), description: description.trim(), createDate: createDate.trim() };
-    const metodo = id ? "PUT" : "POST";
+    // Tipado para los objetos seleccionados
+    const selectedCriticityType: CriticityType | undefined = criticityType.find(ct => ct.id === selectedCriticityTypeId);
+    const selectedChecker: Checker | undefined = checker.find(c => c.id === selectedCheckerId);
+
+    if (!selectedCriticityType || !selectedChecker) {
+        showAlert("No se encontró el tipo de criticidad o verificación seleccionado", "warning");
+        return;
+    }
+
+    // Tipado explícito para los parámetros a enviar
+    const parametros: HazzardData = {
+        name: name.trim(),
+        criticityTypeId: selectedCriticityTypeId,  // Enviando el objeto completo
+        checkerId: selectedCheckerId                       // Enviando el objeto completo
+    };
+
+    console.log("Datos a enviar:", parametros);
+
+    const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
-  };
-  
+};
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+  const enviarSolicitud = async (method: "POST" | "PUT", data: HazzardData) => {
     try {
-      const url = method === "PUT" && id ? `${URL}` : URL;
+      const url = method === "PUT" && id ? `${URL}${id}/` : URL;
       const response = await axios({
         method,
         url,
         data,
         headers: { "Content-Type": "application/json" },
       });
-
-      const { tipo, msj } = response.data;
-      showAlert(msj, tipo);
-      getUsers();
-      if (tipo === "success") {
-        // Cierra el modal después de un segundo para permitir la actualización
-        setTimeout(() => {
-          const closeModalButton = document.getElementById("btnCerrar");
-          if (closeModalButton) {
-            closeModalButton.click();
-          }
-          getUsers(); // Actualiza la lista de usuarios
-        }, 500);
+  
+      showAlert("Operación realizada con éxito", "success");
+      getHazzard();
+      if (modalRef.current) {
+        const modal = bootstrap.Modal.getInstance(modalRef.current);
+        modal?.hide();
       }
     } catch (error) {
-      showAlert("Error al enviar la solicitud", "error");
-      console.error(error);
+      if (axios.isAxiosError(error) && error.response) {
+        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+      } else {
+        showAlert("Error al realizar la solicitud", "error");
+      }
     }
   };
 
-  const deleteUser = async (id: string) => {
+  //BORRAMOS EL DATO DE LA TABLA
+  const deleteHazzard = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}`, {
+      await axios.delete(`${URL}${id}/`, {
         headers: {
           'Content-Type': 'application/json'
         }
       });
-      showAlert("Usuario eliminado correctamente", "success");
-      getUsers(); 
+      showAlert("Peligro eliminado correctamente", "success");
+      getHazzard();
     } catch (error) {
-      showAlert("Error al eliminar el usuario", "error");
-      console.error(error);
+      showAlert("Error al eliminar el peligro", "error");
     }
   };
 
   const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-		<Tooltip id="button-tooltip-edit" {...props}>
-		  Editar
-		</Tooltip>
-	  );
-	  
-	  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-		<Tooltip id="button-tooltip-delete" {...props}>
-		  Eliminar
-		</Tooltip>
-	  );
+    <Tooltip id="button-tooltip-edit" {...props}>
+      Editar
+    </Tooltip>
+  );
+
+  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+    <Tooltip id="button-tooltip-delete" {...props}>
+      Eliminar
+    </Tooltip>
+  );
+
+  const formatDate = (dateString: string) => {
+    return dateString.split('T')[0];
+  };
 
   return (
     <div className="App">
@@ -174,57 +227,58 @@ const Hazzard: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Peligro' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Peligros' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
-                <thead className="text-center" 
-                style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
-                color: '#fff' }}>
+                <thead className="text-center"
+                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
                   <tr>
-                    <th>ID</th>
+                    <th>N°</th>
                     <th>Nombre</th>
-                    <th>Descripción </th>
+                    <th>Descripción</th>
+                    <th>Nivel de Criticidad</th>
+                    <th>Verificación</th>
                     <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
                   {hazzard.map((hazz, i) => (
-                    <tr key={hazz.id} className="text-center">
+                    <tr key={JSON.stringify(hazz)} className="text-center">
                       <td>{i + 1}</td>
                       <td>{hazz.name}</td>
                       <td>{hazz.description}</td>
-                      <td>{hazz.createDate}</td>
+                      <td>{hazz.criticityType.description}</td>
+                      <td>{hazz.checker.name}</td>
+                      <td>{formatDate(hazz.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
-                        <button
-                        onClick={() => openModal("2", hazz)}
-                        className="btn btn-custom-editar m-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalUsers"
-                      >
-                        <i className="fa-solid fa-edit"></i>
-                      </button>
-                      </OverlayTrigger>
-                      <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
-                        <button className="btn btn-custom-danger" onClick={() => {
-                          MySwal.fire({
-                            title: "¿Estás seguro?",
-                            text: "No podrás revertir esto",
-                            icon: "warning",
-                            showCancelButton: true,
-                            confirmButtonText: "Sí, bórralo",
-                            cancelButtonText: "Cancelar",
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              deleteUser(hazz.id);
-                            }
-                          });
-                        }}>
-                          <FontAwesomeIcon icon={faCircleXmark} />
-                        </button>
-                      </OverlayTrigger>
+                          <button
+                            onClick={() => openModal("2", hazz)}
+                            className="btn btn-custom-editar m-2"
+                          >
+                            <i className="fa-solid fa-edit"></i>
+                          </button>
+                        </OverlayTrigger>
+                        <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+                          <button className="btn btn-custom-danger" onClick={() => {
+                            MySwal.fire({
+                              title: "¿Estás seguro?",
+                              text: "No podrás revertir esto",
+                              icon: "warning",
+                              showCancelButton: true,
+                              confirmButtonText: "Sí, bórralo",
+                              cancelButtonText: "Cancelar",
+                            }).then((result) => {
+                              if (result.isConfirmed) {
+                                deleteHazzard(hazz.id);
+                              }
+                            });
+                          }}>
+                            <i className="fa-solid fa-circle-xmark"></i>
+                          </button>
+                        </OverlayTrigger>
                       </td>
                     </tr>
                   ))}
@@ -233,11 +287,11 @@ const Hazzard: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>
+        <div className="modal fade" id="modalHazzard" tabIndex={-1} aria-hidden="true" ref={modalRef}>
           <div className="modal-dialog modal-dialog-top modal-md">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">{title}</h5>
+                <h5 className="modal-title w-100">{title}</h5>
                 <button
                   type="button"
                   className="btn-close"
@@ -246,43 +300,46 @@ const Hazzard: React.FC = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
                     <i className="fa-solid fa-circle-radiation"></i>
                   </span>
                   <input
                     type="text"
-                    id="nombre"
                     className="form-control"
-                    placeholder="Nombre Peligro"
+                    placeholder="Nombre del Peligro"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-regular fa-solid fa-file-alt"></i>
-                  </span>
-                  <input
-                    type="text"
-                    id="descripcion"
-                    className="form-control"
-                    placeholder="Descripción"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
+                <div className="mb-3">
+                  <label htmlFor="criticityType" className="form-label">Nivel de Criticidad</label>
+                  <select
+                    id="criticityType"
+                    className="form-select"
+                    value={selectedCriticityTypeId}
+                    onChange={(e) => setSelectedCriticityTypeId(Number(e.target.value))}
+                  >
+                    <option value={0}>Selecciona el nivel de criticidad</option>
+                    {criticityType.map(cri => (
+                      <option key={JSON.stringify(cri)} value={cri.id}>{cri.description + ' - ' + cri.name}</option>
+                    ))}
+                  </select>
                 </div>
-                <div className="col-md-12 mb-3">
-                    <div className="form-group">
-                      <input
-                        type="date"
-                        id="createDate"
-                        className="form-control"
-                        value={createDate}
-                        onChange={(e) => setCreateDate(e.target.value)}
-                      />
-                 </div>
+                <div className="mb-3">
+                  <label htmlFor="checker" className="form-label">Verificación</label>
+                  <select
+                    id="checker"
+                    className="form-select"
+                    value={selectedCheckerId}  
+                    onChange={(e) => setSelectedCheckerId(Number(e.target.value))}
+                  >
+                    <option value={0}>Selecciona la verificación</option>
+                    {checker.map(chec => (
+                      <option key={JSON.stringify(chec)} value={chec.id}>{chec.name}</option>
+                    ))}
+                 </select>
+
                 </div>
               </div>
               <div className="modal-footer">
