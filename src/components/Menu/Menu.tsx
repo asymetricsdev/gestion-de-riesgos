@@ -246,7 +246,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                                 </NavLink>
                             </OverlayTrigger>
                         )}
-
+                        {isOpen ? (
                             <NavLink to="/admin/ciudad" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-tree-city"></i>
                                 <span>Ciudad</span>
@@ -257,19 +257,18 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                                 <i className="fa-solid fa-tree-city"></i>
                                 </NavLink>
                             </OverlayTrigger>
-                        )}
-                        
-
+                        )}     
                     </div>
-                )}
-            </Nav>
+                    )}
+                </Nav> 
             <button onClick={toggleSidebar} className="btn-sidebar">
                 <OverlayTrigger placement="right" overlay={ isOpen ? renderTooltip('cerrar') : renderTooltip('abrir')}>
                 <i className={`fa-solid ${isOpen ? 'fa-chevron-left' : 'fa-chevron-right'}`}></i>
                 </OverlayTrigger>
             </button>
         </div>
+    
     );
-}
+};
 
 export default Menu;
