@@ -161,6 +161,7 @@ const Hazzard: React.FC = () => {
 
     console.log("Datos a enviar:", parametros);
 
+
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
 };
@@ -287,7 +288,7 @@ const Hazzard: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="modal fade" id="modalHazzard" tabIndex={-1} aria-hidden="true" ref={modalRef}>
+        <div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
           <div className="modal-dialog modal-dialog-top modal-md">
             <div className="modal-content">
               <div className="modal-header">
