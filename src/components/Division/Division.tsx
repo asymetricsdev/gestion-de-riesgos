@@ -16,7 +16,7 @@ interface Division {
 	description: string;
 	createDate: string;
 	updateDate: string;
-	company: Company; // Cambiado a objeto
+	company: Company; 
 	city: City;
   }
 
@@ -38,18 +38,25 @@ interface City {
 
 interface DivisionData {
   name: string;
-  description: string;
-  companyTypeId: number;
+  description: string | undefined;
+  companyId: number;
   cityId: number;
+  positionIds: number[];
 }
 
-const Division: React.FC = () => {
+interface Props {
+	isNewRecord: boolean;
+  }
+
+const Division: React.FC<Props> = ({ isNewRecord }) => {
   const URL = "https://asymetricsbackend.uk.r.appspot.com/division/";
   const [division, setDivision] = useState<Division[]>([]);
   const [company, setCompanyType] = useState<Company[]>([]);
   const [city, setCity] = useState<City[]>([]);
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
+  const [companyName, setCompanyName] = useState<string>("");
+  const [cityName, setCityName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [selectedCompanyTypeId, setSelectedCompanyTypeId] = useState<number>(0);
   const [selectedCityId, setSelectedCityId] = useState<number>(0);
@@ -104,6 +111,8 @@ const Division: React.FC = () => {
     if (op === "1") {
       setId(null);
       setName("");
+	  setCompanyName("");
+	  setCityName("");
       setDescription("");
       setSelectedCompanyTypeId(0);
       setSelectedCityId(0);
@@ -111,10 +120,15 @@ const Division: React.FC = () => {
     } else if (op === "2" && division) {
       setId(division.id);
       setName(division.name);
-      setDescription(division.description);
+	  setCompanyName(division.company.name);
+	  setCityName(division.city.name);
+      setDescription(division.description || "");
+     setSelectedCompanyTypeId(division.company.id);
       setSelectedCompanyTypeId(division.company.id); 
       setSelectedCityId(division.city.id);
       setTitle("Editar Division");
+
+	  console.log("Nombre en el modal:", name);
     }
 
     if (modalRef.current) {
@@ -124,81 +138,79 @@ const Division: React.FC = () => {
     }
   };
 
+
+  useEffect(() => {
+	if (id && !isNewRecord) {
+	  setDescription(name);
+	} else if (isNewRecord && description === "") {
+	  setDescription(name);
+	}
+  }, [name, isNewRecord, id]);
+  
+  
   const handleModalHidden = () => {
     setIsModalOpen(false);
     const modals = document.querySelectorAll('.modal-backdrop');
     modals.forEach(modal => modal.parentNode?.removeChild(modal));
   };
 
-const validar = (): void => {
-	if (name.trim() === "") {
-	  showAlert("Escribe el nombre de la Division", "warning");
-	  return;
-	}
-	if (selectedCompanyTypeId === 0) {
-	  showAlert("Selecciona una Compañia", "warning");
-	  return;
-	}
-	if (selectedCityId === 0) {
-	  showAlert("Selecciona una Ciudad", "warning");
-	  return;
-	}
-  
-	// Tipado para los objetos seleccionados
-	const selectedCompanyType: Company | undefined = company.find(
-	  (ct) => ct.id === selectedCompanyTypeId
-	);
-	const selectedCity: City | undefined = city.find((c) => c.id === selectedCityId);
-  
-	if (!selectedCompanyType) {
-	  showAlert("La Compañia seleccionada no se encontró", "warning");
-	  return;
-	}
-  
-	if (!selectedCity) {
-	  showAlert("La Ciudad seleccionada no se encontró", "warning");
-	  return;
-	}
-  
+  const validar = (): void => {
+    if (name.trim() === "") {
+        showAlert("Escribe el nombre del área", "warning");
+        return;
+    }
+    if (selectedCompanyTypeId === 0 ) {
+        showAlert("Selecciona una Compañía", "warning");
+        return;
+    }
+    if (selectedCityId === 0 ) {
+        showAlert("Selecciona una Ciudad", "warning");
+        return;
+    }
+
+	console.log("Valor de description al validar:", description);
+
+	const positionIds = id ? [2] : [];
 	const parametros: DivisionData = {
 	  name: name.trim(),
-	  description: description.trim(),
-	  companyTypeId: selectedCompanyTypeId,
+	  description: description ? description.trim() : name.trim(),
+	  companyId: selectedCompanyTypeId,
 	  cityId: selectedCityId,
+	  positionIds: positionIds?.length > 0 ? positionIds : [],  
 	};
-  
-	console.log("Datos a enviar:", parametros);
-  
-	const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
-	enviarSolicitud(metodo, parametros);
-  };
-  
+	
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: DivisionData) => {
-    try {
-    //   const url = method === "PUT" && id ? `${URL}${id}/` : URL;
-	const url = method === "PUT" && id ? `${URL}${id}/` : URL;
-      const response = await axios({
-        method,
-        url,
-        data,
-        headers: { "Content-Type": "application/json" },
-      });
+    const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
+    enviarSolicitud(metodo, parametros);
+};
+
+
+const enviarSolicitud = async (method: "POST" | "PUT", data: DivisionData) => {
+	try {
+	  const url = method === "PUT" && id ? `${URL}${id}/` : URL;
+	  const response = await axios({
+		method,
+		url,
+		data,
+		headers: { "Content-Type": "application/json" },
+	  });
   
-      showAlert("Operación realizada con éxito", "success");
-      getDivision();
-      if (modalRef.current) {
-        const modal = bootstrap.Modal.getInstance(modalRef.current);
-        modal?.hide();
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
-      } else {
-        showAlert("Error al realizar la solicitud", "error");
-      }
-    }
+	  showAlert("Operación realizada con éxito", "success");
+	  getDivision();
+	  if (modalRef.current) {
+		const modal = bootstrap.Modal.getInstance(modalRef.current);
+		modal?.hide();
+	  }
+	} catch (error) {
+	  if (axios.isAxiosError(error) && error.response) {
+		console.log('Detalles del error:', error.response.data);  // Para obtener más detalles sobre el error
+		showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+	  } else {
+		showAlert("Error al realizar la solicitud", "error");
+	  }
+	}
   };
+  
 
 
   const deleteDivision = async (id: number) => {
@@ -231,6 +243,8 @@ const validar = (): void => {
     return dateString.split('T')[0];
   };
 
+
+
   return (
 		<div className="App">
 			<div className="container-fluid">
@@ -253,8 +267,7 @@ const validar = (): void => {
 										<th>Descripción</th>
 										<th>Compañia</th>
 										<th>Ciudad</th>
-										<th>Crear Fecha</th>
-										<th>Actualizar Fecha</th>
+										<th>Fecha</th>
 										<th>Acciones</th>
 									</tr>
 								</thead>
@@ -264,12 +277,9 @@ const validar = (): void => {
 											<td>{i + 1}</td>
 											<td>{div.name}</td>
 											<td>{div.description}</td>
-											<td>Compañia</td>
-											<td>Ciudad</td>
-											{/* <td>{div.companyTypeId.id}</td>
-											<td>{div.cityId}</td> */}
-											<td>{div.createDate}</td>
-											<td>{div.updateDate}</td>
+											<td>{div.company.name}</td>
+											<td>{div.city.name}</td> 
+											<td>{div.createDate ? formatDate(div.createDate) : ''}</td>
 											<td className="text-center">
 												<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
 													<button
@@ -334,22 +344,6 @@ const validar = (): void => {
 										/>
 									</div>
 								</div>
-								<div className="mb-3">
-									<div className="input-group">
-										<span className="input-group-text">
-											<i className="fa-regular fa-file-alt"></i>
-										</span>
-										<input
-											type="text"
-											id="description"
-											className="form-control"
-											placeholder="Descripción"
-											value={description}
-											onChange={(e) => setDescription(e.target.value)}
-										/>
-									</div>
-								</div>
-
 								<div className="mb-3">
 									<label htmlFor="Company" className="form-label">
 										Compañias
