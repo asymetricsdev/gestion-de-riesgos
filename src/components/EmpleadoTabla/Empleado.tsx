@@ -19,6 +19,7 @@ interface Empleado {
   createDate?: string;
   updateDate?: string;
   position: Position;
+  tasks: Tasks[];
 }
 
 interface Position {
@@ -29,11 +30,23 @@ interface Position {
   updateDate?: string;
 }
 
-interface EmpleadoData {
-  firstName: string;
-  lastName: string;
-  positionId: number;
-  rut: string;
+interface Tasks {
+  id: number;
+  name: string;
+  description: string;
+  createDate?: string;
+  updateDate?: string;
+  version: number;
+  extension: string;
+  taskType: TaskType;
+}
+
+interface TaskType {
+  id: number;
+  name: string;
+  description: string;
+  createDate?: string;
+  updateDate?: string;
 }
 
 
@@ -140,7 +153,7 @@ const Empleado: React.FC = () => {
     }
     
     // Tipado explícito para los parámetros a enviar
-      const parametros: EmpleadoData = {
+      const parametros: Tasks = {
         rut: rut.trim(),
         firstName: firstName.trim(),
         lastName: lastName.trim(),
@@ -152,7 +165,7 @@ const Empleado: React.FC = () => {
     enviarSolicitud(metodo, parametros); 
 };
 
-   const enviarSolicitud = async (method: "POST" | "PUT", data: EmpleadoData) => {
+   const enviarSolicitud = async (method: "POST" | "PUT", data: Tasks) => {
     try {
       const url = method === "PUT" && id ? `${URL}${id}/` : URL;
       const response = await axios({
