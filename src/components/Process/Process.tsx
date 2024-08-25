@@ -90,7 +90,7 @@ const Process: React.FC = () => {
     enviarSolicitud(metodo, parametros);
   };
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
         // Si es una petición PUT, se añade el ID al final de la URL
         const url = method === "PUT" && id ? `${URL}${id}` : URL;
@@ -121,7 +121,7 @@ const Process: React.FC = () => {
 };
 
 
-  const deleteUser = async (id: string) => {
+  const deleteUser = async (id: number) => {
     try {
       await axios.delete(`${URL}${id}`, {
         headers: {
@@ -204,7 +204,7 @@ const Process: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteUser(proc.id);
+                              deleteUser(1);
                             }
                           });
                         }}>

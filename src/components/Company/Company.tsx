@@ -10,29 +10,21 @@ import * as bootstrap from 'bootstrap';
 const MySwal = withReactContent(Swal);
 
 interface Company {
-  id: string;                  
+  id: number;                  
   name: string;
   description: string;
   createDate: string;  
   updateDate: string; 
-  divisions: Division[];
-}
-
-interface Division {
-  id: number;
-  name: string;
 }
 
 
 const Company: React.FC = () => {
 
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/company";
+  const URL = "https://asymetricsbackend.uk.r.appspot.com/company/";
   const [company, setCompany] = useState<Company[]>([]);
-  const [id, setId] = useState<string>("");
+  const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [createDate, setCreateDate] = useState<string>("");
-  const [updateDate, setUpdateDate] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -58,20 +50,17 @@ const Company: React.FC = () => {
     }
   };
 
+
   
   const openModal = (op: string, company?: Company) => {
     if (company) {
-      setId(company.id);
+      setId(null);
       setName(company.name);
       setDescription(company.description);
-      setCreateDate(company.createDate);
-      setUpdateDate(company.updateDate);
     } else {
-      setId("");
+      setId(0);
       setName("");
       setDescription("");
-      setCreateDate("");
-      setUpdateDate("");
     }
     setTitle(op === "1" ? "Registrar Compañia" : "Editar Compañia");
 
@@ -97,21 +86,13 @@ const Company: React.FC = () => {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
-    if (createDate.trim() === "") {
-      showAlert("Escribe la descripción", "warning", "crear Fecha");
-      return;
-    }
-    if (updateDate.trim() === "") {
-      showAlert("Escribe la descripción", "warning", "actualizar Fecha");
-      return;
-    }
     
-    const parametros = { id, name: name.trim(), description: description.trim(), createDate:createDate.trim(), updateDate:updateDate.trim() };
+    const parametros = { id, name: name.trim(), description: description.trim() };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
         const url = method === "PUT" && id ? `${URL}${id}` : URL;
         const response = await axios({
@@ -140,7 +121,7 @@ const Company: React.FC = () => {
 };
 
 
-  const deleteUser = async (id: string) => {
+  const deleteUser = async (id: number) => {
     try {
       await axios.delete(`${URL}${id}`, {
         headers: {
@@ -167,6 +148,10 @@ const Company: React.FC = () => {
 		</Tooltip>
 	  );
 
+    const formatDate = (dateString: string) => {
+      return dateString.split('T')[0];
+    };
+
 
   return (
     <div className="App">
@@ -185,8 +170,7 @@ const Company: React.FC = () => {
                     <th>N°</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
-                    <th>Crear Fecha</th>
-                    <th>Actualizar Fecha</th>
+                    <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -196,8 +180,7 @@ const Company: React.FC = () => {
                       <td>{i + 1}</td>
                       <td>{comp.name}</td>
                       <td>{comp.description}</td>
-                      <td>{comp.createDate}</td>
-                      <td>{comp.updateDate}</td>
+                      <td>{formatDate(comp.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button
@@ -273,32 +256,6 @@ const Company: React.FC = () => {
                     placeholder="Descripción"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                  <i className="fa-solid fa-calendar"></i>
-                  </span>
-                  <input
-                    type="date"
-                    id="descripcion"
-                    className="form-control"
-                    placeholder="Fecha de Creación"
-                    value={createDate}
-                    onChange={(e) => setCreateDate(e.target.value)}
-                  />
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                  <i className="fa-solid fa-calendar-days"></i>
-                  </span>
-                  <input
-                    type="date"
-                    id="descripcion"
-                    className="form-control"
-                    placeholder="Actualizar Fecha"
-                    value={updateDate}
-                    onChange={(e) => setUpdateDate(e.target.value)}
                   />
                 </div>
               </div>

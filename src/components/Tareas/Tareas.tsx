@@ -39,7 +39,7 @@ interface TaskType {
 }
 
 function Tareas() {
-	const URL = "https://asymetricsbackend.uk.r.appspot.com/task/";
+	const URL = "https://asymetricsbackend.uk.r.appspot.com/task";
 
 	const [tareas, setTareas] = useState<Tareas[]>([]);
 	const [id, setId] = useState<string>("");
