@@ -27,6 +27,14 @@
     overflow-x: auto; /* Asegurarse de que el contenido no se desborde */
   }
 
+  .tabla-contenedor-matriz {
+    width: 100%; /* Ajustar el ancho al 100% */
+    margin: 0 auto; /* Centrar el contenedor */
+    margin-top: 5px;
+    box-sizing: border-box; /* Incluir padding y border en el ancho */
+    overflow-x: auto; /* Asegurarse de que el contenido no se desborde */
+  }
+
   /*Posición botón agregar nuevo usuario*/
   .action-button {
     position: absolute;

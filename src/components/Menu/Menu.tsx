@@ -9,10 +9,20 @@ interface SidebarProps {
 }
 
 const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
-    const [isAdminOpen, setIsAdminOpen] = useState(false);
+    const [isOrgOpen, setIsOrgOpen] = useState(false);
+    const [isPlanOpen, setIsPlanOpen] = useState(false);
+    const [isMatrizOpen, setIsMatrizOpen] = useState(false);
     
-    const toggleAdminSubmenu = () => {
-        setIsAdminOpen(!isAdminOpen);
+    const toggleOrgSubmenu = () => {
+        setIsOrgOpen(!isOrgOpen);
+    };
+
+    const togglePlanSubmenu = () => {
+        setIsPlanOpen(!isPlanOpen);
+    };
+
+    const toggleMatrizSubmenu = () => {
+        setIsMatrizOpen(!isMatrizOpen);
     };
 
     const renderTooltip = (text: string) => (
@@ -20,7 +30,6 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             {text}
         </Tooltip>
     );
-
     return (
         <div className={`sidebar bg-dark text-white vh-100 ${isOpen ? 'open' : ''}`}>
             <Nav defaultActiveKey="/home" className="flex-column">
@@ -37,227 +46,305 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                     </OverlayTrigger>
                 )}
                 {isOpen ? (
-                    <NavLink to="/planificador-de-actividad" className="nav-link text-white d-flex align-items-center">
-                        <i className="fa-solid fa-calendar-alt"></i>
-                        <span>Planificador de Actividad</span>
-                    </NavLink>
-                ) : (
-                    <OverlayTrigger placement="right" overlay={renderTooltip('Planificador de Actividad')}>
-                        <NavLink to="/planificador-de-actividad" className="nav-link text-white d-flex align-items-center">
-                        <i className="fa-solid fa-calendar-alt"></i>
-                        </NavLink>
-                    </OverlayTrigger>
-                )}
-                {isOpen ? (
-                    <NavLink to="/matriz-de-peligro" className="nav-link text-white d-flex align-items-center">
-                        <i className="fa-solid fa-exclamation-triangle"></i>
-                        <span>Matriz de Peligro</span>
-                    </NavLink>
-                ) : (
-                    <OverlayTrigger placement="right" overlay={renderTooltip('Matriz de Peligro')}>
-                        <NavLink to="/matriz-de-peligro" className="nav-link text-white d-flex align-items-center">
-                        <i className="fa-solid fa-exclamation-triangle"></i>
-                        </NavLink>
-                    </OverlayTrigger>
-                )}
-                {isOpen ? (
-                    <NavLink to="/matriz-legal" className="nav-link text-white d-flex align-items-center">
-                        <i className="fa-solid fa-file-alt"></i>
-                        <span>Matriz Legal</span>
-                    </NavLink>
-                ) : (
-                    <OverlayTrigger placement="right" overlay={renderTooltip('Matriz Legal')}>
-                        <NavLink to="/matriz-legal" className="nav-link text-white d-flex align-items-center">
-                        <i className="fa-solid fa-file-alt"></i>
-                        </NavLink>
-                    </OverlayTrigger>
-                )}
-                {isOpen ? (
-                    <div className="nav-link text-white d-flex align-items-center" onClick={toggleAdminSubmenu}>
-                        <i className="fa-solid fa-user-tie"></i>
-                        <span>Administración</span>
-                        <i className={`ms-auto ${isAdminOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'}`}></i>
+                    <div className="nav-link text-white d-flex align-items-center" onClick={togglePlanSubmenu}>
+                        <i className="fa-solid fa-business-time"></i>
+                        <span>Planificación</span>
+                        <i className={`ms-auto ${isPlanOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'}`}></i>
 
                     </div>
                 ) : (
-                    <OverlayTrigger placement="right" overlay={renderTooltip('Administración')}>
-                        <div className="nav-link text-white d-flex align-items-center" onClick={toggleAdminSubmenu}>
-                        <i className="fa-solid fa-user-tie"></i>
-                        <i className={`ms-auto ${isAdminOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'}`}></i>
+                    <OverlayTrigger placement="right" overlay={renderTooltip('Planificación')}>
+                        <div className="nav-link text-white d-flex align-items-center" onClick={togglePlanSubmenu}>
+                        <i className="fa-solid fa-business-time"></i>
+                        <i className={`ms-auto ${isPlanOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'}`}></i>
                         </div>
                     </OverlayTrigger>
                 )}
-                {isAdminOpen && (
+                    {isPlanOpen && (
                     <div className="submenu">
                         {isOpen ? (
-                            <NavLink to="/admin/usuarios" className="nav-link text-white d-flex align-items-center">
+                            <NavLink to="/planificacion/planificador-de-actividad" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-users"></i>
-                                <span>Usuarios</span>
+                                <span>PlanificadorActividad</span>
                             </NavLink>
                         ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Usuarios')}>
-                                <NavLink to="/admin/usuarios" className="nav-link text-white d-flex align-items-center">
+                            <OverlayTrigger placement="right" overlay={renderTooltip('PlanificadorActividad')}>
+                                <NavLink to="/planificacion/planificador-de-actividad" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-users"></i>
                                 </NavLink>
                             </OverlayTrigger>
                         )}
                         {isOpen ? (
-                            <NavLink to="/admin/perfiles" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-address-card"></i>
+                            <NavLink to="/planificacion/checkpoint" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-list-check"></i>
+                                <span>Checkpoint</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Checkpoint')}>
+                                <NavLink to="/planificacion/checkpoint" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-list-check"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
+                        {isOpen ? (
+                            <NavLink to="/planificacion/perfiles" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-id-badge"></i>
                                 <span>Perfiles</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Perfiles')}>
-                                <NavLink to="/admin/perfiles" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-address-card"></i>
+                                <NavLink to="/planificacion/perfiles" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-id-badge"></i>
                                 </NavLink>
                             </OverlayTrigger>
                         )}
                         {isOpen ? (
-                            <NavLink to="/admin/procesos" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-list-check"></i>
-                                <span>Procesos</span>
-                            </NavLink>
-                        ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Tareas')}>
-                                <NavLink to="/admin/procesos" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-list-check"></i>
-                                </NavLink>
-                            </OverlayTrigger>
-                        )}
-                        {isOpen ? (
-                            <NavLink to="/admin/company" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-building"></i>
-                                <span>Company</span>
-                            </NavLink>
-                        ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Company')}>
-                                <NavLink to="/admin/company" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-building"></i>
-                                </NavLink>
-                            </OverlayTrigger>
-                        )}
-                        {isOpen ? (
-                            <NavLink to="/admin/actividades" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-people-robbery"></i>
-                                <span>Actividades</span>
-                            </NavLink>
-                        ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Actividades')}>
-                                <NavLink to="/admin/actividades" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-people-robbery"></i>
-                                </NavLink>
-                            </OverlayTrigger>
-                        )}
-                        {isOpen ? (
-                            <NavLink to="/admin/division" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-sitemap"></i>
-                                <span>Division</span>
-                            </NavLink>
-                        ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Division')}>
-                                <NavLink to="/admin/division" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-sitemap"></i>
-                                </NavLink>
-                            </OverlayTrigger>
-                        )}
-                        {isOpen ? (
-                            <NavLink to="/admin/peligro" className="nav-link text-white d-flex align-items-center">
-                                 <i className="fa-solid fa-circle-radiation"></i>
-                                <span>Peligro</span>
-                            </NavLink>
-                        ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Peligro')}>
-                                <NavLink to="/admin/peligro" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-circle-radiation"></i>
-                                </NavLink>
-                            </OverlayTrigger>
-                        )}
-                        {isOpen ? (
-                            <NavLink to="/admin/matriz-de-peligro/riesgos" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-circle-exclamation"></i>
-                                <span>Riesgos</span>
-                            </NavLink>
-                        ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Riesgos')}>
-                                <NavLink to="/admin/matriz-de-peligro/riesgos" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-circle-exclamation"></i>
-                                </NavLink>
-                            </OverlayTrigger>
-                        )}
-                        {isOpen ? (
-                            <NavLink to="/admin/matriz-de-peligro/criticidad-de-peligro" className="nav-link text-white d-flex align-items-center">
-                                 <i className="fa-solid fa-bolt"></i>
-                                <span>Criticidad</span>
-                            </NavLink>
-                        ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Criticidad')}>
-                                <NavLink to="/admin/matriz-de-peligro/criticidad-de-peligro" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-bolt"></i>
-                                </NavLink>
-                            </OverlayTrigger>
-                        )}
-                        {isOpen ? (
-                            <NavLink to="/admin/matriz-de-peligro/comprobaciones" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-check-circle"></i>
-                                <span>Checker</span>
-                            </NavLink>
-                        ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Checker')}>
-                                <NavLink to="/admin/matriz-de-peligro/comprobaciones" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-check-circle"></i>
-                                </NavLink>
-                            </OverlayTrigger>
-                        )}
-                        {isOpen ? (
-                            <NavLink to="/admin/actividad" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-chart-line"></i>
-                                <span>Actividad</span>
-                            </NavLink>
-                        ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Actividad')}>
-                                <NavLink to="/admin/actividad" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-chart-line"></i>
-                                </NavLink>
-                            </OverlayTrigger>
-                        )}
-                        {isOpen ? (
-                            <NavLink to="/admin/tareas" className="nav-link text-white d-flex align-items-center">
+                            <NavLink to="/planificacion/tareas" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-bars-progress"></i>
                                 <span>Tareas</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Tareas')}>
-                                <NavLink to="/admin/tareas" className="nav-link text-white d-flex align-items-center">
+                                <NavLink to="/planificacion/tareas" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-bars-progress"></i>
                                 </NavLink>
                             </OverlayTrigger>
                         )}
                         {isOpen ? (
+                            <NavLink to="/planificacion/tipos-de-tareas" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-list-check"></i>
+                                <span>TiposDeTareas</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('TiposDeTareas')}>
+                                <NavLink to="/planificacion/tipos-de-tareas" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-list-check"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
 
-                            <NavLink to="/admin/empleado" className="nav-link text-white d-flex align-items-center">
-                               <i className="fa-solid fa-id-card-clip"></i>
-                                <span>Empleados</span>
+                    </div>
+                    )}
+        
+
+                    {isOpen ? (
+                    <div className="nav-link text-white d-flex align-items-center" onClick={toggleMatrizSubmenu}>
+                        <i className="fa-solid fa-exclamation-triangle"></i>
+                        <span>Matriz de Peligro</span>
+                        <i className={`ms-auto ${isMatrizOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'}`}></i>
+
+                    </div>
+                ) : (
+                    <OverlayTrigger placement="right" overlay={renderTooltip('Matriz de Peligro')}>
+                        <div className="nav-link text-white d-flex align-items-center" onClick={toggleMatrizSubmenu}>
+                        <i className="fa-solid fa-exclamation-triangle"></i>
+                        <i className={`ms-auto ${isMatrizOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'}`}></i>
+                        </div>
+                    </OverlayTrigger>
+                )}
+                    {isMatrizOpen && (
+                    <div className="submenu">
+                        {isOpen ? (
+                            <NavLink to="/matriz-de-peligro/actividad" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-chart-line"></i>
+                                <span>Actividad</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Actividad')}>
-                                <NavLink to="/admin/empleado" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-id-card-clip"></i>
+                                <NavLink to="/matriz-de-peligro/actividad" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-chart-line"></i>
                                 </NavLink>
                             </OverlayTrigger>
                         )}
                         {isOpen ? (
-                            <NavLink to="/admin/ciudad" className="nav-link text-white d-flex align-items-center">
+                            <NavLink to="/matriz-de-peligro/actividades" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-people-robbery"></i>
+                                <span>Tipos de Actividades</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Tipos de Actividades')}>
+                                <NavLink to="/matriz-de-peligro/actividades" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-people-robbery"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
+                        {isOpen ? (
+                            <NavLink to="/matriz-de-peligro/criticidad-de-peligro" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-bolt"></i>
+                                <span>Criticidad</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Criticidad')}>
+                                <NavLink to="/matriz-de-peligro/criticidad-de-peligro" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-bolt"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
+                        {isOpen ? (
+                            <NavLink to="/matriz-de-peligro/comprobaciones" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-check-circle"></i>
+                                <span>Comprobaciones</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Comprobaciones')}>
+                                <NavLink to="/matriz-de-peligro/comprobaciones" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-check-circle"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
+                        {/* {isOpen ? (
+                            <NavLink to="/matriz-de-peligro/tipo-de-comprobaciones" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-list-check"></i>
+                                <span>Tipo de Comprobaciones</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Tipo de Comprobaciones')}>
+                                <NavLink to="/matriz-de-peligro/tipo-de-comprobaciones" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-list-check"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )} */}
+                        {isOpen ? (
+                    <NavLink to="/matriz-de-peligro/peligro" className="nav-link text-white d-flex align-items-center">
+                        <i className="fa-solid fa-exclamation-triangle"></i>
+                        <span>Peligro</span>
+                    </NavLink>
+                ) : (
+                    <OverlayTrigger placement="right" overlay={renderTooltip('Peligro')}>
+                        <NavLink to="/matriz-de-peligro/peligro" className="nav-link text-white d-flex align-items-center">
+                        <i className="fa-solid fa-exclamation-triangle"></i>
+                        </NavLink>
+                    </OverlayTrigger>
+                )}
+                    {isOpen ? (
+                    <NavLink to="/matriz-de-peligro/matriz-peligro" className="nav-link text-white d-flex align-items-center">
+                        <i className="fa-solid fa-calendar-alt"></i>
+                        <span>Matriz de Peligro</span>
+                    </NavLink>
+                ) : (
+                    <OverlayTrigger placement="right" overlay={renderTooltip('Matriz')}>
+                        <NavLink to="/matriz-de-peligro/matriz-peligro" className="nav-link text-white d-flex align-items-center">
+                        <i className="fa-solid fa-calendar-alt"></i>
+                        </NavLink>
+                    </OverlayTrigger>
+                )}
+                    {isOpen ? (
+                    <NavLink to="/matriz-de-peligro/riesgos" className="nav-link text-white d-flex align-items-center">
+                        <i className="fa-solid fa-circle-exclamation"></i>
+                        <span>Riesgos</span>
+                    </NavLink>
+                ) : (
+                    <OverlayTrigger placement="right" overlay={renderTooltip('Riesgos')}>
+                        <NavLink to="/matriz-de-peligro/riesgos" className="nav-link text-white d-flex align-items-center">
+                        <i className="fa-solid fa-circle-exclamation"></i>
+                    </NavLink>
+                    </OverlayTrigger>
+                        )}
+                </div>
+                )}
+                {isOpen ? (
+                    <div className="nav-link text-white d-flex align-items-center" onClick={toggleOrgSubmenu}>
+                        <i className="fa-solid fa-layer-group"></i>
+                        <span>Organización</span>
+                        <i className={`ms-auto ${isOrgOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'}`}></i>
+
+                    </div>
+                ) : (
+                    <OverlayTrigger placement="right" overlay={renderTooltip('Administración')}>
+                        <div className="nav-link text-white d-flex align-items-center" onClick={toggleOrgSubmenu}>
+                        <i className="fa-solid fa-layer-group"></i>
+                        <i className={`ms-auto ${isOrgOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'}`}></i>
+                        </div>
+                    </OverlayTrigger>
+                )}
+
+                {isOrgOpen && (
+                    <div className="submenu">
+                        {isOpen ? (
+                            <NavLink to="/organizacion/ciudad" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-tree-city"></i>
                                 <span>Ciudad</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Ciudad')}>
-                                <NavLink to="/admin/ciudad" className="nav-link text-white d-flex align-items-center">
+                                <NavLink to="/organizacion/ciudad" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-tree-city"></i>
                                 </NavLink>
                             </OverlayTrigger>
-                        )}     
+                        )}
+                        {isOpen ? (
+                            <NavLink to="/organizacion/compañia" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-building"></i>
+                                <span>Compañia</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Compañia')}>
+                                <NavLink to="/organizacion/compañia" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-building"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
+                        {isOpen ? (
+                            <NavLink to="/organizacion/division" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-sitemap"></i>
+                                <span>Division</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Division')}>
+                                <NavLink to="/organizacion/division" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-sitemap"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
+                        {isOpen ? (
+
+                            <NavLink to="/organizacion/empleados" className="nav-link text-white d-flex align-items-center">
+                               <i className="fa-solid fa-id-card-clip"></i>
+                                <span>Empleados</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Empleados')}>
+                                <NavLink to="/organizacion/empleados" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-id-card-clip"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )} 
+                        {isOpen ? (
+                            <NavLink to="/organizacion/posicion" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-address-card"></i>
+                                <span>Posición</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Posición')}>
+                                <NavLink to="/organizacion/posicion" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-address-card"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
+                        {isOpen ? (
+                            <NavLink to="/organizacion/procesos" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-list-check"></i>
+                                <span>Procesos</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Procesos')}>
+                                <NavLink to="/organizacion/procesos" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-list-check"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
+                        {isOpen ? (
+                            <NavLink to="/organizacion/usuarios" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-users"></i>
+                                <span>Usuarios</span>
+                            </NavLink>
+                        ) : (
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Usuarios')}>
+                                <NavLink to="/organizacion/usuarios" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-users"></i>
+                                </NavLink>
+                            </OverlayTrigger>
+                        )}
                     </div>
                     )}
                 </Nav> 
@@ -267,7 +354,6 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 </OverlayTrigger>
             </button>
         </div>
-    
     );
 };
 

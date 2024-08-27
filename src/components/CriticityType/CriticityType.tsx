@@ -17,7 +17,7 @@ interface CriticityType {
 }
 
 const CriticityType: React.FC = () => {
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/criticity_type/";
+  const URL = "https://asymetricsbackend.uk.r.appspot.com/criticity/";
   const [criticity, setCriticityType] = useState<CriticityType[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
