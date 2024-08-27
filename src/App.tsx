@@ -23,6 +23,7 @@ import './AppStyle.css';
 import Procesos from './components/Process/Process';
 import Actividad from './components/ActividadTabla/ActividadTabla';
 import Tareas from './components/Tareas/Tareas';
+import TipoTareas from './components/TipoTareas/TipoTareas';
 import Empleados from './components/EmpleadoTabla/Empleado';
 
 
@@ -50,7 +51,7 @@ export function App() {
                                 <Route path="/planificacion/checkpoint" element={< PlanificadorActividad/>} />
                                 <Route path="/planificacion/perfiles" element={<Perfiles />} />
                                 <Route path="/planificacion/tareas" element={<Tareas />} />
-                                <Route path="/planificacion/tipos-de-tareas" element={<Tareas />} />
+                                <Route path="/planificacion/tipos-de-tareas" element={<TipoTareas />} />
 
                                 <Route path="/matriz-de-peligro" element={<MatrizPeligro />} />
                                 <Route path="/matriz-de-peligro/actividad" element={<Actividad />} />
