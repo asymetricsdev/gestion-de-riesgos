@@ -25,6 +25,7 @@ import Actividad from './components/ActividadTabla/ActividadTabla';
 import Tareas from './components/Tareas/Tareas';
 import TipoTareas from './components/TipoTareas/TipoTareas';
 import Empleados from './components/EmpleadoTabla/Empleado';
+import Checkpoint from './components/Checkpoint/Checkpoint';
 
 
 export function App() {
@@ -48,7 +49,7 @@ export function App() {
                                 <Route path="/home" element={<Home />} />
                                 <Route path="/planificacion" element={< PlanificadorActividad/>} />
                                 <Route path="/planificacion/planificador-de-actividad" element={< PlanificadorActividad/>} />
-                                <Route path="/planificacion/checkpoint" element={< PlanificadorActividad/>} />
+                                <Route path="/planificacion/checkpoint" element={< Checkpoint/>} />
                                 <Route path="/planificacion/perfiles" element={<Perfiles />} />
                                 <Route path="/planificacion/tareas" element={<Tareas />} />
                                 <Route path="/planificacion/tipos-de-tareas" element={<TipoTareas />} />
