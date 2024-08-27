@@ -275,30 +275,6 @@ const validar = (): void => {
 		}
 	};
 
-	// const onDrop = useCallback((acceptedFiles: File[]) => {
-	// 	if (acceptedFiles.length > 0) {
-	// 		const file = acceptedFiles[0];
-	// 		setSelectedFile(file);
-
-	// 		const reader = new FileReader();
-	// 		reader.onload = async () => {
-	// 			const base64 = reader.result as string;
-	// 			handleImageUpload(base64);
-	// 		};
-	// 		reader.readAsDataURL(file);
-	// 	}
-	// }, []);
-
-	// const extractFileExtension = (base64: string): string => {
-	// 	const extensionMap: { [key: string]: string } = {
-	// 		"image/jpeg": "jpg",
-	// 		"image/png": "png",
-	// 		"application/pdf": "pdf",
-	// 	};
-	// 	const type = base64.split(";")[0].split(":")[1];
-	// 	return extensionMap[type] || "unknown";
-	// };
-
 	const onDrop = useCallback((acceptedFiles: File[]) => {
 		if (acceptedFiles.length > 0) {
 		  const file = acceptedFiles[0];

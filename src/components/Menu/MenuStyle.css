@@ -77,6 +77,19 @@
     width: 100%; 
     padding: 0.5rem; 
   }
+
+  .arrow-circle {
+    background-color: white;
+    color: black;
+    margin-left: 234px;
+    clip-path: circle(60% at 92%);
+    height: 30px;
+    width: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+    
   
 .btn-sidebar:focus {
     

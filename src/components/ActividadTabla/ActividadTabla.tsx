@@ -98,7 +98,7 @@ const Actividad: React.FC = () => {
   
    const getActivityType = async () => {
     try {
-      const response = await axios.get<ActivityType[]>('https://asymetricsbackend.uk.r.appspot.com/activity_type/');
+      const response = await axios.get<ActivityType[]>('https://asymetricsbackend.uk.r.appspot.com/activity_type');
       setActivityType(response.data);
     } catch (error) {
       showAlert("Error al obtener los tipos de actividad", "error");

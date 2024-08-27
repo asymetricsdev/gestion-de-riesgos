@@ -83,7 +83,7 @@ const Hazzard: React.FC = () => {
 
   const getCriticityType = async () => {
     try {
-      const response = await axios.get<CriticityType[]>('https://asymetricsbackend.uk.r.appspot.com/criticity_type/');
+      const response = await axios.get<CriticityType[]>('https://asymetricsbackend.uk.r.appspot.com/activity_type');
       setCriticityType(response.data);
     } catch (error) {
       showAlert("Error al obtener los tipos de criticidad", "error");
