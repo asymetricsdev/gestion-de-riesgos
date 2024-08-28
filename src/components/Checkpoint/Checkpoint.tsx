@@ -13,8 +13,14 @@ interface Checkpoint {
   id: number;
   name: string;
   description: string;
-  checkerId: number;
+  checker: Checker;
 }
+
+interface Checker {
+  id: number;
+  name: string;
+}
+
 
 const Checkpoint: React.FC = () => {
 
@@ -23,13 +29,14 @@ const Checkpoint: React.FC = () => {
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [checkerId, setCheckerId] = useState<number | null>(null);
+  const [checker, setChecker] = useState<Checker[]>([]);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     getCheckpoint();
+	getChecker();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -49,18 +56,25 @@ const Checkpoint: React.FC = () => {
     }
   };
 
+  const getChecker = async () => {
+    try {
+      const response = await axios.get<Checker[]>('https://asymetricsbackend.uk.r.appspot.com/checker/');
+      setChecker(response.data);
+    } catch (error) {
+      showAlert("Error al obtener el cargo del Perfiles", "error");
+    }
+  };
+
   
   const openModal = (op: string, checkpoint?: Checkpoint) => {
     if (checkpoint) {
       setId(checkpoint.id);
       setName(checkpoint.name);
       setDescription(checkpoint.description);
-      setCheckerId(checkpoint.checkerId);
     } else {
       setId(null);
       setName("");
       setDescription("");
-      setCheckerId(null);
     }
     setTitle(op === "1" ? "Registrar el Tipo de Checkpoint" : "Editar el Tipo de Checkpoint");
 
@@ -87,10 +101,16 @@ const Checkpoint: React.FC = () => {
       return;
     }
     
-    const parametros = { id, name: name.trim(), description: description.trim(), checkerId, };
+    const parametros = { id, name: name.trim(), description: description.trim() };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
+
+      // Tipado explícito para los parámetros a enviar
+      const parametros: Checker = {
+        id: 0,
+        name: name.trim(),
+    };  
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
@@ -168,7 +188,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 										<th>N°</th>
 										<th>Nombre</th>
 										<th>Descripción </th>
-										<th>checkerId</th>
+										<th>Tipo de Verificación</th>
 										<th>Acciones</th>
 									</tr>
 								</thead>
@@ -178,7 +198,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 											<td>{i + 1}</td>
 											<td>{check.name}</td>
 											<td>{check.description}</td>
-                                            <td>{check.checkerId}</td>
+                                            <td>{check.checker.name}</td>
 											<td className="text-center">
 												<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
 													<button

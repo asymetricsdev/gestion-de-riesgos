@@ -10,7 +10,7 @@ import * as bootstrap from 'bootstrap';
 const MySwal = withReactContent(Swal);
 
 interface Process {
-  id: string;
+  id: number;
   name: string;
   description: string;
   createDate: string;
@@ -20,7 +20,7 @@ const Process: React.FC = () => {
 
   const URL = "https://asymetricsbackend.uk.r.appspot.com/process/";
   const [process, setProcess] = useState<Process[]>([]);
-  const [id, setId] = useState<string>("");
+  const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   // const [createDate, setCreateDate] = useState<string>("");
@@ -56,7 +56,7 @@ const Process: React.FC = () => {
       setName(process.name);
       setDescription(process.description);
     } else {
-      setId("");
+      setId(null);
       setName("");
       setDescription("");
     }
@@ -92,7 +92,6 @@ const Process: React.FC = () => {
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-        // Si es una petición PUT, se añade el ID al final de la URL
         const url = method === "PUT" && id ? `${URL}${id}` : URL;
         const response = await axios({
             method,
@@ -105,7 +104,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
         showAlert(msj, tipo);
         getUsers();
         if (tipo === "success") {
-            // Cierra el modal después de un segundo para permitir la actualización
             setTimeout(() => {
                 const closeModalButton = document.getElementById("btnCerrar");
                 if (closeModalButton) {
@@ -121,7 +119,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 };
 
 
-  const deleteUser = async (id: number) => {
+  const deleteProcess = async (id: number) => {
     try {
       await axios.delete(`${URL}${id}`, {
         headers: {
@@ -148,9 +146,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 		</Tooltip>
 	  );
 
-    // Función para formatear la fecha y eliminar la hora
     const formatDate = (dateString: string) => {
-    // Solo toma la parte de la fecha (YYYY-MM-DD)
     return dateString.split('T')[0];
   };
 
@@ -188,8 +184,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                         onClick={() => openModal("2", proc)}
                         className="btn btn-custom-editar m-2"
                         data-bs-toggle="modal"
-                        data-bs-target="#modalUsers"
-                      >
+                        data-bs-target="#modalUsers">
                         <i className="fa-solid fa-edit"></i>
                       </button>
                       </OverlayTrigger>
@@ -204,7 +199,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteUser(1);
+                              deleteProcess(proc.id);
                             }
                           });
                         }}>
