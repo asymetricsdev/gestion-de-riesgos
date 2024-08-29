@@ -76,7 +76,7 @@ const Empleado: React.FC = () => {
   
   const getPosition = async () => {
     try {
-      const response = await axios.get<Position[]>('https://asymetricsbackend.uk.r.appspot.com/position/');
+      const response = await axios.get<Position[]>('https://testbackend-433922.uk.r.appspot.com/position/');
       setPosition(response.data);
     } catch (error) {
       showAlert("Error al obtener el cargo del empleado", "error");
