@@ -17,7 +17,7 @@ interface Activity {
 }
 
 const Activity: React.FC = () => {
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/activity_type/";
+  const URL = "https://testbackend-433922.uk.r.appspot.com/activity_type/";
   const [activity, setActivity] = useState<Activity[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");

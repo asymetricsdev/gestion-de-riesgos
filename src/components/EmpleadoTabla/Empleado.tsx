@@ -19,7 +19,6 @@ interface Empleado {
   createDate?: string;
   updateDate?: string;
   position: Position;
-  tasks: Tasks[];
 }
 
 interface Position {
@@ -30,28 +29,16 @@ interface Position {
   updateDate?: string;
 }
 
-interface Tasks {
-  id: number;
-  name: string;
-  description: string;
-  createDate?: string;
-  updateDate?: string;
-  version: number;
-  extension: string;
-  taskType: TaskType;
-}
-
-interface TaskType {
-  id: number;
-  name: string;
-  description: string;
-  createDate?: string;
-  updateDate?: string;
+interface EmpleadoData {
+  rut: string;
+  firstName: string;
+  lastName: string;
+  positionId: number;
 }
 
 
 const Empleado: React.FC = () => {
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/employee/";
+  const URL = "https://testbackend-433922.uk.r.appspot.com/employee/";
   const [empleado, setEmpleado] = useState<Empleado[]>([]);
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
@@ -114,7 +101,6 @@ const Empleado: React.FC = () => {
       setFirstName(empleado.firstName);
       setLastName(empleado.lastName);
       setSelectedPositionId(empleado.position.id);
-
       setTitle("Editar Empleado");
     }
 
@@ -153,7 +139,7 @@ const Empleado: React.FC = () => {
     }
     
     // Tipado explícito para los parámetros a enviar
-      const parametros: Tasks = {
+      const parametros: EmpleadoData = {
         rut: rut.trim(),
         firstName: firstName.trim(),
         lastName: lastName.trim(),
@@ -165,7 +151,7 @@ const Empleado: React.FC = () => {
     enviarSolicitud(metodo, parametros); 
 };
 
-   const enviarSolicitud = async (method: "POST" | "PUT", data: Tasks) => {
+   const enviarSolicitud = async (method: "POST" | "PUT", data: EmpleadoData) => {
     try {
       const url = method === "PUT" && id ? `${URL}${id}/` : URL;
       const response = await axios({
