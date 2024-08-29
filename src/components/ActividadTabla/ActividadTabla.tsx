@@ -56,7 +56,7 @@ interface ActividadData{
 }
 
 const Actividad: React.FC = () => {
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/activity/";
+  const URL = "https://testbackend-433922.uk.r.appspot.com/activity/";
   const [actividad, setActividad] = useState<Actividad[]>([]);
   const [description, setDescription] = useState<string>("");
   const [activityType, setActivityType] = useState<ActivityType[]>([]);
@@ -98,7 +98,7 @@ const Actividad: React.FC = () => {
   
    const getActivityType = async () => {
     try {
-      const response = await axios.get<ActivityType[]>('https://asymetricsbackend.uk.r.appspot.com/activity_type');
+      const response = await axios.get<ActivityType[]>('https://testbackend-433922.uk.r.appspot.com/activity_type');
       setActivityType(response.data);
     } catch (error) {
       showAlert("Error al obtener los tipos de actividad", "error");
@@ -107,7 +107,7 @@ const Actividad: React.FC = () => {
 
   const getProcess = async () => {
     try {
-      const response = await axios.get<Process[]>('https://asymetricsbackend.uk.r.appspot.com/process/');
+      const response = await axios.get<Process[]>('https://testbackend-433922.uk.r.appspot.com/process/');
       setProcess(response.data);
     } catch (error) {
       showAlert("Error al obtener los procesos", "error");
@@ -116,7 +116,7 @@ const Actividad: React.FC = () => {
 
   const getHazzard = async () => {
     try {
-      const response = await axios.get<Hazzard[]>('https://asymetricsbackend.uk.r.appspot.com/hazzard/');
+      const response = await axios.get<Hazzard[]>('https://testbackend-433922.uk.r.appspot.com/hazzard/');
       setHazzard(response.data);
     } catch (error) {
       showAlert("Error al obtener los peligros", "error");

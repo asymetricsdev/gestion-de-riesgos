@@ -43,7 +43,7 @@ interface HazzardData {
 }
 
 const Hazzard: React.FC = () => {
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/hazzard/";
+  const URL = "https://testbackend-433922.uk.r.appspot.com/hazzard/";
   const [hazzard, setHazzard] = useState<Hazzard[]>([]);
   const [criticityType, setCriticityType] = useState<CriticityType[]>([]);
   const [checker, setChecker] = useState<Checker[]>([]);
@@ -83,7 +83,7 @@ const Hazzard: React.FC = () => {
 
   const getCriticityType = async () => {
     try {
-      const response = await axios.get<CriticityType[]>('https://asymetricsbackend.uk.r.appspot.com/activity_type');
+      const response = await axios.get<CriticityType[]>('https://testbackend-433922.uk.r.appspot.com/activity_type');
       setCriticityType(response.data);
     } catch (error) {
       showAlert("Error al obtener los tipos de criticidad", "error");
@@ -92,7 +92,7 @@ const Hazzard: React.FC = () => {
 
   const getChecker = async () => {
     try {
-      const response = await axios.get<Checker[]>('https://asymetricsbackend.uk.r.appspot.com/checker/');
+      const response = await axios.get<Checker[]>('https://testbackend-433922.uk.r.appspot.com/checker/');
       setChecker(response.data);
     } catch (error) {
       showAlert("Error al obtener los tipos de verificación", "error");
