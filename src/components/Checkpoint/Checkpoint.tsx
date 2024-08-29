@@ -2,173 +2,177 @@ import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { showAlert } from "../functions";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import * as bootstrap from 'bootstrap';
+import * as bootstrap from "bootstrap";
 
 const MySwal = withReactContent(Swal);
 
 interface Checkpoint {
-  id: number;
-  name: string;
-  description: string;
-  checker: Checker;
+	id: number;
+	name: string;
+	description: string;
+	checker: Checker;
 }
 
 interface Checker {
-  id: number;
-  name: string;
+	id: number;
+	name: string;
+	checkerId: number;
 }
 
-
 const Checkpoint: React.FC = () => {
+	const URL = "https://asymetricsbackend.uk.r.appspot.com/checkpoint/";
+	const [checkpoint, setCheckpoint] = useState<Checkpoint[]>([]);
+	const [id, setId] = useState<number | null>(null);
+	const [name, setName] = useState<string>("");
+	const [description, setDescription] = useState<string>("");
+	const [checker, setChecker] = useState<Checker[]>([]);
+	const [selectedCheckpointId, setSelectedCheckpointId] = useState<number>(0);
+	const [title, setTitle] = useState<string>("");
+	const modalRef = useRef<HTMLDivElement | null>(null);
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/checkpoint/";
-  const [checkpoint, setCheckpoint] = useState<Checkpoint[]>([]);
-  const [id, setId] = useState<number | null>(null);
-  const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [checker, setChecker] = useState<Checker[]>([]);
-  const [title, setTitle] = useState<string>("");
-  const modalRef = useRef<HTMLDivElement | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	useEffect(() => {
+		getCheckpoint();
+		getChecker();
+		if (modalRef.current) {
+			modalRef.current.addEventListener("hidden.bs.modal", handleModalHidden);
+		}
+		return () => {
+			if (modalRef.current) {
+				modalRef.current.removeEventListener("hidden.bs.modal", handleModalHidden);
+			}
+		};
+	}, []);
 
-  useEffect(() => {
-    getCheckpoint();
-	getChecker();
-    if (modalRef.current) {
-      modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
-    }
-    return () => {
-      if (modalRef.current) {
-        modalRef.current.removeEventListener('hidden.bs.modal', handleModalHidden);
-      }
-    };
-  }, []);
+	const getCheckpoint = async () => {
+		try {
+			const response: AxiosResponse<Checkpoint[]> = await axios.get(URL);
+			setCheckpoint(response.data);
+		} catch (error) {
+			showAlert("Error al obtener los Checkpoint", "error");
+		}
+	};
 
-  const getCheckpoint = async () => {
-    try {
-      const response: AxiosResponse<Checkpoint[]> = await axios.get(URL);
-      setCheckpoint(response.data);
-    } catch (error) {
-      showAlert("Error al obtener los Checkpoint", "error");
-    }
-  };
+	const getChecker = async () => {
+		try {
+			const response = await axios.get<Checker[]>(
+				"https://asymetricsbackend.uk.r.appspot.com/checker/"
+			);
+			setChecker(response.data);
+		} catch (error) {
+			showAlert("Error al obtener el cargo del Perfiles", "error");
+		}
+	};
 
-  const getChecker = async () => {
-    try {
-      const response = await axios.get<Checker[]>('https://asymetricsbackend.uk.r.appspot.com/checker/');
-      setChecker(response.data);
-    } catch (error) {
-      showAlert("Error al obtener el cargo del Perfiles", "error");
-    }
-  };
+	const openModal = (op: string, checkpoint?: Checkpoint) => {
+		if (checkpoint) {
+			setId(checkpoint.id);
+			setName(checkpoint.name);
+			setDescription(checkpoint.description);
+		} else {
+			setId(null);
+			setName("");
+			setDescription("");
+		}
+		setTitle(op === "1" ? "Registrar el Tipo de Checkpoint" : "Editar el Tipo de Checkpoint");
 
-  
-  const openModal = (op: string, checkpoint?: Checkpoint) => {
-    if (checkpoint) {
-      setId(checkpoint.id);
-      setName(checkpoint.name);
-      setDescription(checkpoint.description);
-    } else {
-      setId(null);
-      setName("");
-      setDescription("");
-    }
-    setTitle(op === "1" ? "Registrar el Tipo de Checkpoint" : "Editar el Tipo de Checkpoint");
+		if (modalRef.current) {
+			const modal = new bootstrap.Modal(modalRef.current);
+			modal.show();
+			setIsModalOpen(true);
+		}
+	};
 
-    if (modalRef.current) {
-      const modal = new bootstrap.Modal(modalRef.current);
-      modal.show();
-      setIsModalOpen(true);
-    }
-  };
+	const handleModalHidden = () => {
+		setIsModalOpen(false);
+		const modals = document.querySelectorAll(".modal-backdrop");
+		modals.forEach((modal) => modal.parentNode?.removeChild(modal));
+	};
 
-  const handleModalHidden = () => {
-    setIsModalOpen(false);
-    const modals = document.querySelectorAll('.modal-backdrop');
-    modals.forEach(modal => modal.parentNode?.removeChild(modal));
-  };
+	const validar = () => {
+		if (name.trim() === "") {
+			showAlert("Escribe el nombre", "warning", "nombre del checkpoint");
+			return;
+		}
+		if (description.trim() === "") {
+			showAlert("Escribe la descripción", "warning", "descripción");
+			return;
+		}
+		if (selectedCheckpointId === 0) {
+			showAlert("Selecciona un tipo de Checker", "warning");
+			return;
+		}
 
-  const validar = () => {
-    if (name.trim() === "") {
-      showAlert("Escribe el nombre", "warning", "nombre del checkpoint");
-      return;
-    }
-    if (description.trim() === "") {
-      showAlert("Escribe la descripción", "warning", "descripción");
-      return;
-    }
-    
-    const parametros = { id, name: name.trim(), description: description.trim() };
-    const metodo = id ? "PUT" : "POST";
-    enviarSolicitud(metodo, parametros);
-  };
+		const parametros = { id, name: name.trim(), description: description.trim(), checkerId: selectedCheckpointId };
+		const metodo = id ? "PUT" : "POST";
+		enviarSolicitud(metodo, parametros);
+	};
 
-      // Tipado explícito para los parámetros a enviar
-      const parametros: Checker = {
-        id: 0,
-        name: name.trim(),
-    };  
+	const parametros: Checker = {
+		id: 0,
+		name: name.trim(),
+		checkerId: selectedCheckpointId,
+	};
 
-const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
-    try {
-        const url = method === "PUT" && id ? `${URL}${id}` : URL;
-        const response = await axios({
-            method,
-            url,
-            data,
-            headers: { "Content-Type": "application/json" },
-        });
+	const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+		try {
+			const url = method === "PUT" && id ? `${URL}${id}` : URL;
+			const response = await axios({
+				method,
+				url,
+				data,
+				headers: { "Content-Type": "application/json" },
+			});
 
-        const { tipo, msj } = response.data;
-        showAlert(msj, tipo);
-        getCheckpoint();
-        if (tipo === "success") {
-            setTimeout(() => {
-                const closeModalButton = document.getElementById("btnCerrar");
-                if (closeModalButton) {
-                    closeModalButton.click();
-                }
-                getCheckpoint(); 
-            }, 500);
-        }
-    } catch (error) {
-        showAlert("Error al enviar la solicitud", "error");
-        console.error(error);
-    }
-};
+			const { tipo, msj } = response.data;
+			showAlert(msj, tipo);
+			getCheckpoint();
+			if (tipo === "success") {
+				setTimeout(() => {
+					const closeModalButton = document.getElementById("btnCerrar");
+					if (closeModalButton) {
+						closeModalButton.click();
+					}
+					getCheckpoint();
+				}, 500);
+			}
+		} catch (error) {
+			showAlert("Error al enviar la solicitud", "error");
+			console.error(error);
+		}
+	};
 
+	const deleteCheckpoint = async (id: number) => {
+		try {
+			await axios.delete(`${URL}${id}`, {
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+			showAlert("Checkpoint eliminado correctamente", "success");
+			getCheckpoint();
+		} catch (error) {
+			showAlert("Error al eliminar el Tipo de Checkpoint", "error");
+			console.error(error);
+		}
+	};
 
-  const deleteCheckpoint = async (id: number) => {
-    try {
-      await axios.delete(`${URL}${id}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      showAlert("Checkpoint eliminado correctamente", "success");
-      getCheckpoint(); 
-    } catch (error) {
-      showAlert("Error al eliminar el Tipo de Checkpoint", "error");
-      console.error(error);
-    }
-  };
-
-  const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+	const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>
-		  Editar
+			Editar
 		</Tooltip>
-	  );
-	  
-	  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-		<Tooltip id="button-tooltip-delete" {...props}>
-		  Eliminar
-		</Tooltip>
-	  );
+	);
 
-  return (
+	const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-delete" {...props}>
+			Eliminar
+		</Tooltip>
+	);
+
+	return (
 		<div className="App">
 			<div className="container-fluid">
 				<div className="row mt-3">
@@ -198,7 +202,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 											<td>{i + 1}</td>
 											<td>{check.name}</td>
 											<td>{check.description}</td>
-                                            <td>{check.checker.name}</td>
+											<td>{check.checker.name}</td>
 											<td className="text-center">
 												<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
 													<button
@@ -244,8 +248,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 									type="button"
 									className="btn-close"
 									data-bs-dismiss="modal"
-									aria-label="Close"> 
-                                </button>
+									aria-label="Close"
+								></button>
 							</div>
 							<div className="modal-body">
 								<input type="hidden" id="id" />
@@ -275,15 +279,28 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 										onChange={(e) => setDescription(e.target.value)}
 									/>
 								</div>
-								<div className="input-group mb-3"></div>
+								<div className="mb-3">
+									<label htmlFor="Checkpoint" className="form-label">
+									Verificador:
+									</label>
+									<select
+										id="checkpoint"
+										className="form-select"
+										value={selectedCheckpointId}
+										onChange={(e) => setSelectedCheckpointId(Number(e.target.value))}>
+										<option value={0}>Selecciona el Verificador</option>
+										{checkpoint.map((chec) => (
+										<option key={JSON.stringify(chec)} value={chec.checker.id}>{chec.checker.name}</option>
+										))}
+									</select>
+								</div>
 							</div>
 							<div className="modal-footer">
 								<button
 									type="button"
 									className="btn btn-secondary"
 									data-bs-dismiss="modal"
-									id="btnCerrar"
-								>
+									id="btnCerrar">
 									Cerrar
 								</button>
 								<button type="button" className="btn btn-primary" onClick={validar}>
