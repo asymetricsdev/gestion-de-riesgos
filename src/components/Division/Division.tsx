@@ -213,18 +213,21 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: DivisionData) => {
   };
   
 
-
-  const deleteDivision = async (id: number) => {
+const deleteDivision = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}/`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      await axios.delete(`${baseURL}/division/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-      showAlert("Division eliminada correctamente", "success");
+      Swal.fire("Área eliminada correctamente", "", "success");
       getDivision();
     } catch (error) {
-      showAlert("Error al eliminar la Division", "error");
+      console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar la Área.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 

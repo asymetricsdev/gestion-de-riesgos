@@ -176,19 +176,24 @@ const Empleado: React.FC = () => {
     }
   }; 
 
-   const deleteEmpleado = async (id: number) => {
+
+  const deleteEmpleado = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}/`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      await axios.delete(`${baseURL}/employee/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-      showAlert("Empleado eliminado correctamente", "success");
+      Swal.fire("Colaborador eliminado correctamente", "", "success");
       getEmpleado();
     } catch (error) {
-      showAlert("Error al eliminar empleado", "error");
+      console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar el Colaborador.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
-  }; 
+  };
 
   const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
     <Tooltip id="button-tooltip-edit" {...props}>

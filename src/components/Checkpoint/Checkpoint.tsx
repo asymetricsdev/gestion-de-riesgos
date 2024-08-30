@@ -144,20 +144,38 @@ const Checkpoint: React.FC = () => {
 		}
 	};
 
+	// const deleteCheckpoint = async (id: number) => {
+	// 	try {
+	// 		await axios.delete(`${URL}${id}`, {
+	// 			headers: {
+	// 				"Content-Type": "application/json",
+	// 			},
+	// 		});
+	// 		showAlert("Checkpoint eliminado correctamente", "success");
+	// 		getCheckpoint();
+	// 	} catch (error) {
+	// 		showAlert("Error al eliminar el Tipo de Checkpoint", "error");
+	// 		console.error(error);
+	// 	}
+	// };
+
 	const deleteCheckpoint = async (id: number) => {
 		try {
-			await axios.delete(`${URL}${id}`, {
-				headers: {
-					"Content-Type": "application/json",
-				},
-			});
-			showAlert("Checkpoint eliminado correctamente", "success");
-			getCheckpoint();
+		  await axios.delete(`${baseURL}/checkpoint/${id}`, {
+			headers: { "Content-Type": "application/json" },
+		  });
+		  Swal.fire("Checkpoint eliminado correctamente", "", "success");
+		  getCheckpoint();
 		} catch (error) {
-			showAlert("Error al eliminar el Tipo de Checkpoint", "error");
-			console.error(error);
+		  console.error(error);
+		  Swal.fire({
+			title: "Error",
+			text: "Error al eliminar Checkpoint.",
+			icon: "error",
+			confirmButtonText: "OK",
+		  });
 		}
-	};
+	  };
 
 	const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>

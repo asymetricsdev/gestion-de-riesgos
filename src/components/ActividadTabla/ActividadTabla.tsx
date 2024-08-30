@@ -232,16 +232,20 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
 
   const deleteActividad = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}/`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      await axios.delete(`${baseURL}/activity/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-      showAlert("Peligro eliminado correctamente", "success");
-      // Actualizar el estado eliminando la actividad
+      Swal.fire("Tarea eliminada correctamente", "", "success");
       setActividad((prev) => prev.filter((act) => act.id !== id));
+      getActivity();
     } catch (error) {
-      showAlert("Error al eliminar el peligro", "error");
+      console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar la tarea.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
   

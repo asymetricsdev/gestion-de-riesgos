@@ -168,7 +168,7 @@ const Profiles: React.FC = () => {
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
   try {
-    const url = method === "PUT" && id ? `${baseURL}/process/${id}` : `${baseURL}/process/`;
+    const url = method === "PUT" && id ? `${baseURL}/profile/${id}` : `${baseURL}/profile/`;
     const response = await axios({
       method,
       url,
@@ -202,19 +202,22 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
   }
 };
 
-  //BORRAMOS EL DATO DE LA TABLA
+
   const deleteProfiles = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}/`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      await axios.delete(`${baseURL}/profile/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-      showAlert("Perfil eliminado correctamente", "success");
-      // Actualizar el estado eliminando la actividad
-      setProfiles((prev) => prev.filter((prof) => prof.id !== id));
+      Swal.fire("Perfil eliminado correctamente", "", "success");
+      getProfiles();
     } catch (error) {
-      showAlert("Error al eliminar el perfil", "error");
+      console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar el Perfil.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
   

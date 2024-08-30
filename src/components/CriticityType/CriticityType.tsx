@@ -10,7 +10,7 @@ import * as bootstrap from 'bootstrap';
 const MySwal = withReactContent(Swal);
 
 interface CriticityType {
-  id: string;
+  id: number;
   name: string;
   description: string;
   createDate: string;
@@ -27,7 +27,7 @@ const CriticityType: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getUsers();
+    getCriticity();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -38,7 +38,7 @@ const CriticityType: React.FC = () => {
     };
   }, []);
 
-  const getUsers = async () => {
+  const getCriticity = async () => {
     try {
       const response: AxiosResponse<CriticityType[]> = await axios.get(`${baseURL}/criticity/`);
       setCriticityType(response.data);
@@ -50,7 +50,7 @@ const CriticityType: React.FC = () => {
   
   const openModal = (op: string, criticity?: CriticityType) => {
     if (criticity) {
-      setId(criticity.id);
+      setId("");
       setName(criticity.name);
       setDescription(criticity.description);
     } else {
@@ -100,14 +100,14 @@ const CriticityType: React.FC = () => {
 
         const { tipo, msj } = response.data;
         showAlert(msj, tipo);
-        getUsers();
+        getCriticity();
         if (tipo === "success") {
             setTimeout(() => {
                 const closeModalButton = document.getElementById("btnCerrar");
                 if (closeModalButton) {
                     closeModalButton.click();
                 }
-                getUsers(); 
+                getCriticity(); 
             }, 500);
         }
     } catch (error) {
@@ -117,18 +117,21 @@ const CriticityType: React.FC = () => {
 };
 
 
-  const deleteUser = async (id: string) => {
+  const deleteCriticity = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      await axios.delete(`${baseURL}/criticity/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-      showAlert("Criticidad eliminado correctamente", "success");
-      getUsers(); 
+      Swal.fire("Tipo de Criticity eliminada correctamente", "", "success");
+      getCriticity();
     } catch (error) {
-      showAlert("Error al eliminar la criticidad", "error");
       console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar el Tipo de Criticity.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -144,9 +147,8 @@ const CriticityType: React.FC = () => {
 		</Tooltip>
 	  );
 
-    // Función para formatear la fecha y eliminar la hora
+
     const formatDate = (dateString: string) => {
-    // Solo toma la parte de la fecha (YYYY-MM-DD)
     return dateString.split('T')[0];
   };
 
@@ -200,7 +202,7 @@ const CriticityType: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteUser(crit.id);
+                              deleteCriticity(crit.id);
                             }
                           });
                         }}>

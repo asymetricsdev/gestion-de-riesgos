@@ -39,7 +39,7 @@ const City: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getUsers();
+    getCity();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -50,7 +50,7 @@ const City: React.FC = () => {
     };
   }, []);
 
-  const getUsers = async () => {
+  const getCity = async () => {
     try {
       const response: AxiosResponse<City[]> = await axios.get(`${baseURL}/city/`);
       const data = response.data.map(City => ({
@@ -134,7 +134,7 @@ const City: React.FC = () => {
 
       const { tipo, msj } = response.data;
       showAlert(msj, tipo);
-      getUsers();
+      getCity();
       if (tipo === "success") {
         setTimeout(() => {
           const closeModalButton = document.getElementById("btnCerrar");
@@ -148,15 +148,21 @@ const City: React.FC = () => {
     }
   };
 
-  const deleteUser = async (id: string) => {
+  const deleteCity = async (id: string) => {
     try {
-      await axios.delete(`${URL}${id}`, {
-        headers: { 'Content-Type': 'application/json' }
+      await axios.delete(`${baseURL}/city/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-      showAlert("Ciudad eliminada correctamente", "success");
-      getUsers();
+      Swal.fire("Ciudad eliminada correctamente", "", "success");
+      getCity();
     } catch (error) {
-      showAlert("Error al eliminar la Ciudad", "error");
+      console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar la Ciudad.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -220,7 +226,7 @@ const City: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteUser(cit.id);
+                              deleteCity(cit.id);
                             }
                           });
                         }}
