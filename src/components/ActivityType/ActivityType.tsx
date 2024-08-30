@@ -17,7 +17,7 @@ interface Activity {
 }
 
 const Activity: React.FC = () => {
-  const URL = "https://testbackend-433922.uk.r.appspot.com/activity_type/";
+  const baseURL = import.meta.env.VITE_API_URL;
   const [activity, setActivity] = useState<Activity[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -40,7 +40,7 @@ const Activity: React.FC = () => {
 
   const getUsers = async () => {
     try {
-      const response: AxiosResponse<Activity[]> = await axios.get(URL);
+      const response: AxiosResponse<Activity[]> = await axios.get(`${baseURL}/activity_type/`);
       setActivity(response.data);
     } catch (error) {
       showAlert("Error al obtener el tipo de actividad", "error");
@@ -90,8 +90,7 @@ const Activity: React.FC = () => {
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-        // Si es una petición PUT, se añade el ID al final de la URL
-        const url = method === "PUT" && id ? `${URL}${id}` : URL;
+        const url = method === "PUT" && id ? `${baseURL}/activity_type/${id}` : `${baseURL}/activity_type/`;
         const response = await axios({
             method,
             url,
@@ -146,9 +145,8 @@ const Activity: React.FC = () => {
 		</Tooltip>
 	  );
 
-    // Función para formatear la fecha y eliminar la hora
+
     const formatDate = (dateString: string) => {
-    // Solo toma la parte de la fecha (YYYY-MM-DD)
     return dateString.split('T')[0];
   };
 

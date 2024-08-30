@@ -26,7 +26,7 @@ interface subordinatePositions {
 }
 
 const PositionComponent: React.FC = () => {
-	const URL = "https://asymetricsbackend.uk.r.appspot.com/position/";
+	const baseURL = import.meta.env.VITE_API_URL;
 	const [position, setPosition] = useState<Position[]>([]);
 	const [id, setId] = useState<string>("");
 	const [name, setName] = useState<string>("");
@@ -52,8 +52,8 @@ const PositionComponent: React.FC = () => {
 
 	const getPosition = async () => {
 		try {
-			const response: AxiosResponse<Position[]> = await axios.get(URL);
-			setPosition(response.data); // Aquí se mantiene el tipo de Position como se recibe.
+			const response: AxiosResponse<Position[]> = await axios.get(`${baseURL}/position/`);
+			setPosition(response.data);
 		} catch (error) {
 			showAlert("Error al obtener la Posición", "error");
 		}
@@ -75,7 +75,7 @@ const PositionComponent: React.FC = () => {
 			setManagerPosition(null);
 			setSubordinatePositions([]);
 		}
-		setTitle(op === "1" ? "Registrar Posición" : "Editar Posición");
+		setTitle(op === "1" ? "Registrar Cargo" : "Editar Cargo");
 
 		if (modalRef.current) {
 			const modal = new bootstrap.Modal(modalRef.current);
@@ -104,7 +104,7 @@ const PositionComponent: React.FC = () => {
 			return;
 		}
 
-		// Crear el objeto Position para enviar al servidor
+
 		const parametros: Position = {
 			id,
 			name: name.trim(),
@@ -122,7 +122,7 @@ const PositionComponent: React.FC = () => {
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: Position) => {
     try {
-      const url = method === "PUT" && id ? `${URL}${id}/` : URL;
+	  const url = method === "PUT" && id ? `${baseURL}/position/${id}` : `${baseURL}/position/`;
       const response = await axios({
         method,
         url,
@@ -179,7 +179,7 @@ const PositionComponent: React.FC = () => {
 			showAlert("Usuario eliminado correctamente", "success");
 			getPosition();
 		} catch (error) {
-			showAlert("Error al eliminar la Posición", "error");
+			showAlert("Error al eliminar el Cargo", "error");
 		}
 	};
 
@@ -193,7 +193,7 @@ const PositionComponent: React.FC = () => {
 				<div className="row mt-3">
 					<div className="col-12">
 						<div className="tabla-contenedor">
-							<EncabezadoTabla title="Posición" onClick={() => openModal("1")} />
+							<EncabezadoTabla title="Cargos" onClick={() => openModal("1")} />
 						</div>
 						<div className="table-responsive">
 							<table className="table table-bordered">
@@ -205,12 +205,10 @@ const PositionComponent: React.FC = () => {
 									}}>
 									<tr>
 										<th>ID</th>
-										<th>Nombre</th>
-										<th>Descripción</th>
-                    <th>Posicion Manager</th>
-                    <th>Posicion Subordinada</th>
-										<th>Fecha</th>
-										<th>Acciones</th>
+										<th>Cargo</th>
+										<th>Jefatura</th>
+										<th>Equipo</th>
+										<th >Acciones</th>
 									</tr>
 								</thead>
 								<tbody className="table-group-divider">
@@ -218,16 +216,15 @@ const PositionComponent: React.FC = () => {
 										<tr key={pos.id} className="text-center">
 											<td>{i + 1}</td>
 											<td>{pos.name}</td>
-											<td>{pos.description}</td>
-                      <td>{pos.managerPosition?.name}</td>
-                      <td>{pos.subordinatePositions.map((subPos) => subPos.name).join(", ")}</td>
-                      <td>{pos.createDate ? formatDate(pos.createDate) : ""}</td>
-											<td className="text-center">
+											<td>{pos.managerPosition?.name}</td>
+											<td>{pos.subordinatePositions.map((subPos) => subPos.name).join(", ")}</td>
+											<td className="text-center p-3">
 												<button
 													onClick={() => openModal("2", pos)}
 													className="btn btn-custom-editar m-2"
 													data-bs-toggle="modal"
-													data-bs-target="#modalUsers">
+													data-bs-target="#modalUsers"
+												>
 													<i className="fa-solid fa-edit"></i>
 												</button>
 												<button
@@ -245,7 +242,8 @@ const PositionComponent: React.FC = () => {
 																deleteUser(pos.id);
 															}
 														});
-													}}>
+													}}
+												>
 													<FontAwesomeIcon icon={faCircleXmark} />
 												</button>
 											</td>
@@ -264,14 +262,20 @@ const PositionComponent: React.FC = () => {
 					data-bs-keyboard="false"
 					tabIndex={-1}
 					aria-labelledby="modalTitle"
-					aria-hidden="true">
+					aria-hidden="true"
+				>
 					<div className="modal-dialog">
 						<div className="modal-content">
 							<div className="modal-header">
 								<h1 className="modal-title fs-5" id="modalTitle">
 									{title}
 								</h1>
-									<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								<button
+									type="button"
+									className="btn-close"
+									data-bs-dismiss="modal"
+									aria-label="Close"
+								></button>
 							</div>
 							<div className="modal-body">
 								<div className="input-group mb-3">
@@ -284,7 +288,8 @@ const PositionComponent: React.FC = () => {
 										className="form-control"
 										placeholder="Nombre"
 										value={name}
-										onChange={(e) => setName(e.target.value)}/>
+										onChange={(e) => setName(e.target.value)}
+									/>
 								</div>
 								<div className="input-group mb-3">
 									<span className="input-group-text">
@@ -299,21 +304,7 @@ const PositionComponent: React.FC = () => {
 										onChange={(e) => setDescription(e.target.value)}
 									/>
 								</div>
-								<div className="input-group mb-3">
-									<span className="input-group-text">
-                  <i className="fa-solid fa-calendar"></i>
-									</span>
-									<input
-										type="text"
-										id="createDate"
-										className="form-control"
-										placeholder="Fecha"
-										value={createDate}
-										onChange={(e) => setCreateDate(e.target.value)}
-									/>
-								</div>
 
-								{/* Combo box for Manager Position */}
 								<div className="input-group mb-3">
 									<span className="input-group-text">
 										<i className="fa-solid fa-user-tie"></i>
@@ -321,31 +312,9 @@ const PositionComponent: React.FC = () => {
 									<select
 										className="form-select"
 										value={managerPosition ?? ""}
-										onChange={(e) => setManagerPosition(e.target.value || null)}>
+										onChange={(e) => setManagerPosition(e.target.value || null)}
+									>
 										<option value="">Seleccione una posición</option>
-										{position.map((pos) => (
-											<option key={pos.id} value={pos.id}>
-												{pos.name}
-											</option>
-										))}
-									</select>
-								</div>
-
-								{/* Combo box for Subordinate Positions */}
-								<div className="input-group mb-3">
-									<span className="input-group-text">
-										<i className="fa-solid fa-users"></i>
-									</span>
-									<select
-										className="form-select"
-										multiple
-										value={subordinatePositions}
-										onChange={(e) => {
-											const selectedOptions = Array.from(e.target.selectedOptions).map(
-												(option) => option.value
-											);
-											setSubordinatePositions(selectedOptions);
-										}}>
 										{position.map((pos) => (
 											<option key={pos.id} value={pos.id}>
 												{pos.name}
@@ -359,13 +328,11 @@ const PositionComponent: React.FC = () => {
 									type="button"
 									className="btn btn-secondary"
 									data-bs-dismiss="modal"
-									id="btnCerrar">
+									id="btnCerrar"
+								>
 									Close
 								</button>
-								<button
-									type="button"
-									className="btn btn-primary"
-									onClick={() => validar()}>
+								<button type="button" className="btn btn-primary" onClick={() => validar()}>
 									Guardar
 								</button>
 							</div>

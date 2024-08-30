@@ -17,7 +17,7 @@ interface CheckerType {
 }
 
 const CheckerType: React.FC = () => {
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/checker_type/";
+  const baseURL = import.meta.env.VITE_API_URL;
   const [checker, setChecker] = useState<CheckerType[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -40,7 +40,7 @@ const CheckerType: React.FC = () => {
 
   const getUsers = async () => {
     try {
-      const response: AxiosResponse<CheckerType[]> = await axios.get(URL);
+      const response: AxiosResponse<CheckerType[]> = await axios.get(`${baseURL}/checker_type/`);
       setChecker(response.data);
     } catch (error) {
       showAlert("Error al obtener Tipo de Verificación", "error");
@@ -90,8 +90,7 @@ const CheckerType: React.FC = () => {
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-        // Si es una petición PUT, se añade el ID al final de la URL
-        const url = method === "PUT" && id ? `${URL}${id}` : URL;
+        const url = method === "PUT" && id ? `${baseURL}/checker_type/${id}` : `${baseURL}/checker_type/`;
         const response = await axios({
             method,
             url,
@@ -146,9 +145,7 @@ const CheckerType: React.FC = () => {
 		</Tooltip>
 	  );
 
-    // Función para formatear la fecha y eliminar la hora
     const formatDate = (dateString: string) => {
-    // Solo toma la parte de la fecha (YYYY-MM-DD)
     return dateString.split('T')[0];
   };
 
@@ -158,7 +155,7 @@ const CheckerType: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Tipo de Verificación' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Jerarquía de Control' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">

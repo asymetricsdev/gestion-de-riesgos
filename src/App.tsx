@@ -59,7 +59,7 @@ export function App() {
                                 <Route path="/matriz-de-peligro/actividades" element={<ActivitiesPage />} />
                                 <Route path="/matriz-de-peligro/criticidad-de-peligro" element={<Criticidad />} />
                                 <Route path="/matriz-de-peligro/comprobaciones" element={<Comprobaciones />} />
-                                {/* <Route path="/matriz-de-peligro/tipo-de-comprobaciones" element={<TipoComprobaciones />} /> */}
+                                {/* <Route path="/matriz-de-peligro/verificadores" element={<Verificadores />} /> */}
                                 <Route path="/matriz-de-peligro/peligro" element={<Peligro />} />
                                 <Route path="/matriz-de-peligro/matriz-peligro" element={<MatrizPeligro />} />
                                 <Route path="/matriz-de-peligro/riesgos" element={<Riesgo />} />

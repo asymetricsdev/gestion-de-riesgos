@@ -193,13 +193,13 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                             </OverlayTrigger>
                         )}
                         {/* {isOpen ? (
-                            <NavLink to="/matriz-de-peligro/tipo-de-comprobaciones" className="nav-link text-white d-flex align-items-center">
+                            <NavLink to="/matriz-de-peligro/verificador" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-list-check"></i>
-                                <span>Tipo de Comprobaciones</span>
+                                <span>Verificadores</span>
                             </NavLink>
                         ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Tipo de Comprobaciones')}>
-                                <NavLink to="/matriz-de-peligro/tipo-de-comprobaciones" className="nav-link text-white d-flex align-items-center">
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Verificadores')}>
+                                <NavLink to="/matriz-de-peligro/verificador" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-list-check"></i>
                                 </NavLink>
                             </OverlayTrigger>

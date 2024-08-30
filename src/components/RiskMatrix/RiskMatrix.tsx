@@ -20,7 +20,7 @@ interface Risk {
 }
 
 const Risks: React.FC = () => { 
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/risk/";
+  const baseURL = import.meta.env.VITE_API_URL;
   const [Risks, setRisks] = useState<Risk[]>([]); 
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -45,7 +45,7 @@ const Risks: React.FC = () => {
 
   const getRisks = async () => {
     try {
-      const response: AxiosResponse<Risk[]> = await axios.get(URL);
+      const response: AxiosResponse<Risk[]> = await axios.get(`${baseURL}/risk/`);
       const formattedRisks = response.data.map((Risk) => ({
         ...Risk,
         createDate: new Date(Risk.createDate).toLocaleString(),
@@ -116,7 +116,7 @@ const Risks: React.FC = () => {
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-      const url = method === "PUT" && id ? `${URL}${id}` : URL;
+      const url = method === "PUT" && id ? `${baseURL}/risk/${id}` : `${baseURL}/risk/`;
       const response = await axios({
         method,
         url,

@@ -56,7 +56,7 @@ interface ActividadData{
 }
 
 const Actividad: React.FC = () => {
-  const URL = "https://testbackend-433922.uk.r.appspot.com/activity/";
+  const baseURL = import.meta.env.VITE_API_URL;
   const [actividad, setActividad] = useState<Actividad[]>([]);
   const [description, setDescription] = useState<string>("");
   const [activityType, setActivityType] = useState<ActivityType[]>([]);
@@ -89,7 +89,7 @@ const Actividad: React.FC = () => {
 
   const getActivity = async () => {
     try {
-      const response: AxiosResponse<Actividad[]> = await axios.get(URL);
+      const response: AxiosResponse<Actividad[]> = await axios.get(`${baseURL}/activity/`);
       setActividad(response.data);
     } catch (error) {
       showAlert("Error al obtener las actividades", "error");
@@ -98,7 +98,7 @@ const Actividad: React.FC = () => {
   
    const getActivityType = async () => {
     try {
-      const response = await axios.get<ActivityType[]>('https://testbackend-433922.uk.r.appspot.com/activity_type');
+      const response: AxiosResponse<ActivityType[]> = await axios.get(`${baseURL}/activity_type/`);
       setActivityType(response.data);
     } catch (error) {
       showAlert("Error al obtener los tipos de actividad", "error");
@@ -107,7 +107,7 @@ const Actividad: React.FC = () => {
 
   const getProcess = async () => {
     try {
-      const response = await axios.get<Process[]>('https://testbackend-433922.uk.r.appspot.com/process/');
+      const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
       setProcess(response.data);
     } catch (error) {
       showAlert("Error al obtener los procesos", "error");
@@ -116,7 +116,7 @@ const Actividad: React.FC = () => {
 
   const getHazzard = async () => {
     try {
-      const response = await axios.get<Hazzard[]>('https://testbackend-433922.uk.r.appspot.com/hazzard/');
+      const response: AxiosResponse<Hazzard[]> = await axios.get(`${baseURL}/hazzard/`);
       setHazzard(response.data);
     } catch (error) {
       showAlert("Error al obtener los peligros", "error");
@@ -194,7 +194,7 @@ const Actividad: React.FC = () => {
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
   try {
-    const url = method === "PUT" && id ? `${URL}${id}/` : URL;
+    const url = method === "PUT" && id ? `${baseURL}/activity/${id}` : `${baseURL}/activity/`;
     const response = await axios({
       method,
       url,
@@ -230,7 +230,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
   }
 };
 
-  //BORRAMOS EL DATO DE LA TABLA
   const deleteActividad = async (id: number) => {
     try {
       await axios.delete(`${URL}${id}/`, {
@@ -261,7 +260,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
 
   const handleHazzardSelection = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOptions = Array.from(event.target.selectedOptions, option => Number(option.value));
-    console.log(selectedOptions); // Verifica si las opciones seleccionadas están presentes
+    console.log(selectedOptions); 
     setSelectedHazzardIds(selectedOptions);
   };
   
@@ -294,7 +293,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
                     <th>Tipo de Actividad</th>
                     <th>Proceso</th>
                     <th>Peligro</th>
-                    <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -307,7 +305,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
                       <td>{act.activityType.description}</td>
                       <td>{act.process.name}</td> 
                       <td>{act.hazzards.map(h => h.name).join(', ')}</td>
-                      <td>{formatDate(act.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                           <button

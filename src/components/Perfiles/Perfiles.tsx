@@ -48,7 +48,8 @@ interface ProfilesData{
 }
 
 const Profiles: React.FC = () => {
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/profile/";
+
+  const baseURL = import.meta.env.VITE_API_URL;
   const [profiles, setProfiles] = useState<Profiles[]>([]);
   const [description, setDescription] = useState<string>("");
   const [process, setProcess] = useState<Process[]>([]);
@@ -78,7 +79,7 @@ const Profiles: React.FC = () => {
 
   const getProfiles = async () => {
     try {
-      const response: AxiosResponse<Profiles[]> = await axios.get(URL);
+      const response: AxiosResponse<Profiles[]> = await axios.get(`${baseURL}/profile/`);
       setProfiles(response.data);
     } catch (error) {
       showAlert("Error al obtener los perfiles", "error");
@@ -88,7 +89,7 @@ const Profiles: React.FC = () => {
   
   const getProcess = async () => {
     try {
-      const response = await axios.get<Process[]>('https://asymetricsbackend.uk.r.appspot.com/process/');
+      const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
       setProcess(response.data);
     } catch (error) {
       showAlert("Error al obtener los procesos", "error");
@@ -97,7 +98,7 @@ const Profiles: React.FC = () => {
 
   const getTasks = async () => {
     try {
-      const response = await axios.get<Tasks[]>('https://asymetricsbackend.uk.r.appspot.com/task/');
+      const response: AxiosResponse<Tasks[]> = await axios.get(`${baseURL}/task/`);
       setTasks(response.data);
     } catch (error) {
       showAlert("Error al obtener las tareas", "error");
@@ -167,7 +168,7 @@ const Profiles: React.FC = () => {
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
   try {
-    const url = method === "PUT" && id ? `${URL}${id}/` : URL;
+    const url = method === "PUT" && id ? `${baseURL}/process/${id}` : `${baseURL}/process/`;
     const response = await axios({
       method,
       url,
@@ -175,7 +176,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
       headers: { "Content-Type": "application/json" },
     });
 
-    const newActividad = response.data; // Asumiendo que la respuesta contiene la actividad registrada o actualizada
+    const newActividad = response.data; 
 
     showAlert("Operación realizada con éxito", "success");
 

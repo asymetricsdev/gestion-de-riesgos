@@ -23,7 +23,7 @@ interface Checker {
 }
 
 const Checkpoint: React.FC = () => {
-	const URL = "https://asymetricsbackend.uk.r.appspot.com/checkpoint/";
+	const baseURL = import.meta.env.VITE_API_URL;
 	const [checkpoint, setCheckpoint] = useState<Checkpoint[]>([]);
 	const [id, setId] = useState<number | null>(null);
 	const [name, setName] = useState<string>("");
@@ -49,7 +49,7 @@ const Checkpoint: React.FC = () => {
 
 	const getCheckpoint = async () => {
 		try {
-			const response: AxiosResponse<Checkpoint[]> = await axios.get(URL);
+			const response: AxiosResponse<Checkpoint[]> = await axios.get(`${baseURL}/checkpoint/`);
 			setCheckpoint(response.data);
 		} catch (error) {
 			showAlert("Error al obtener los Checkpoint", "error");
@@ -58,9 +58,7 @@ const Checkpoint: React.FC = () => {
 
 	const getChecker = async () => {
 		try {
-			const response = await axios.get<Checker[]>(
-				"https://asymetricsbackend.uk.r.appspot.com/checker/"
-			);
+			const response = await axios.get<Checker[]>(`${baseURL}/checker/`);
 			setChecker(response.data);
 		} catch (error) {
 			showAlert("Error al obtener el cargo del Perfiles", "error");
@@ -119,7 +117,8 @@ const Checkpoint: React.FC = () => {
 
 	const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 		try {
-			const url = method === "PUT" && id ? `${URL}${id}` : URL;
+			// const url = method === "PUT" && id ? `${URL}${id}` : URL;
+			const url = method === "PUT" && id ? `${baseURL}/checkpoint/${id}` : `${baseURL}/checkpoint/`;
 			const response = await axios({
 				method,
 				url,

@@ -17,7 +17,7 @@ interface TipoTareas {
 }
 
 const TipoTareas: React.FC = () => {
-	const URL = "https://asymetricsbackend.uk.r.appspot.com/task_type/";
+	const baseURL = import.meta.env.VITE_API_URL;
 	const [tipoTareas, setTipoTareas] = useState<TipoTareas[]>([]);
 	const [id, setId] = useState<number | null>(null);
 	const [name, setName] = useState<string>("");
@@ -40,7 +40,7 @@ const TipoTareas: React.FC = () => {
 
 	const getTipoTareas = async () => {
 		try {
-			const response: AxiosResponse<TipoTareas[]> = await axios.get(URL);
+			const response: AxiosResponse<TipoTareas[]> = await axios.get(`${baseURL}/task_type/`);
 			setTipoTareas(response.data);
 		} catch (error) {
 			showAlert("Error al obtener el Tipo de Tareas", "error");
@@ -89,7 +89,7 @@ const TipoTareas: React.FC = () => {
 
 	const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 		try {
-			const url = method === "PUT" && id ? `${URL}${id}` : URL;
+			const url = method === "PUT" && id ? `${baseURL}/task_type/${id}` : `${baseURL}/task_type/`;
 			const response = await axios({
 				method,
 				url,

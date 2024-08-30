@@ -49,7 +49,8 @@ interface Props {
   }
 
 const Division: React.FC<Props> = ({ isNewRecord }) => {
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/division/";
+
+  const baseURL = import.meta.env.VITE_API_URL;
   const [division, setDivision] = useState<Division[]>([]);
   const [company, setCompanyType] = useState<Company[]>([]);
   const [city, setCity] = useState<City[]>([]);
@@ -80,7 +81,7 @@ const Division: React.FC<Props> = ({ isNewRecord }) => {
 
   const getDivision = async () => {
     try {
-      const response: AxiosResponse<Division[]> = await axios.get(URL);
+	  const response: AxiosResponse<Division[]> = await axios.get(`${baseURL}/division/`);
       setDivision(response.data);
       console.log("Datos de Division:", response.data);
     } catch (error) {
@@ -91,7 +92,7 @@ const Division: React.FC<Props> = ({ isNewRecord }) => {
 
   const getCompanyType = async () => {
     try {
-      const response = await axios.get<Company[]>('https://asymetricsbackend.uk.r.appspot.com/company/');
+	  const response: AxiosResponse<Company[]> = await axios.get(`${baseURL}/company/`);
       setCompanyType(response.data);
     } catch (error) {
       showAlert("Error al obtener las compañias", "error");
@@ -100,7 +101,7 @@ const Division: React.FC<Props> = ({ isNewRecord }) => {
 
   const getCity = async () => {
     try {
-      const response = await axios.get<City[]>('https://asymetricsbackend.uk.r.appspot.com/city/');
+	  const response: AxiosResponse<City[]> = await axios.get(`${baseURL}/city/`);
       setCity(response.data);
     } catch (error) {
       showAlert("Error al obtener los tipos de verificación", "error");
@@ -187,7 +188,7 @@ const Division: React.FC<Props> = ({ isNewRecord }) => {
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: DivisionData) => {
 	try {
-	  const url = method === "PUT" && id ? `${URL}${id}/` : URL;
+	  const url = method === "PUT" && id ? `${baseURL}/division/${id}` : `${baseURL}/division/`;
 	  const response = await axios({
 		method,
 		url,
@@ -251,7 +252,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: DivisionData) => {
 				<div className="row mt-3">
 					<div className="col-12">
 						<div className="tabla-contenedor">
-							<EncabezadoTabla title="Division" onClick={() => openModal("1")} />
+							<EncabezadoTabla title="Áreas" onClick={() => openModal("1")} />
 						</div>
 						<div className="table-responsive">
 							<table className="table table-bordered">
