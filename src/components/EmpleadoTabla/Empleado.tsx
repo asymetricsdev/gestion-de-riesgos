@@ -38,7 +38,7 @@ interface EmpleadoData {
 
 
 const Empleado: React.FC = () => {
-  const URL = "https://testbackend-433922.uk.r.appspot.com/employee/";
+  const baseURL = import.meta.env.VITE_API_URL;
   const [empleado, setEmpleado] = useState<Empleado[]>([]);
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
@@ -67,7 +67,7 @@ const Empleado: React.FC = () => {
 
   const getEmpleado = async () => {
     try {
-      const response: AxiosResponse<Empleado[]> = await axios.get(URL);
+      const response: AxiosResponse<Empleado[]> = await axios.get(`${baseURL}/employee/`);
       setEmpleado(response.data);
     } catch (error) {
       showAlert("Error al obtener los peligros", "error");
@@ -76,7 +76,7 @@ const Empleado: React.FC = () => {
   
   const getPosition = async () => {
     try {
-      const response = await axios.get<Position[]>('https://asymetricsbackend.uk.r.appspot.com/position/');
+      const response: AxiosResponse<Position[]> = await axios.get(`${baseURL}/position/`);
       setPosition(response.data);
     } catch (error) {
       showAlert("Error al obtener el cargo del empleado", "error");
@@ -138,7 +138,6 @@ const Empleado: React.FC = () => {
         return;
     }
     
-    // Tipado explícito para los parámetros a enviar
       const parametros: EmpleadoData = {
         rut: rut.trim(),
         firstName: firstName.trim(),
@@ -153,7 +152,7 @@ const Empleado: React.FC = () => {
 
    const enviarSolicitud = async (method: "POST" | "PUT", data: EmpleadoData) => {
     try {
-      const url = method === "PUT" && id ? `${URL}${id}/` : URL;
+      const url = method === "PUT" && id ? `${baseURL}/employee/${id}` : `${baseURL}/employee/`;
       const response = await axios({
         method,
         url,
@@ -176,7 +175,6 @@ const Empleado: React.FC = () => {
     }
   }; 
 
-  //BORRAMOS EL DATO DE LA TABLA
    const deleteEmpleado = async (id: number) => {
     try {
       await axios.delete(`${URL}${id}/`, {
@@ -213,7 +211,7 @@ const Empleado: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Empleados' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Colaboradores' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
@@ -221,12 +219,12 @@ const Empleado: React.FC = () => {
                   style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
                   <tr>
                     <th>N°</th>
+                    <th>Rut</th>
                     <th>Nombre</th>
                     <th>Apellido</th>
-                    <th>Rut</th>
-                    <th>Descripción</th>  
+                    {/* <th>Descripción</th>   */}
                     <th>Cargo</th>
-                    <th>Fecha</th>
+                    {/* <th>Fecha</th> */}
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -234,12 +232,12 @@ const Empleado: React.FC = () => {
                   {empleado.map((emp, i) => (
                     <tr key={JSON.stringify(emp)} className="text-center">
                       <td>{i + 1}</td>
+                      <td>{emp.rut}</td>
                       <td>{emp.firstName}</td>
                       <td>{emp.lastName}</td>
-                      <td>{emp.rut}</td>
-                      <td>{emp.description}</td>  
+                      {/* <td>{emp.description}</td>   */}
                       <td>{emp.position.name}</td> 
-                      <td>{emp.createDate ? formatDate(emp.createDate) : ''}</td>
+                      {/* <td>{emp.createDate ? formatDate(emp.createDate) : ''}</td> */}
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                           <button

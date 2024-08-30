@@ -17,7 +17,7 @@ interface CriticityType {
 }
 
 const CriticityType: React.FC = () => {
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/criticity/";
+  const baseURL = import.meta.env.VITE_API_URL;
   const [criticity, setCriticityType] = useState<CriticityType[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -40,7 +40,7 @@ const CriticityType: React.FC = () => {
 
   const getUsers = async () => {
     try {
-      const response: AxiosResponse<CriticityType[]> = await axios.get(URL);
+      const response: AxiosResponse<CriticityType[]> = await axios.get(`${baseURL}/criticity/`);
       setCriticityType(response.data);
     } catch (error) {
       showAlert("Error al obtener criticidad", "error");
@@ -90,8 +90,7 @@ const CriticityType: React.FC = () => {
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-        // Si es una petición PUT, se añade el ID al final de la URL
-        const url = method === "PUT" && id ? `${URL}${id}` : URL;
+        const url = method === "PUT" && id ? `${baseURL}/criticity/${id}` : `${baseURL}/criticity/`;
         const response = await axios({
             method,
             url,
@@ -103,7 +102,6 @@ const CriticityType: React.FC = () => {
         showAlert(msj, tipo);
         getUsers();
         if (tipo === "success") {
-            // Cierra el modal después de un segundo para permitir la actualización
             setTimeout(() => {
                 const closeModalButton = document.getElementById("btnCerrar");
                 if (closeModalButton) {
@@ -167,7 +165,7 @@ const CriticityType: React.FC = () => {
                 color: '#fff' }}>
                   <tr>
                     <th>N°</th>
-                    <th>Tipo</th>
+                    <th>Nivel</th>
                     <th>Descripción </th>
                     <th>Fecha</th>
                     <th>Acciones</th>
@@ -239,7 +237,7 @@ const CriticityType: React.FC = () => {
                     type="text"
                     id="nombre"
                     className="form-control"
-                    placeholder="Tipo de Criticidad"
+                    placeholder="Nivel de Criticidad"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />

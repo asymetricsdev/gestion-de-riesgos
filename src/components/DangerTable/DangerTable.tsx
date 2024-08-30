@@ -24,15 +24,14 @@ interface Danger {
 }
 
 const Danger: React.FC = () => {
+  const baseURL = import.meta.env.VITE_API_URL;
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/matrix/hazzard";
   const [danger, setDanger] = useState<Danger[]>([]);
 
   useEffect(() => {
     const getDangers = async () => {
       try {
-        const response: AxiosResponse<Danger[]> = await axios.get(URL);
+        const response: AxiosResponse<Danger[]> = await axios.get(`${baseURL}/matrix/hazzard`);
         setDanger(response.data);
       } catch (error) {
         showAlert("Error al obtener Peligro", "error");

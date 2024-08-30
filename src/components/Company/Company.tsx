@@ -20,7 +20,7 @@ interface Company {
 
 const Company: React.FC = () => {
 
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/company/";
+  const baseURL = import.meta.env.VITE_API_URL;
   const [company, setCompany] = useState<Company[]>([]);
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
@@ -43,7 +43,7 @@ const Company: React.FC = () => {
 
   const getUsers = async () => {
     try {
-      const response: AxiosResponse<Company[]> = await axios.get(URL);
+      const response: AxiosResponse<Company[]> = await axios.get(`${baseURL}/company/`);
       setCompany(response.data);
     } catch (error) {
       showAlert("Error al obtener Compañias", "error");
@@ -94,7 +94,7 @@ const Company: React.FC = () => {
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-        const url = method === "PUT" && id ? `${URL}${id}` : URL;
+      const url = method === "PUT" && id ? `${baseURL}/company/${id}` : `${baseURL}/company/`;
         const response = await axios({
             method,
             url,
@@ -159,7 +159,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Compañias' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Compañías' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">

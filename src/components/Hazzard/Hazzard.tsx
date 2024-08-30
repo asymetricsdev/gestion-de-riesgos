@@ -43,7 +43,8 @@ interface HazzardData {
 }
 
 const Hazzard: React.FC = () => {
-  const URL = "https://testbackend-433922.uk.r.appspot.com/hazzard/";
+  // const URL = "https://testbackend-433922.uk.r.appspot.com/hazzard/";
+  const baseURL = import.meta.env.VITE_API_URL;
   const [hazzard, setHazzard] = useState<Hazzard[]>([]);
   const [criticityType, setCriticityType] = useState<CriticityType[]>([]);
   const [checker, setChecker] = useState<Checker[]>([]);
@@ -72,7 +73,7 @@ const Hazzard: React.FC = () => {
 
   const getHazzard = async () => {
     try {
-      const response: AxiosResponse<Hazzard[]> = await axios.get(URL);
+      const response: AxiosResponse<Hazzard[]> = await axios.get(`${baseURL}/hazzard/`);
       setHazzard(response.data);
       console.log("Datos de Hazzard:", response.data);
     } catch (error) {
@@ -83,7 +84,7 @@ const Hazzard: React.FC = () => {
 
   const getCriticityType = async () => {
     try {
-      const response = await axios.get<CriticityType[]>('https://testbackend-433922.uk.r.appspot.com/activity_type');
+      const response: AxiosResponse<CriticityType[]> = await axios.get(`${baseURL}/activity_type/`);
       setCriticityType(response.data);
     } catch (error) {
       showAlert("Error al obtener los tipos de criticidad", "error");
@@ -92,7 +93,7 @@ const Hazzard: React.FC = () => {
 
   const getChecker = async () => {
     try {
-      const response = await axios.get<Checker[]>('https://testbackend-433922.uk.r.appspot.com/checker/');
+      const response: AxiosResponse<Checker[]> = await axios.get(`${baseURL}/checker/`);
       setChecker(response.data);
     } catch (error) {
       showAlert("Error al obtener los tipos de verificación", "error");
@@ -168,7 +169,7 @@ const Hazzard: React.FC = () => {
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: HazzardData) => {
     try {
-      const url = method === "PUT" && id ? `${URL}${id}/` : URL;
+      const url = method === "PUT" && id ? `${baseURL}/hazzard/${id}` : `${baseURL}/hazzard/`;
       const response = await axios({
         method,
         url,

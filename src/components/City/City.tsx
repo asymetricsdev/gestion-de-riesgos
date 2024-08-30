@@ -26,7 +26,7 @@ interface Division {
 }
 
 const City: React.FC = () => {
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/city/";
+  const baseURL = import.meta.env.VITE_API_URL;
   const [city, setCity] = useState<City[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -52,7 +52,7 @@ const City: React.FC = () => {
 
   const getUsers = async () => {
     try {
-      const response: AxiosResponse<City[]> = await axios.get(URL);
+      const response: AxiosResponse<City[]> = await axios.get(`${baseURL}/city/`);
       const data = response.data.map(City => ({
         ...City,
        
@@ -124,16 +124,13 @@ const City: React.FC = () => {
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-      console.log("Sending data:", data); // Debug log
-      const url = method === "PUT" && id ? `${URL}${id}` : URL;
+      const url = method === "PUT" && id ? `${baseURL}/city/${id}` : `${baseURL}/city/`;
       const response = await axios({
         method,
         url,
         data,
         headers: { "Content-Type": "application/json" },
       });
-
-      console.log("Response:", response); // Debug log
 
       const { tipo, msj } = response.data;
       showAlert(msj, tipo);
@@ -148,7 +145,6 @@ const City: React.FC = () => {
       }
     } catch (error) {
       showAlert("Error al enviar la solicitud", "error");
-      console.error("Error sending request:", error); // Debug log
     }
   };
 
@@ -161,7 +157,6 @@ const City: React.FC = () => {
       getUsers();
     } catch (error) {
       showAlert("Error al eliminar la Ciudad", "error");
-      console.error("Error deleting user:", error); // Debug log
     }
   };
 
@@ -194,8 +189,6 @@ const City: React.FC = () => {
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
-                    <th>Crear Fecha</th>
-                    <th>Actualizar Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -205,8 +198,6 @@ const City: React.FC = () => {
                       <td>{i + 1}</td>
                       <td>{cit.name}</td>
                       <td>{cit.description}</td>
-                      <td>{cit.createDate}</td>
-                      <td>{cit.updateDate}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button
@@ -293,32 +284,6 @@ const City: React.FC = () => {
                     placeholder="Descripción"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-solid fa-calendar"></i>
-                  </span>
-                  <input
-                    type="date"
-                    id="createDate"
-                    className="form-control"
-                    placeholder="Fecha"
-                    value={createDate}
-                    onChange={(e) => setCreateDate(e.target.value)}
-                  />
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                  <i className="fa-solid fa-calendar-days"></i>
-                  </span>
-                  <input
-                    type="date"
-                    id="descripcion"
-                    className="form-control"
-                    placeholder="Actualizar Fecha"
-                    value={updateDate}
-                    onChange={(e) => setUpdateDate(e.target.value)}
                   />
                 </div>
               </div>

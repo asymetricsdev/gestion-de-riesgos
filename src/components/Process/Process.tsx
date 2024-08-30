@@ -18,7 +18,7 @@ interface Process {
 
 const Process: React.FC = () => {
 
-  const URL = "https://asymetricsbackend.uk.r.appspot.com/process/";
+  const baseURL = import.meta.env.VITE_API_URL;
   const [process, setProcess] = useState<Process[]>([]);
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
@@ -42,7 +42,7 @@ const Process: React.FC = () => {
 
   const getUsers = async () => {
     try {
-      const response: AxiosResponse<Process[]> = await axios.get(URL);
+      const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
       setProcess(response.data);
     } catch (error) {
       showAlert("Error al obtener Proceso", "error");
@@ -92,7 +92,7 @@ const Process: React.FC = () => {
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-        const url = method === "PUT" && id ? `${URL}${id}` : URL;
+        const url = method === "PUT" && id ? `${baseURL}/process/${id}` : `${baseURL}/process/`;
         const response = await axios({
             method,
             url,
