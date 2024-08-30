@@ -10,7 +10,7 @@ import * as bootstrap from 'bootstrap';
 const MySwal = withReactContent(Swal);
 
 interface CheckerType {
-  id: string;
+  id: number;
   name: string;
   description: string;
   createDate: string;
@@ -27,7 +27,7 @@ const CheckerType: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getUsers();
+    getCheckerType();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -38,7 +38,7 @@ const CheckerType: React.FC = () => {
     };
   }, []);
 
-  const getUsers = async () => {
+  const getCheckerType = async () => {
     try {
       const response: AxiosResponse<CheckerType[]> = await axios.get(`${baseURL}/checker_type/`);
       setChecker(response.data);
@@ -50,7 +50,7 @@ const CheckerType: React.FC = () => {
   
   const openModal = (op: string, checker?: CheckerType) => {
     if (checker) {
-      setId(checker.id);
+      setId("");
       setName(checker.name);
       setDescription(checker.description);
     } else {
@@ -100,7 +100,7 @@ const CheckerType: React.FC = () => {
 
         const { tipo, msj } = response.data;
         showAlert(msj, tipo);
-        getUsers();
+        getCheckerType();
         if (tipo === "success") {
             // Cierra el modal después de un segundo para permitir la actualización
             setTimeout(() => {
@@ -108,7 +108,7 @@ const CheckerType: React.FC = () => {
                 if (closeModalButton) {
                     closeModalButton.click();
                 }
-                getUsers(); 
+                getCheckerType(); 
             }, 500);
         }
     } catch (error) {
@@ -117,19 +117,21 @@ const CheckerType: React.FC = () => {
     }
 };
 
-
-  const deleteUser = async (id: string) => {
+  const deleteCheckerType = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      await axios.delete(`${baseURL}/checker_type/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-      showAlert("Proceso eliminado correctamente", "success");
-      getUsers(); 
+      Swal.fire("Tipo de Jerarquía eliminada correctamente", "", "success");
+      getCheckerType();
     } catch (error) {
-      showAlert("Error al eliminar el proceso", "error");
       console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar el Tipo de Jerarquía.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -199,7 +201,7 @@ const CheckerType: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteUser(check.id);
+                              deleteCheckerType(check.id);
                             }
                           });
                         }}>

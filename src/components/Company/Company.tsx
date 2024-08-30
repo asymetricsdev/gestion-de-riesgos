@@ -30,7 +30,7 @@ const Company: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getUsers();
+    getCompany();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -41,7 +41,7 @@ const Company: React.FC = () => {
     };
   }, []);
 
-  const getUsers = async () => {
+  const getCompany = async () => {
     try {
       const response: AxiosResponse<Company[]> = await axios.get(`${baseURL}/company/`);
       setCompany(response.data);
@@ -104,14 +104,14 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 
         const { tipo, msj } = response.data;
         showAlert(msj, tipo);
-        getUsers();
+        getCompany();
         if (tipo === "success") {
             setTimeout(() => {
                 const closeModalButton = document.getElementById("btnCerrar");
                 if (closeModalButton) {
                     closeModalButton.click();
                 }
-                getUsers(); 
+                getCompany(); 
             }, 500);
         }
     } catch (error) {
@@ -121,18 +121,21 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 };
 
 
-  const deleteUser = async (id: number) => {
+  const deleteCompany = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      await axios.delete(`${baseURL}/company/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-      showAlert("Compañia eliminado correctamente", "success");
-      getUsers(); 
+      Swal.fire("Compañia eliminada correctamente", "", "success");
+      getCompany();
     } catch (error) {
-      showAlert("Error al eliminar la compañia", "error");
       console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar la Compañia.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -203,7 +206,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteUser(comp.id);
+                              deleteCompany(comp.id);
                             }
                           });
                         }}>

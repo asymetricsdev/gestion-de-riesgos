@@ -10,7 +10,7 @@ import * as bootstrap from 'bootstrap';
 const MySwal = withReactContent(Swal);
 
 interface Activity {
-  id: string;
+  id: number;
   name: string;
   description: string;
   createDate: string;
@@ -27,7 +27,7 @@ const Activity: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getUsers();
+    getActivityType();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -38,7 +38,7 @@ const Activity: React.FC = () => {
     };
   }, []);
 
-  const getUsers = async () => {
+  const getActivityType = async () => {
     try {
       const response: AxiosResponse<Activity[]> = await axios.get(`${baseURL}/activity_type/`);
       setActivity(response.data);
@@ -50,7 +50,7 @@ const Activity: React.FC = () => {
   
   const openModal = (op: string, activity?: Activity) => {
     if (activity) {
-      setId(activity.id);
+      setId("");
       setName(activity.name);
       setDescription(activity.description);
     } else {
@@ -100,7 +100,7 @@ const Activity: React.FC = () => {
 
         const { tipo, msj } = response.data;
         showAlert(msj, tipo);
-        getUsers();
+        getActivityType();
         if (tipo === "success") {
             // Cierra el modal después de un segundo para permitir la actualización
             setTimeout(() => {
@@ -108,7 +108,7 @@ const Activity: React.FC = () => {
                 if (closeModalButton) {
                     closeModalButton.click();
                 }
-                getUsers(); 
+                getActivityType(); 
             }, 500);
         }
     } catch (error) {
@@ -117,19 +117,21 @@ const Activity: React.FC = () => {
     }
 };
 
-
-  const deleteUser = async (id: string) => {
+  const deleteActividad = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      await axios.delete(`${baseURL}/activity_type/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-      showAlert("Proceso eliminado correctamente", "success");
-      getUsers(); 
+      Swal.fire("Tipo de Actividad eliminada correctamente", "", "success");
+      getActivityType();
     } catch (error) {
-      showAlert("Error al eliminar el proceso", "error");
       console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar el Tipo de Actividad.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -200,7 +202,7 @@ const Activity: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteUser(act.id);
+                              deleteActividad(act.id);
                             }
                           });
                         }}>

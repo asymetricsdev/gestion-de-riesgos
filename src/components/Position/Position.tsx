@@ -145,43 +145,23 @@ const PositionComponent: React.FC = () => {
     }
   };
 
-	// const enviarSolicitud = async (method: "POST" | "PUT", data: Position) => {
-	// 	try {
-	// 		const url = method === "PUT" && id ? `${URL}${id}` : URL;
-	// 		const response = await axios({
-	// 			method,
-	// 			url,
-	// 			data,
-	// 			headers: { "Content-Type": "application/json" },
-	// 		});
-
-	// 		const { tipo, msj } = response.data;
-	// 		showAlert(msj, tipo);
-	// 		getPosition();
-	// 		if (tipo === "success") {
-	// 			setTimeout(() => {
-	// 				const closeModalButton = document.getElementById("btnCerrar");
-	// 				if (closeModalButton) {
-	// 					closeModalButton.click();
-	// 				}
-	// 			}, 500);
-	// 		}
-	// 	} catch (error) {
-	// 		showAlert("Error al enviar la Posición", "error");
-	// 	}
-	// };
-
-	const deleteUser = async (id: string) => {
+	const deleteCargo = async (id: string) => {
 		try {
-			await axios.delete(`${URL}${id}`, {
-				headers: { "Content-Type": "application/json" },
-			});
-			showAlert("Usuario eliminado correctamente", "success");
-			getPosition();
+		  await axios.delete(`${baseURL}/position/${id}`, {
+			headers: { "Content-Type": "application/json" },
+		  });
+		  Swal.fire("Cargo eliminado correctamente", "", "success");
+		  getPosition();
 		} catch (error) {
-			showAlert("Error al eliminar el Cargo", "error");
+		  console.error(error);
+		  Swal.fire({
+			title: "Error",
+			text: "Error al eliminar el Cargo.",
+			icon: "error",
+			confirmButtonText: "OK",
+		  });
 		}
-	};
+	  };
 
   const formatDate = (dateString: string) => {
 		return dateString.split("T")[0];
@@ -239,7 +219,7 @@ const PositionComponent: React.FC = () => {
 															cancelButtonText: "Cancelar",
 														}).then((result) => {
 															if (result.isConfirmed) {
-																deleteUser(pos.id);
+																deleteCargo(pos.id);
 															}
 														});
 													}}

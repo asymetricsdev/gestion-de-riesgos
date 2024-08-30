@@ -29,7 +29,7 @@ const Process: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getUsers();
+    getProcess();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -40,7 +40,7 @@ const Process: React.FC = () => {
     };
   }, []);
 
-  const getUsers = async () => {
+  const getProcess = async () => {
     try {
       const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
       setProcess(response.data);
@@ -102,14 +102,14 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 
         const { tipo, msj } = response.data;
         showAlert(msj, tipo);
-        getUsers();
+        getProcess();
         if (tipo === "success") {
             setTimeout(() => {
                 const closeModalButton = document.getElementById("btnCerrar");
                 if (closeModalButton) {
                     closeModalButton.click();
                 }
-                getUsers(); 
+                getProcess(); 
             }, 500);
         }
     } catch (error) {
@@ -119,18 +119,22 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 };
 
 
+
   const deleteProcess = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      await axios.delete(`${baseURL}/process/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-      showAlert("Proceso eliminado correctamente", "success");
-      getUsers(); 
+      Swal.fire("Proceso eliminado correctamente", "", "success");
+      getProcess();
     } catch (error) {
-      showAlert("Error al eliminar el proceso", "error");
       console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar el Proceso.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 

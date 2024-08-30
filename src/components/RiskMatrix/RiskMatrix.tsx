@@ -12,7 +12,7 @@ import * as bootstrap from 'bootstrap';
 const MySwal = withReactContent(Swal);
 
 interface Risk {
-  id: string;
+  id: number;
   name: string;
   description: string;
   createDate: string;
@@ -58,7 +58,7 @@ const Risks: React.FC = () => {
 
   const openModal = (op: string, risk?: Risk) => { 
     if (risk) {
-      setId(risk.id);
+      setId("");
       setName(risk.name);
       setDescription(risk.description);
       // setCreateDate(new Date(profile.createDate));
@@ -142,18 +142,21 @@ const Risks: React.FC = () => {
     }
   };
 
-  const deleteRisk = async (id: string) => {
+  const deleteRisk = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      await axios.delete(`${baseURL}/risk/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-      showAlert("Actividad eliminado correctamente", "success");
+      Swal.fire("Tipo de Peligro eliminado correctamente", "", "success");
       getRisks();
     } catch (error) {
-      showAlert("Error al eliminar el Actividad", "error");
       console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar el Tipo de Peligro.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 

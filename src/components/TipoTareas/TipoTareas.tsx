@@ -115,20 +115,24 @@ const TipoTareas: React.FC = () => {
 		}
 	};
 
+
 	const deleteTipoTareas = async (id: number) => {
 		try {
-			await axios.delete(`${URL}${id}`, {
-				headers: {
-					"Content-Type": "application/json",
-				},
-			});
-			showAlert("Tipo de Tareas eliminado correctamente", "success");
-			getTipoTareas();
+		  await axios.delete(`${baseURL}/task_type/${id}`, {
+			headers: { "Content-Type": "application/json" },
+		  });
+		  Swal.fire("Tipo de Tareas eliminado correctamente", "", "success");
+		  getTipoTareas();
 		} catch (error) {
-			showAlert("Error al eliminar el Tipo de Tareas", "error");
-			console.error(error);
+		  console.error(error);
+		  Swal.fire({
+			title: "Error",
+			text: "Error al eliminar el Tipo de Tareas.",
+			icon: "error",
+			confirmButtonText: "OK",
+		  });
 		}
-	};
+	  };
 
 	const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>
