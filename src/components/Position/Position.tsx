@@ -64,14 +64,12 @@ const PositionComponent: React.FC = () => {
 			setId(position.id);
 			setName(position.name);
 			setDescription(position.description);
-			setCreateDate(position.createDate);
 			setManagerPosition(position.managerPosition ? position.managerPosition.id : null);
 			setSubordinatePositions(position.subordinatePositions.map((sub) => sub.id));
 		} else {
 			setId("");
 			setName("");
 			setDescription("");
-			setCreateDate("");
 			setManagerPosition(null);
 			setSubordinatePositions([]);
 		}
@@ -99,10 +97,6 @@ const PositionComponent: React.FC = () => {
 			showAlert("Escribe la descripción", "warning", "descripción");
 			return;
 		}
-		if (!createDate.trim()) {
-			showAlert("Escribe la fecha", "warning", "fecha");
-			return;
-		}
 
 
 		const parametros: Position = {
@@ -119,31 +113,32 @@ const PositionComponent: React.FC = () => {
 
 
 	};
+	
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: Position) => {
-    try {
+const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+	try {
 	  const url = method === "PUT" && id ? `${baseURL}/position/${id}` : `${baseURL}/position/`;
-      const response = await axios({
-        method,
-        url,
-        data,
-        headers: { "Content-Type": "application/json" },
-      });
+	  const response = await axios({
+		method,
+		url,
+		data,
+		headers: { "Content-Type": "application/json" },
+	  });
   
-      showAlert("Operación realizada con éxito", "success");
-      getPosition();
-      if (modalRef.current) {
-        const modal = bootstrap.Modal.getInstance(modalRef.current);
-        modal?.hide();
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
-      } else {
-        showAlert("Error al realizar la solicitud", "error");
-      }
-    }
-  };
+	  showAlert("Operación realizada con éxito", "success");
+	  getPosition();
+	  if (modalRef.current) {
+		const modal = bootstrap.Modal.getInstance(modalRef.current);
+		modal?.hide();
+	  }
+	} catch (error) {
+	  if (axios.isAxiosError(error) && error.response) {
+		showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+	  } else {
+		showAlert("Error al realizar la solicitud", "error");
+	  }
+	}
+  }; 
 
 	const deleteCargo = async (id: string) => {
 		try {

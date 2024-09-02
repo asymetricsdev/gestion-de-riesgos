@@ -68,16 +68,12 @@ const City: React.FC = () => {
       setId(city.id);
       setName(city.name);
       setDescription(city.description);
-      setCreateDate(city.createDate);
-      setUpdateDate(city.updateDate);
       setDivisions(city.divisions || []);
       
     } else {
       setId("");
       setName("");
       setDescription("");
-      setCreateDate("");
-      setUpdateDate("");
       setDivisions([]);
     }
     setTitle(op === "1" ? "Registrar Ciudad" : "Editar Ciudad");
@@ -104,10 +100,6 @@ const City: React.FC = () => {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
-    if (!createDate.trim()) {
-      showAlert("Escribe la fecha", "warning", "fecha");
-      return;
-    }
     
     
 
@@ -115,7 +107,6 @@ const City: React.FC = () => {
       id, 
       name: name.trim(), 
       description: description.trim(), 
-      createDate: createDate.trim(),
       
     };
     const metodo = id ? "PUT" : "POST";
@@ -131,22 +122,21 @@ const City: React.FC = () => {
         data,
         headers: { "Content-Type": "application/json" },
       });
-
-      const { tipo, msj } = response.data;
-      showAlert(msj, tipo);
+  
+      showAlert("Operación realizada con éxito", "success");
       getCity();
-      if (tipo === "success") {
-        setTimeout(() => {
-          const closeModalButton = document.getElementById("btnCerrar");
-          if (closeModalButton) {
-            closeModalButton.click();
-          }
-        }, 500);
+      if (modalRef.current) {
+        const modal = bootstrap.Modal.getInstance(modalRef.current);
+        modal?.hide();
       }
     } catch (error) {
-      showAlert("Error al enviar la solicitud", "error");
+      if (axios.isAxiosError(error) && error.response) {
+        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+      } else {
+        showAlert("Error al realizar la solicitud", "error");
+      }
     }
-  };
+  }; 
 
   const deleteCity = async (id: string) => {
     try {

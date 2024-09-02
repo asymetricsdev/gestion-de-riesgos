@@ -43,7 +43,7 @@ const CheckerType: React.FC = () => {
       const response: AxiosResponse<CheckerType[]> = await axios.get(`${baseURL}/checker_type/`);
       setChecker(response.data);
     } catch (error) {
-      showAlert("Error al obtener Tipo de Verificación", "error");
+      showAlert("Error al obtener Jerarquía de control", "error");
     }
   };
 
@@ -58,7 +58,7 @@ const CheckerType: React.FC = () => {
       setName("");
       setDescription("");
     }
-    setTitle(op === "1" ? "Registrar Tipo de Verificación" : "Editar Tipo de Verificación");
+    setTitle(op === "1" ? "Registrar Jerarquía de control" : "Editar Jerarquía de control");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -75,7 +75,7 @@ const CheckerType: React.FC = () => {
 
   const validar = () => {
     if (name.trim() === "") {
-      showAlert("Escribe el nombre de la verificación", "warning", "nombre de la verificación");
+      showAlert("Escribe el nombre de la Jerarquía de control", "warning", "nombre de la Jerarquía de control");
       return;
     }
     if (description.trim() === "") {
@@ -88,34 +88,31 @@ const CheckerType: React.FC = () => {
     enviarSolicitud(metodo, parametros);
   };
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
-    try {
-        const url = method === "PUT" && id ? `${baseURL}/checker_type/${id}` : `${baseURL}/checker_type/`;
-        const response = await axios({
-            method,
-            url,
-            data,
-            headers: { "Content-Type": "application/json" },
-        });
 
-        const { tipo, msj } = response.data;
-        showAlert(msj, tipo);
-        getCheckerType();
-        if (tipo === "success") {
-            // Cierra el modal después de un segundo para permitir la actualización
-            setTimeout(() => {
-                const closeModalButton = document.getElementById("btnCerrar");
-                if (closeModalButton) {
-                    closeModalButton.click();
-                }
-                getCheckerType(); 
-            }, 500);
-        }
-    } catch (error) {
-        showAlert("Error al enviar la solicitud", "error");
-        console.error(error);
-    }
-};
+const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+	try {
+	  const url = method === "PUT" && id ? `${baseURL}/checker_type/${id}` : `${baseURL}/checker_type/`;
+	  const response = await axios({
+		method,
+		url,
+		data,
+		headers: { "Content-Type": "application/json" },
+	  });
+  
+	  showAlert("Operación realizada con éxito", "success");
+	  getCheckerType();
+	  if (modalRef.current) {
+		const modal = bootstrap.Modal.getInstance(modalRef.current);
+		modal?.hide();
+	  }
+	} catch (error) {
+	  if (axios.isAxiosError(error) && error.response) {
+		showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+	  } else {
+		showAlert("Error al realizar la solicitud", "error");
+	  }
+	}
+  }; 
 
   const deleteCheckerType = async (id: number) => {
     try {

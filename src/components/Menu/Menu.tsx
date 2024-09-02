@@ -159,10 +159,10 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                         {isOpen ? (
                             <NavLink to="/matriz-de-peligro/actividades" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-people-robbery"></i>
-                                <span>Tipos de Actividades</span>
+                                <span>Actividades</span>
                             </NavLink>
                         ) : (
-                            <OverlayTrigger placement="right" overlay={renderTooltip('Tipos de Actividades')}>
+                            <OverlayTrigger placement="right" overlay={renderTooltip('Actividades')}>
                                 <NavLink to="/matriz-de-peligro/actividades" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-people-robbery"></i>
                                 </NavLink>

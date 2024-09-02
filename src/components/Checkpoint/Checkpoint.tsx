@@ -115,49 +115,32 @@ const Checkpoint: React.FC = () => {
 		checkerId: selectedCheckpointId,
 	};
 
-	const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+	
+
+const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 		try {
-			// const url = method === "PUT" && id ? `${URL}${id}` : URL;
-			const url = method === "PUT" && id ? `${baseURL}/checkpoint/${id}` : `${baseURL}/checkpoint/`;
-			const response = await axios({
-				method,
-				url,
-				data,
-				headers: { "Content-Type": "application/json" },
-			});
-
-			const { tipo, msj } = response.data;
-			showAlert(msj, tipo);
-			getCheckpoint();
-			if (tipo === "success") {
-				setTimeout(() => {
-					const closeModalButton = document.getElementById("btnCerrar");
-					if (closeModalButton) {
-						closeModalButton.click();
-					}
-					getCheckpoint();
-				}, 500);
-			}
+		  const url = method === "PUT" && id ? `${baseURL}/checkpoint/${id}` : `${baseURL}/checkpoint/`;
+		  const response = await axios({
+			method,
+			url,
+			data,
+			headers: { "Content-Type": "application/json" },
+		  });
+	  
+		  showAlert("Operación realizada con éxito", "success");
+		  getCheckpoint();
+		  if (modalRef.current) {
+			const modal = bootstrap.Modal.getInstance(modalRef.current);
+			modal?.hide();
+		  }
 		} catch (error) {
-			showAlert("Error al enviar la solicitud", "error");
-			console.error(error);
+		  if (axios.isAxiosError(error) && error.response) {
+			showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+		  } else {
+			showAlert("Error al realizar la solicitud", "error");
+		  }
 		}
-	};
-
-	// const deleteCheckpoint = async (id: number) => {
-	// 	try {
-	// 		await axios.delete(`${URL}${id}`, {
-	// 			headers: {
-	// 				"Content-Type": "application/json",
-	// 			},
-	// 		});
-	// 		showAlert("Checkpoint eliminado correctamente", "success");
-	// 		getCheckpoint();
-	// 	} catch (error) {
-	// 		showAlert("Error al eliminar el Tipo de Checkpoint", "error");
-	// 		console.error(error);
-	// 	}
-	// };
+}; 
 
 	const deleteCheckpoint = async (id: number) => {
 		try {
