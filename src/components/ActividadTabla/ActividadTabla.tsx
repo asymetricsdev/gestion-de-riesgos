@@ -202,21 +202,18 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
       headers: { "Content-Type": "application/json" },
     });
 
-    const newActividad = response.data; // Asumiendo que la respuesta contiene la actividad registrada o actualizada
+    const newActividad = response.data;
 
     showAlert("Operación realizada con éxito", "success");
 
     if (method === "POST") {
-      // Si es una nueva actividad, la añadimos al estado
       setActividad((prev) => [...prev, newActividad]);
     } else if (method === "PUT") {
-      // Si es una actualización, modificamos la actividad en el estado
       setActividad((prev) =>
         prev.map((act) => (act.id === newActividad.id ? newActividad : act))
       );
     }
 
-    // Cerrar el modal después de la operación
     if (modalRef.current) {
       const modal = bootstrap.Modal.getInstance(modalRef.current);
       modal?.hide();

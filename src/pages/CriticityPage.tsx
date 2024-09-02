@@ -1,9 +1,9 @@
-import Criticity from '../components/CriticityType/CriticityType';
+import Criticidad from '../components/Criticidad/Criticidad';
 
 export default function CriticityPage() {
     return (
       <div>
-        <Criticity />
+        <Criticidad />
       </div>
     )
   }

@@ -93,32 +93,29 @@ const Company: React.FC = () => {
   };
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
-    try {
-      const url = method === "PUT" && id ? `${baseURL}/company/${id}` : `${baseURL}/company/`;
-        const response = await axios({
-            method,
-            url,
-            data,
-            headers: { "Content-Type": "application/json" },
-        });
+  try {
+    const url = method === "PUT" && id ? `${baseURL}/company/${id}` : `${baseURL}/company/`;
+    const response = await axios({
+      method,
+      url,
+      data,
+      headers: { "Content-Type": "application/json" },
+    });
 
-        const { tipo, msj } = response.data;
-        showAlert(msj, tipo);
-        getCompany();
-        if (tipo === "success") {
-            setTimeout(() => {
-                const closeModalButton = document.getElementById("btnCerrar");
-                if (closeModalButton) {
-                    closeModalButton.click();
-                }
-                getCompany(); 
-            }, 500);
-        }
-    } catch (error) {
-        showAlert("Error al enviar la solicitud", "error");
-        console.error(error);
+    showAlert("Operación realizada con éxito", "success");
+    getCompany();
+    if (modalRef.current) {
+      const modal = bootstrap.Modal.getInstance(modalRef.current);
+      modal?.hide();
     }
-};
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+    } else {
+      showAlert("Error al realizar la solicitud", "error");
+    }
+  }
+}; 
 
 
   const deleteCompany = async (id: number) => {

@@ -9,16 +9,16 @@ import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-interface CriticityType {
+interface Criticity {
   id: number;
   name: string;
   description: string;
   createDate: string;
 }
 
-const CriticityType: React.FC = () => {
+const Criticity: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
-  const [criticity, setCriticityType] = useState<CriticityType[]>([]);
+  const [criticity, setCriticityType] = useState<Criticity[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -40,7 +40,7 @@ const CriticityType: React.FC = () => {
 
   const getCriticity = async () => {
     try {
-      const response: AxiosResponse<CriticityType[]> = await axios.get(`${baseURL}/criticity/`);
+      const response: AxiosResponse<Criticity[]> = await axios.get(`${baseURL}/criticity/`);
       setCriticityType(response.data);
     } catch (error) {
       showAlert("Error al obtener criticidad", "error");
@@ -48,7 +48,7 @@ const CriticityType: React.FC = () => {
   };
 
   
-  const openModal = (op: string, criticity?: CriticityType) => {
+  const openModal = (op: string, criticity?: Criticity) => {
     if (criticity) {
       setId("");
       setName(criticity.name);
@@ -88,33 +88,31 @@ const CriticityType: React.FC = () => {
     enviarSolicitud(metodo, parametros);
   };
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
-    try {
-        const url = method === "PUT" && id ? `${baseURL}/criticity/${id}` : `${baseURL}/criticity/`;
-        const response = await axios({
-            method,
-            url,
-            data,
-            headers: { "Content-Type": "application/json" },
-        });
 
-        const { tipo, msj } = response.data;
-        showAlert(msj, tipo);
-        getCriticity();
-        if (tipo === "success") {
-            setTimeout(() => {
-                const closeModalButton = document.getElementById("btnCerrar");
-                if (closeModalButton) {
-                    closeModalButton.click();
-                }
-                getCriticity(); 
-            }, 500);
-        }
-    } catch (error) {
-        showAlert("Error al enviar la solicitud", "error");
-        console.error(error);
-    }
-};
+const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+	try {
+	  const url = method === "PUT" && id ? `${baseURL}/criticity/${id}` : `${baseURL}/criticity/`;
+	  const response = await axios({
+		method,
+		url,
+		data,
+		headers: { "Content-Type": "application/json" },
+	  });
+  
+	  showAlert("Operación realizada con éxito", "success");
+	  getCriticity();
+	  if (modalRef.current) {
+		const modal = bootstrap.Modal.getInstance(modalRef.current);
+		modal?.hide();
+	  }
+	} catch (error) {
+	  if (axios.isAxiosError(error) && error.response) {
+		showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+	  } else {
+		showAlert("Error al realizar la solicitud", "error");
+	  }
+	}
+  }; 
 
 
   const deleteCriticity = async (id: number) => {
@@ -122,13 +120,13 @@ const CriticityType: React.FC = () => {
       await axios.delete(`${baseURL}/criticity/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-      Swal.fire("Tipo de Criticity eliminada correctamente", "", "success");
+      Swal.fire("Tipo de Criticidad eliminada correctamente", "", "success");
       getCriticity();
     } catch (error) {
       console.error(error);
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar el Tipo de Criticity.",
+        text: "Error al eliminar el Tipo de Criticidad.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -286,4 +284,4 @@ const CriticityType: React.FC = () => {
   );
 };
 
-export default CriticityType;
+export default Criticity;

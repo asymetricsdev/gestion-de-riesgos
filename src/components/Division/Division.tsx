@@ -185,7 +185,6 @@ const Division: React.FC<Props> = ({ isNewRecord }) => {
     enviarSolicitud(metodo, parametros);
 };
 
-
 const enviarSolicitud = async (method: "POST" | "PUT", data: DivisionData) => {
 	try {
 	  const url = method === "PUT" && id ? `${baseURL}/division/${id}` : `${baseURL}/division/`;
@@ -204,13 +203,12 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: DivisionData) => {
 	  }
 	} catch (error) {
 	  if (axios.isAxiosError(error) && error.response) {
-		console.log('Detalles del error:', error.response.data);  // Para obtener más detalles sobre el error
 		showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
 	  } else {
 		showAlert("Error al realizar la solicitud", "error");
 	  }
 	}
-  };
+  }; 
   
 
 const deleteDivision = async (id: number) => {

@@ -88,34 +88,31 @@ const Activity: React.FC = () => {
     enviarSolicitud(metodo, parametros);
   };
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
-    try {
-        const url = method === "PUT" && id ? `${baseURL}/activity_type/${id}` : `${baseURL}/activity_type/`;
-        const response = await axios({
-            method,
-            url,
-            data,
-            headers: { "Content-Type": "application/json" },
-        });
 
-        const { tipo, msj } = response.data;
-        showAlert(msj, tipo);
-        getActivityType();
-        if (tipo === "success") {
-            // Cierra el modal después de un segundo para permitir la actualización
-            setTimeout(() => {
-                const closeModalButton = document.getElementById("btnCerrar");
-                if (closeModalButton) {
-                    closeModalButton.click();
-                }
-                getActivityType(); 
-            }, 500);
-        }
-    } catch (error) {
-        showAlert("Error al enviar la solicitud", "error");
-        console.error(error);
-    }
-};
+const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+	try {
+	  const url = method === "PUT" && id ? `${baseURL}/activity_type/${id}` : `${baseURL}/activity_type/`;
+	  const response = await axios({
+		method,
+		url,
+		data,
+		headers: { "Content-Type": "application/json" },
+	  });
+  
+	  showAlert("Operación realizada con éxito", "success");
+	  getActivityType();
+	  if (modalRef.current) {
+		const modal = bootstrap.Modal.getInstance(modalRef.current);
+		modal?.hide();
+	  }
+	} catch (error) {
+	  if (axios.isAxiosError(error) && error.response) {
+		showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+	  } else {
+		showAlert("Error al realizar la solicitud", "error");
+	  }
+	}
+  }; 
 
   const deleteActividad = async (id: number) => {
     try {

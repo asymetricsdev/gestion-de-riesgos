@@ -23,7 +23,6 @@ const Process: React.FC = () => {
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  // const [createDate, setCreateDate] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -90,33 +89,30 @@ const Process: React.FC = () => {
     enviarSolicitud(metodo, parametros);
   };
 
-const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-        const url = method === "PUT" && id ? `${baseURL}/process/${id}` : `${baseURL}/process/`;
-        const response = await axios({
-            method,
-            url,
-            data,
-            headers: { "Content-Type": "application/json" },
-        });
-
-        const { tipo, msj } = response.data;
-        showAlert(msj, tipo);
-        getProcess();
-        if (tipo === "success") {
-            setTimeout(() => {
-                const closeModalButton = document.getElementById("btnCerrar");
-                if (closeModalButton) {
-                    closeModalButton.click();
-                }
-                getProcess(); 
-            }, 500);
-        }
+      const url = method === "PUT" && id ? `${baseURL}/process/${id}` : `${baseURL}/process/`;
+      const response = await axios({
+      method,
+      url,
+      data,
+      headers: { "Content-Type": "application/json" },
+      });
+    
+      showAlert("Operación realizada con éxito", "success");
+      getProcess();
+      if (modalRef.current) {
+      const modal = bootstrap.Modal.getInstance(modalRef.current);
+      modal?.hide();
+      }
     } catch (error) {
-        showAlert("Error al enviar la solicitud", "error");
-        console.error(error);
+      if (axios.isAxiosError(error) && error.response) {
+      showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+      } else {
+      showAlert("Error al realizar la solicitud", "error");
+      }
     }
-};
+    }; 
 
 
 
