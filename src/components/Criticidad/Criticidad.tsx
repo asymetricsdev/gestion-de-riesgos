@@ -75,7 +75,7 @@ const Criticity: React.FC = () => {
 
   const validar = () => {
     if (name.trim() === "") {
-      showAlert("Escribe el tipo de criticidad", "warning", "tipo de criticidad");
+      showAlert("Escribe la criticidad", "warning", "criticidad");
       return;
     }
     if (description.trim() === "") {
@@ -120,13 +120,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
       await axios.delete(`${baseURL}/criticity/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-      Swal.fire("Tipo de Criticidad eliminada correctamente", "", "success");
+      Swal.fire("Criticidad eliminada correctamente", "", "success");
       getCriticity();
     } catch (error) {
       console.error(error);
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar el Tipo de Criticidad.",
+        text: "Error al eliminar Criticidad.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -156,7 +156,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Tipo de Criticidad' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Criticidad' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">

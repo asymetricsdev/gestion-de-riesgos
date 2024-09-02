@@ -58,7 +58,7 @@ const Activity: React.FC = () => {
       setName("");
       setDescription("");
     }
-    setTitle(op === "1" ? "Registrar Tipo de Actividad" : "Editar Tipo de Actividad");
+    setTitle(op === "1" ? "Registrar Actividades" : "Editar Actividades");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -75,7 +75,7 @@ const Activity: React.FC = () => {
 
   const validar = () => {
     if (name.trim() === "") {
-      showAlert("Escribe el tipo de actividad", "warning", "el tipo de actividad");
+      showAlert("Escribe actividades", "warning", "actividades");
       return;
     }
     if (description.trim() === "") {
@@ -119,13 +119,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
       await axios.delete(`${baseURL}/activity_type/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-      Swal.fire("Tipo de Actividad eliminada correctamente", "", "success");
+      Swal.fire("Actividades eliminada correctamente", "", "success");
       getActivityType();
     } catch (error) {
       console.error(error);
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar el Tipo de Actividad.",
+        text: "Error al eliminar Actividades.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -155,7 +155,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Tipo de Actividad' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Actividades' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
