@@ -1416,63 +1416,32 @@ function Tareas() {
 	};
 
 
-	// const downloadFile = async () => {
-    //     try {
-    //         const response = await axios.get("https://testbackend-433922.uk.r.appspot.com/task/1/download", {
-    //             responseType: "blob",
-    //         });
+	const downloadFile = async () => {
+        try {
+            const response = await axios.get("https://testbackend-433922.uk.r.appspot.com/task/1/download", {
+                responseType: "blob",
+            });
 
-    //         // Crear una URL para descargar el archivo
-    //         const url = window.URL.createObjectURL(new Blob([response.data]));
-    //         const link = document.createElement("a");
-    //         link.href = url;
-    //         link.setAttribute("download", `tarea.${fileExtension}`);
-    //         document.body.appendChild(link);
-    //         link.click();
+            // Crear una URL para descargar el archivo
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `tarea.${fileExtension}`);
+            document.body.appendChild(link);
+            link.click();
 
-    //         // Liberar la URL creada
-    //         window.URL.revokeObjectURL(url);
-    //     } catch (error) {
-    //         console.error("Error al descargar el archivo", error);
-    //         Swal.fire({
-    //             title: "Error",
-    //             text: "Hubo un error al descargar el archivo.",
-    //             icon: "error",
-    //             confirmButtonText: "OK",
-    //         });
-    //     }
-    // };
-
-	const downloadFile = () => {
-
-		    //     try {
-    //         const response = await axios.get("https://testbackend-433922.uk.r.appspot.com/task/1/download", {
-    //             responseType: "blob",
-    //         });
-	
-		if (file.length > 0) {
-			const base64Content = file[0].base64;
-			const extension = file[0].type;
-			const byteCharacters = atob(base64Content);
-			const byteNumbers = new Array(byteCharacters.length).fill(null).map((_, i) => byteCharacters.charCodeAt(i));
-			const byteArray = new Uint8Array(byteNumbers);
-			const blob = new Blob([byteArray], { type: `application/${extension}` });
-			const url = window.URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.setAttribute("download", `tarea.${extension}`);
-			document.body.appendChild(link);
-			link.click();
-			window.URL.revokeObjectURL(url);
-		} else {
-			Swal.fire({
-				title: "Error",
-				text: "No hay archivo para descargar.",
-				icon: "error",
-				confirmButtonText: "OK",
-			});
-		}
-	};
+            // Liberar la URL creada
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Error al descargar el archivo", error);
+            Swal.fire({
+                title: "Error",
+                text: "Hubo un error al descargar el archivo.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+        }
+    };
 
 	
 
@@ -1697,23 +1666,17 @@ function Tareas() {
 									{uploadedImageUrl && (
 										<div className="uploaded-image-preview">
 											<h6>Archivo subido:</h6>
-											{/* {uploadedImageUrl.startsWith("data:image/") && (
+											{uploadedImageUrl.startsWith("data:image/") && (
 												// <img src={uploadedImageUrl} alt="Vista previa" />
 												<img
 												src={`data:image/${fileExtension};base64,${uploadedImageUrl}`}
 												alt="Vista previa"
 											/>
-											)} */}
-											{uploadedImageUrl.startsWith("data:image/") && (
-												<img
-													src={`data:image/${fileExtension};base64,${uploadedImageUrl}`}
-													alt="Vista previa"
-												/>
 											)}
 										</div>
 									)}
 									<div className="mb-3">
-									{uploadedFiles.length > 0 && (
+										{uploadedFiles.length > 0 && (
 											<div>
 												<h6>Archivos subidos:</h6>
 												<ul>

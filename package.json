@@ -33,8 +33,9 @@
     "lint": "eslint --ignore-path .gitignore . && stylelint **/*.scss",
     "lint:fix": "eslint --fix --ignore-path .gitignore . && stylelint --fix **/*.scss",
     "preview": "vite preview",
-    "proxy": "https://asymetricsbackend.uk.r.appspot.com"
+    "proxy": "https://testbackend-433922.uk.r.appspot.com"
   },
+
   "eslintConfig": {
     "extends": [
       "react-app",
