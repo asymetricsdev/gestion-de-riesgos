@@ -48,13 +48,13 @@
 
 .main-content {
     flex-grow: 1;
-    padding: 20px;
+    padding: 10px;
 }
 
 .submenu {
     display: flex;
     flex-direction: column;
-    padding-left: 20px;
+    padding-left: 10px;
 }
 
 .submenu .nav-link {

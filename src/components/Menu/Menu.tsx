@@ -64,20 +64,20 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                     <div className="submenu">
                         {isOpen ? (
                             <NavLink to="/planificacion/planificador-de-actividad" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-users"></i>
-                                <span>PlanificadorActividad</span>
+                                 <i className="fa-solid fa-calendar-alt"></i>
+                                <span>Planificador de Actividad</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('PlanificadorActividad')}>
                                 <NavLink to="/planificacion/planificador-de-actividad" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-users"></i>
+                                <i className="fa-solid fa-calendar-alt"></i>
                                 </NavLink>
                             </OverlayTrigger>
                         )}
                         {isOpen ? (
                             <NavLink to="/planificacion/checkpoint" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-list-check"></i>
-                                <span>Checkpoint</span>
+                                <span>Items</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Checkpoint')}>
@@ -113,7 +113,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                         {isOpen ? (
                             <NavLink to="/planificacion/tipos-de-tareas" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-list-check"></i>
-                                <span>TiposDeTareas</span>
+                                <span>Tipos de Tareas</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('TiposDeTareas')}>
@@ -206,25 +206,25 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                         )} 
                         {isOpen ? (
                     <NavLink to="/matriz-de-peligro/peligro" className="nav-link text-white d-flex align-items-center">
-                        <i className="fa-solid fa-exclamation-triangle"></i>
+                        <i className="fa-solid fa-circle-radiation"></i>
                         <span>Peligro</span>
                     </NavLink>
                 ) : (
                     <OverlayTrigger placement="right" overlay={renderTooltip('Peligro')}>
                         <NavLink to="/matriz-de-peligro/peligro" className="nav-link text-white d-flex align-items-center">
-                        <i className="fa-solid fa-exclamation-triangle"></i>
+                        <i className="fa-solid fa-circle-radiation"></i>
                         </NavLink>
                     </OverlayTrigger>
                 )}
                     {isOpen ? (
                     <NavLink to="/matriz-de-peligro/matriz-peligro" className="nav-link text-white d-flex align-items-center">
-                        <i className="fa-solid fa-calendar-alt"></i>
+                         <i className="fa-solid fa-exclamation-triangle"></i>
                         <span>Matriz de Peligro</span>
                     </NavLink>
                 ) : (
                     <OverlayTrigger placement="right" overlay={renderTooltip('Matriz')}>
                         <NavLink to="/matriz-de-peligro/matriz-peligro" className="nav-link text-white d-flex align-items-center">
-                        <i className="fa-solid fa-calendar-alt"></i>
+                        <i className="fa-solid fa-exclamation-triangle"></i>
                         </NavLink>
                     </OverlayTrigger>
                 )}
@@ -275,7 +275,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                         {isOpen ? (
                             <NavLink to="/organizacion/compañia" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-building"></i>
-                                <span>Compañia</span>
+                                <span>Compañias</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Compañia')}>
@@ -287,7 +287,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                         {isOpen ? (
                             <NavLink to="/organizacion/division" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-sitemap"></i>
-                                <span>Division</span>
+                                <span>Áreas</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Division')}>
@@ -300,7 +300,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
                             <NavLink to="/organizacion/empleados" className="nav-link text-white d-flex align-items-center">
                                <i className="fa-solid fa-id-card-clip"></i>
-                                <span>Empleados</span>
+                                <span>Colaboradores</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Empleados')}>
@@ -312,7 +312,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                         {isOpen ? (
                             <NavLink to="/organizacion/posicion" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-address-card"></i>
-                                <span>Posición</span>
+                                <span>Cargos</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Posición')}>
