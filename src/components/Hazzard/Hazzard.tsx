@@ -5,19 +5,21 @@ import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+import Select from 'react-select';
 import * as bootstrap from 'bootstrap';
 
 
 const MySwal = withReactContent(Swal);
 
-interface CriticityType {
+interface Hazzard {
   id: number;
   name: string;
   description: string;
-  createDate?: string;
-  updateDate?: string;
+  createDate: string;
+  updateDate: string;
+  checker: Checker;
+  risks: Risk[]; 
 }
-
 interface Checker {
   id: number;
   name: string;
@@ -26,32 +28,32 @@ interface Checker {
   updateDate?: string;
 }
 
-interface Hazzard {
+interface Risk {
   id: number;
   name: string;
   description: string;
-  createDate: string;
-  updateDate: string;
-  criticityType: CriticityType; // Cambiado a objeto
-  checker: Checker;
+  createDate?: string;
+  updateDate?: string;
+  hazzard: Hazzard;
 }
 
 interface HazzardData {
   name: string;
-  criticityTypeId: number;
+  description: string;
   checkerId: number;
+  riskIds: number[];
 }
 
 const Hazzard: React.FC = () => {
   // const URL = "https://testbackend-433922.uk.r.appspot.com/hazzard/";
   const baseURL = import.meta.env.VITE_API_URL;
   const [hazzard, setHazzard] = useState<Hazzard[]>([]);
-  const [criticityType, setCriticityType] = useState<CriticityType[]>([]);
+  const [risk, setRisk] = useState<Risk[]>([]);
   const [checker, setChecker] = useState<Checker[]>([]);
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [selectedCriticityTypeId, setSelectedCriticityTypeId] = useState<number>(0);
+  const [selectedRiskIds, setSelectedRiskIds] = useState<number[]>([]);
   const [selectedCheckerId, setSelectedCheckerId] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
@@ -59,7 +61,7 @@ const Hazzard: React.FC = () => {
 
   useEffect(() => {
     getHazzard();
-    getCriticityType();
+    getRisk();
     getChecker();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
@@ -82,12 +84,12 @@ const Hazzard: React.FC = () => {
   };
   
 
-  const getCriticityType = async () => {
+  const getRisk = async () => {
     try {
-      const response: AxiosResponse<CriticityType[]> = await axios.get(`${baseURL}/activity_type/`);
-      setCriticityType(response.data);
+      const response: AxiosResponse<Risk[]> = await axios.get(`${baseURL}/risk/`);
+      setRisk(response.data);
     } catch (error) {
-      showAlert("Error al obtener los tipos de criticidad", "error");
+      showAlert("Error al obtener los riesgos", "error");
     }
   };
 
@@ -105,15 +107,15 @@ const Hazzard: React.FC = () => {
       setId(null);
       setName("");
       setDescription("");
-      setSelectedCriticityTypeId(0);
+      setSelectedRiskIds([]);
       setSelectedCheckerId(0);
       setTitle("Registrar Peligro");
     } else if (op === "2" && hazzard) {
       setId(hazzard.id);
       setName(hazzard.name);
       setDescription(hazzard.description);
-      setSelectedCriticityTypeId(hazzard.criticityType.id); 
       setSelectedCheckerId(hazzard.checker.id);
+      setSelectedRiskIds(hazzard.risks.map(h => h.id));
       setTitle("Editar Peligro");
     }
 
@@ -135,29 +137,22 @@ const Hazzard: React.FC = () => {
         showAlert("Escribe el nombre del peligro", "warning");
         return;
     }
-    if (selectedCriticityTypeId === 0) {
-        showAlert("Selecciona un tipo de criticidad", "warning");
-        return;
-    }
     if (selectedCheckerId === 0) {
         showAlert("Selecciona un tipo de verificación", "warning");
         return;
     }
+    if (selectedRiskIds.length === 0) {
+      showAlert("Selecciona un tipo de riego", "warning");
+      return;
+  }
 
-    // Tipado para los objetos seleccionados
-    const selectedCriticityType: CriticityType | undefined = criticityType.find(ct => ct.id === selectedCriticityTypeId);
-    const selectedChecker: Checker | undefined = checker.find(c => c.id === selectedCheckerId);
-
-    if (!selectedCriticityType || !selectedChecker) {
-        showAlert("No se encontró el tipo de criticidad o verificación seleccionado", "warning");
-        return;
-    }
-
+    
     // Tipado explícito para los parámetros a enviar
     const parametros: HazzardData = {
         name: name.trim(),
-        criticityTypeId: selectedCriticityTypeId,  // Enviando el objeto completo
-        checkerId: selectedCheckerId                       // Enviando el objeto completo
+        description: description.trim(),
+        checkerId: selectedCheckerId,
+        riskIds: selectedRiskIds,                      
     };
 
     console.log("Datos a enviar:", parametros);
@@ -195,15 +190,20 @@ const Hazzard: React.FC = () => {
   //BORRAMOS EL DATO DE LA TABLA
   const deleteHazzard = async (id: number) => {
     try {
-      await axios.delete(`${URL}${id}/`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      await axios.delete(`${baseURL}/hazzard/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-      showAlert("Peligro eliminado correctamente", "success");
+      Swal.fire("Peligro eliminado correctamente", "", "success");
+      setHazzard((prev) => prev.filter((check) => check.id !== id));
       getHazzard();
     } catch (error) {
-      showAlert("Error al eliminar el peligro", "error");
+      console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar el peligro.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -222,6 +222,12 @@ const Hazzard: React.FC = () => {
   const formatDate = (dateString: string) => {
     return dateString.split('T')[0];
   };
+  /*Selección multiple */
+
+  const opcionesPeligros = risk.map(risk => ({
+    value: risk.id,
+    label: risk.name,
+  }));
 
   return (
     <div className="App">
@@ -239,8 +245,8 @@ const Hazzard: React.FC = () => {
                     <th>N°</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
-                    <th>Nivel de Criticidad</th>
                     <th>Verificación</th>
+                    <th>Riesgos</th> 
                     <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
@@ -251,8 +257,8 @@ const Hazzard: React.FC = () => {
                       <td>{i + 1}</td>
                       <td>{hazz.name}</td>
                       <td>{hazz.description}</td>
-                      <td>{hazz.criticityType.description}</td>
                       <td>{hazz.checker.name}</td>
+                      <td>{hazz.risks.map(h => h.name).join(', ')}</td>
                       <td>{formatDate(hazz.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
@@ -314,35 +320,45 @@ const Hazzard: React.FC = () => {
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="criticityType" className="form-label">Nivel de Criticidad</label>
-                  <select
-                    id="criticityType"
-                    className="form-select"
-                    value={selectedCriticityTypeId}
-                    onChange={(e) => setSelectedCriticityTypeId(Number(e.target.value))}
-                  >
-                    <option value={0}>Selecciona el nivel de criticidad</option>
-                    {criticityType.map(cri => (
-                      <option key={JSON.stringify(cri)} value={cri.id}>{cri.description + ' - ' + cri.name}</option>
-                    ))}
-                  </select>
+                <div className="input-group mb-3">
+                  <span className="input-group-text">
+                  <i className="fa-regular fa-solid fa-file-alt"></i>
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Descripción"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="checker" className="form-label">Verificación</label>
+                  <label htmlFor="checker" className="form-label">Verificación:</label>
                   <select
                     id="checker"
                     className="form-select"
                     value={selectedCheckerId}  
                     onChange={(e) => setSelectedCheckerId(Number(e.target.value))}
                   >
-                    <option value={0}>Selecciona la verificación</option>
+                    <option value={0}>Selecciona...</option>
                     {checker.map(chec => (
                       <option key={JSON.stringify(chec)} value={chec.id}>{chec.name}</option>
                     ))}
                  </select>
-
                 </div>
+                <div className="form-group mt-3">
+                    <label htmlFor="risk">Riesgos:</label>
+                    <Select
+                      isMulti
+                      value={opcionesPeligros.filter(option => selectedRiskIds.includes(option.value))}
+                      onChange={(selectedOptions) => {
+                        const selectedIds = selectedOptions.map((option) => option.value);
+                        setSelectedRiskIds(selectedIds); // Aquí actualizamos el estado con los IDs seleccionados
+                      }}
+                      options={opcionesPeligros}
+                    />
+              </div>
+
               </div>
               <div className="modal-footer">
                 <button
