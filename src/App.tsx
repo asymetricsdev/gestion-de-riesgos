@@ -11,8 +11,6 @@ import Perfiles from  './pages/PerfilesPage';
 import Compañia from './pages/CompanyPage';
 import Actividades from './pages/ActividadesPage';
 import Criticidad from './pages/CriticityPage';
-import Comprobaciones from './pages/CheckerPage';
-// import TipoComprobaciones from './pages/CheckerTypePage';
 import { Container, Row, Col } from 'react-bootstrap';
 import Division from './components/Division/Division';
 import Peligro from './components/Hazzard/Hazzard';
@@ -26,6 +24,8 @@ import Tareas from './components/Tareas/Tareas';
 import TipoTareas from './components/TipoTareas/TipoTareas';
 import Empleados from './components/EmpleadoTabla/Empleado';
 import Checkpoint from './components/Checkpoint/Checkpoint';
+import Checker from './components/Checker/Checker';
+import CheckerType from './components/CheckerType/CheckerType';
 
 
 export function App() {
@@ -58,7 +58,8 @@ export function App() {
                                 <Route path="/matriz-de-peligro/actividad" element={<Actividad />} />
                                 <Route path="/matriz-de-peligro/actividades" element={<Actividades />} />
                                 <Route path="/matriz-de-peligro/criticidad-de-peligro" element={<Criticidad />} />
-                                <Route path="/matriz-de-peligro/comprobaciones" element={<Comprobaciones />} />
+                                <Route path="/matriz-de-peligro/jerarquia-de-control" element={<CheckerType />} />
+                                <Route path="/matriz-de-peligro/verificadores" element={<Checker />} />
                                 <Route path="/matriz-de-peligro/peligro" element={<Peligro />} />
                                 <Route path="/matriz-de-peligro/matriz-peligro" element={<MatrizPeligro />} />
                                 <Route path="/matriz-de-peligro/riesgos" element={<Riesgo />} />

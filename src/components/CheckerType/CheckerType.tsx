@@ -235,7 +235,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                     type="text"
                     id="nombre"
                     className="form-control"
-                    placeholder="Nombre de la Verificación"
+                    placeholder="Nombre de la Jerarquía de Control"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />

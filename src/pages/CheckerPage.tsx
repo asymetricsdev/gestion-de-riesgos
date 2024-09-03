@@ -1,4 +1,4 @@
-import Checker from  '../components/CheckerType/CheckerType';
+import Checker from  '../components/Checker/Checker';
 
 export default function CheckerPage() {
     return (
