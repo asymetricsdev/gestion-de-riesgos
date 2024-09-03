@@ -181,29 +181,29 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                             </OverlayTrigger>
                         )}
                         {isOpen ? (
-                            <NavLink to="/matriz-de-peligro/comprobaciones" className="nav-link text-white d-flex align-items-center">
+                            <NavLink to="/matriz-de-peligro/jerarquia-de-control" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-check-circle"></i>
-                                <span>Comprobaciones</span>
+                                <span>Jerarquía de Control</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Comprobaciones')}>
-                                <NavLink to="/matriz-de-peligro/comprobaciones" className="nav-link text-white d-flex align-items-center">
+                                <NavLink to="/matriz-de-peligro/jerarquia-de-control" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-check-circle"></i>
                                 </NavLink>
                             </OverlayTrigger>
                         )}
-                        {/* {isOpen ? (
-                            <NavLink to="/matriz-de-peligro/verificador" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-list-check"></i>
+                         {isOpen ? (
+                            <NavLink to="/matriz-de-peligro/verificadores" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-rectangle-list"></i>
                                 <span>Verificadores</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Verificadores')}>
-                                <NavLink to="/matriz-de-peligro/verificador" className="nav-link text-white d-flex align-items-center">
-                                <i className="fa-solid fa-list-check"></i>
+                                <NavLink to="/matriz-de-peligro/verificadores" className="nav-link text-white d-flex align-items-center">
+                                <i className="fa-solid fa-rectangle-list"></i>
                                 </NavLink>
                             </OverlayTrigger>
-                        )} */}
+                        )} 
                         {isOpen ? (
                     <NavLink to="/matriz-de-peligro/peligro" className="nav-link text-white d-flex align-items-center">
                         <i className="fa-solid fa-exclamation-triangle"></i>
