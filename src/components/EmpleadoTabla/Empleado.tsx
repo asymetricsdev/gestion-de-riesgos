@@ -70,7 +70,7 @@ const Empleado: React.FC = () => {
       const response: AxiosResponse<Empleado[]> = await axios.get(`${baseURL}/employee/`);
       setEmpleado(response.data);
     } catch (error) {
-      showAlert("Error al obtener los peligros", "error");
+      showAlert("Error al obtener el cargo del colaborador", "error");
     }
   };
   
@@ -80,7 +80,7 @@ const Empleado: React.FC = () => {
 
       setPosition(response.data);
     } catch (error) {
-      showAlert("Error al obtener el cargo del empleado", "error");
+      showAlert("Error al obtener el cargo del colaborador", "error");
     }
   };
   
@@ -93,7 +93,7 @@ const Empleado: React.FC = () => {
       setFirstName("");
       setLastName("");
       setSelectedPositionId(0);
-      setTitle("Registrar Empleado");
+      setTitle("Registrar Colaborador");
     } else if (op === "2" && empleado) {
       setId(empleado.id);
       setName(empleado.name);
@@ -102,7 +102,7 @@ const Empleado: React.FC = () => {
       setFirstName(empleado.firstName);
       setLastName(empleado.lastName);
       setSelectedPositionId(empleado.position.id);
-      setTitle("Editar Empleado");
+      setTitle("Editar colaborador");
     }
 
     if (modalRef.current) {
@@ -120,22 +120,27 @@ const Empleado: React.FC = () => {
 
   const validar = (): void => {
     if (firstName.trim() === "") {
-        showAlert("Escribe el nombre del empleado", "warning");
+        showAlert("Escribe el nombre del colaborador", "warning");
         return;
     }
 
     if (lastName.trim() === "") {
-        showAlert("Escribe el apellido del empleado", "warning");
+        showAlert("Escribe el apellido del colaborador", "warning");
         return;
     }
 
     if (rut.trim() === "") {
-        showAlert("Escribe el rut del empleado", "warning");
+        showAlert("Escribe el rut del colaborador", "warning");
         return;
     }
 
+     if (!validarRut(rut.trim())) {
+    showAlert("El RUT ingresado no es válido", "warning");
+    return;
+    } 
+
     if (selectedPositionId === 0) {
-        showAlert("Escribe el cargo del empleado", "warning");
+        showAlert("Escribe el cargo del colaborador", "warning");
         return;
     }
     
@@ -211,6 +216,36 @@ const Empleado: React.FC = () => {
     return dateString.split('T')[0];
   };
 
+   //VALIDACIÓN RUT CHILENO
+  const validarRut = (rut: string): boolean => {
+    // Remover puntos y guiones
+    const rutSinFormato = rut.replace(/\./g, "").replace(/-/g, "");
+    
+    // Separar número del dígito verificador
+    const rutNumero = rutSinFormato.slice(0, -1);
+    const verificador = rutSinFormato.slice(-1).toUpperCase();
+  
+    // Validar largo del RUT
+    if (rutNumero.length < 7 || rutNumero.length > 8) {
+      return false;
+    }
+  
+    // Calcular dígito verificador esperado
+    let suma = 0;
+    let multiplicador = 2;
+  
+    for (let i = rutNumero.length - 1; i >= 0; i--) {
+      suma += Number(rutNumero.charAt(i)) * multiplicador;
+      multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+    }
+  
+    const residuo = suma % 11;
+    const digitoCalculado = residuo === 0 ? "0" : residuo === 1 ? "K" : String(11 - residuo);
+  
+    // Verificar si el dígito verificador es correcto
+    return digitoCalculado === verificador;
+  }; 
+  
   return (
     <div className="App">
       <div className="container-fluid">
@@ -228,9 +263,7 @@ const Empleado: React.FC = () => {
                     <th>Rut</th>
                     <th>Nombre</th>
                     <th>Apellido</th>
-                    {/* <th>Descripción</th>   */}
                     <th>Cargo</th>
-                    {/* <th>Fecha</th> */}
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -241,9 +274,7 @@ const Empleado: React.FC = () => {
                       <td>{emp.rut}</td>
                       <td>{emp.firstName}</td>
                       <td>{emp.lastName}</td>
-                      {/* <td>{emp.description}</td>   */}
                       <td>{emp.position.name}</td> 
-                      {/* <td>{emp.createDate ? formatDate(emp.createDate) : ''}</td> */}
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                           <button
@@ -329,14 +360,14 @@ const Empleado: React.FC = () => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="position" className="form-label">Cargo</label>
+                  <label htmlFor="position" className="form-label">Cargo:</label>
                   <select
                     id="position"
                     className="form-select"
                     value={selectedPositionId}
                     onChange={(e) => setSelectedPositionId(Number(e.target.value))}
                   >
-                    <option value={0}>Seleccione el cargo</option>
+                    <option value={0}>Selecciona...</option>
                     {position.map(pos => (
                       <option key={JSON.stringify(pos)} value={pos.id}>{pos.name}</option>
                     ))}
