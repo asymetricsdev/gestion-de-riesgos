@@ -234,7 +234,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                 <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-list-check"></i>
+                  <i className="fa-solid fa-building"></i>
                   </span>
                   <input
                     type="text"

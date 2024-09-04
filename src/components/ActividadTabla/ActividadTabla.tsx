@@ -379,28 +379,28 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="activityType" className="form-label">Tipo de Actividad</label>
+                  <label htmlFor="activityType" className="form-label">Tipo de Actividad:</label>
                   <select
                     id="activityType"
                     className="form-select"
                     value={selectedActivityTypeId}
                     onChange={(e) => setSelectedActivityTypeId(Number(e.target.value))}
                   >
-                    <option value={0}>Selecciona el tipo de actividad</option>
+                    <option value={0}>Selecciona...</option>
                     {activityType.map(actv => (
                       <option key={JSON.stringify(actv)} value={actv.id}>{actv.description}</option>
                     ))}
                   </select>
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="process" className="form-label">Proceso</label>
+                  <label htmlFor="process" className="form-label">Proceso:</label>
                   <select
                     id="process"
                     className="form-select"
                     value={selectedProcessId}  
                     onChange={(e) => setSelectedProcessId(Number(e.target.value))}
                   >
-                    <option value={0}>Selecciona el proceso</option>
+                    <option value={0}>Selecciona...</option>
                     {process.map(proc => (
                       <option key={JSON.stringify(proc)} value={proc.id}>{proc.name}</option>
                     ))}

@@ -117,7 +117,7 @@ const Division: React.FC<Props> = ({ isNewRecord }) => {
       setDescription("");
       setSelectedCompanyTypeId(0);
       setSelectedCityId(0);
-      setTitle("Registrar Division");
+      setTitle("Registrar Área");
     } else if (op === "2" && division) {
       setId(division.id);
       setName(division.name);
@@ -127,7 +127,7 @@ const Division: React.FC<Props> = ({ isNewRecord }) => {
      setSelectedCompanyTypeId(division.company.id);
       setSelectedCompanyTypeId(division.company.id); 
       setSelectedCityId(division.city.id);
-      setTitle("Editar Division");
+      setTitle("Editar Área");
 
 	  console.log("Nombre en el modal:", name);
     }
@@ -334,7 +334,7 @@ const deleteDivision = async (id: number) => {
 								<div className="mb-3">
 									<div className="input-group">
 										<span className="input-group-text">
-											<i className="fa-solid fa-list-check"></i>
+										<i className="fa-solid fa-sitemap"></i>
 										</span>
 										<input
 											type="text"
@@ -348,7 +348,7 @@ const deleteDivision = async (id: number) => {
 								</div>
 								<div className="mb-3">
 									<label htmlFor="Company" className="form-label">
-										Compañias
+										Compañias:
 									</label>
 									<select
 										id="Company"
@@ -356,7 +356,7 @@ const deleteDivision = async (id: number) => {
 										value={selectedCompanyTypeId}
 										onChange={(e) => setSelectedCompanyTypeId(Number(e.target.value))}
 									>
-										<option value={0}>Selecciona la Compañia</option>
+										<option value={0}>Selecciona...</option>
 										{company.map((com) => (
 											<option key={com.id} value={com.id}>
 												{com.description + " - " + com.name}
@@ -366,14 +366,14 @@ const deleteDivision = async (id: number) => {
 								</div>
 								<div className="mb-3">
 									<label htmlFor="City" className="form-label">
-										Ciudad
+										Ciudad:
 									</label>
 									<select
 										id="City"
 										className="form-select"
 										value={selectedCityId}
 										onChange={(e) => setSelectedCityId(Number(e.target.value))}>
-										<option value={0}>Selecciona la Ciudad</option>
+										<option value={0}>Selecciona...</option>
 										{city.map((cit) => (
 											<option key={cit.id} value={cit.id}>
 												{cit.name}
