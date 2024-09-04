@@ -178,7 +178,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 				<div className="row mt-3">
 					<div className="col-12">
 						<div className="tabla-contenedor">
-							<EncabezadoTabla title="Checkpoint" onClick={() => openModal("1")} />
+							<EncabezadoTabla title="Items" onClick={() => openModal("1")} />
 						</div>
 						<div className="table-responsive">
 							<table className="table table-bordered">
