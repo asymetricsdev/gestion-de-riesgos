@@ -15,22 +15,24 @@ interface Risk {
   id: number;
   name: string;
   description: string;
-  createDate: string;
+  createDate: string;  
+  updateDate: string; 
 }
 
-const Risks: React.FC = () => { 
+const Risk: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
-  const [Risks, setRisks] = useState<Risk[]>([]); 
-  const [id, setId] = useState<string>("");
+  const [risk, setRisk] = useState<Risk[]>([]);
+  const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [createDate, setCreateDate] = useState<string>(""); 
+  const [createDate, setCreateDate] = useState<string>("");
+  const [updateDate, setUpdateDate] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getRisks();
+    getRisk();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -41,36 +43,32 @@ const Risks: React.FC = () => {
     };
   }, []);
 
-  const getRisks = async () => {
+  const getRisk = async () => {
     try {
       const response: AxiosResponse<Risk[]> = await axios.get(`${baseURL}/risk/`);
-      const formattedRisks = response.data.map((Risk) => ({
+      const data = response.data.map(Risk => ({
         ...Risk,
-        createDate: new Date(Risk.createDate).toLocaleString(),
+       
       }));
-      setRisks(formattedRisks);
+      setRisk(data);
     } catch (error) {
-      showAlert("Error al obtener los datos de Riesgos", "error");
+      showAlert("Error al obtener el riesgo", "error");
     }
   };
 
-  const openModal = (op: string, risk?: Risk) => { 
-    if (risk) {
-      setId("");
-      setName(risk.name);
-      setDescription(risk.description);
-      setCreateDate(risk.createDate);
-    } else {
-      setId("");
+  const openModal = (op: string, risk?: Risk) => {
+    if (op === "1") {
+      setId(null);
       setName("");
       setDescription("");
-      setCreateDate("");
+      setTitle("Registrar Riesgo");
+    } else if (op === "2" && risk) {
+      setId(risk.id);
+      setName( risk.name);
+      setDescription(risk.description);
+     
+      setTitle("Editar Riesgo");
     }
-    setTitle(op === "1" ? "Registrar Riesgo" : "Editar Riesgo");
-
-    setTimeout(() => {
-      document.getElementById("nombre")?.focus();
-    }, 500);
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -81,29 +79,24 @@ const Risks: React.FC = () => {
 
   const handleModalHidden = () => {
     setIsModalOpen(false);
-    const modals = document.querySelectorAll(".modal-backdrop");
-    modals.forEach((modal) => modal.parentNode?.removeChild(modal));
+    const modals = document.querySelectorAll('.modal-backdrop');
+    modals.forEach(modal => modal.parentNode?.removeChild(modal));
   };
 
   const validar = () => {
-    if (name.trim() === "") {
+    if (!name.trim()) {
       showAlert("Escribe el nombre", "warning", "nombre");
       return;
     }
-    if (description.trim() === "") {
-      showAlert("Escribe la descripción", "warning", "description");
+    if (!description.trim()) {
+      showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
-    if (createDate.trim() === "") {
-      showAlert("Escribe la fecha de creación", "warning", "createDate");
-      return;
-    }
-
-    const parametros = {
-      id,
-      name: name.trim(),
-      description: description.trim(),
-      createDate: createDate.trim(),
+    
+    const parametros = {  
+      name: name.trim(), 
+      description: description.trim(), 
+      
     };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
@@ -118,35 +111,34 @@ const Risks: React.FC = () => {
         data,
         headers: { "Content-Type": "application/json" },
       });
-
-      const { tipo, msj } = response.data;
-      showAlert(msj, tipo);
-      getRisks();
-      if (tipo === "success") {
-        setTimeout(() => {
-          const closeModalButton = document.getElementById("btnCerrar");
-          if (closeModalButton) {
-            closeModalButton.click();
-          }
-          getRisks();
-        }, 500);
+  
+      showAlert("Operación realizada con éxito", "success");
+      getRisk();
+      if (modalRef.current) {
+        const modal = bootstrap.Modal.getInstance(modalRef.current);
+        modal?.hide();
       }
     } catch (error) {
-      showAlert("Error al enviar la solicitud", "error");
+
+      if (axios.isAxiosError(error) && error.response) {
+        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+      } else {
+        showAlert("Error al realizar la solicitud", "error");
+      }
     }
-  };
+  }; 
 
   const deleteRisk = async (id: number) => {
     try {
       await axios.delete(`${baseURL}/risk/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-      Swal.fire("Tipo de Peligro eliminado correctamente", "", "success");
-      getRisks();
+      Swal.fire("Riesgo eliminado correctamente", "", "success");
+      getRisk();
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar el Tipo de Peligro.",
+        text: "Error al eliminar el Riesgo.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -154,16 +146,16 @@ const Risks: React.FC = () => {
   };
 
   const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-    <Tooltip id="button-tooltip-edit" {...props}>
-      Editar
-    </Tooltip>
-  );
-  
-  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-    <Tooltip id="button-tooltip-delete" {...props}>
-      Eliminar
-    </Tooltip>
-  );
+		<Tooltip id="button-tooltip-edit" {...props}>
+		  Editar
+		</Tooltip>
+	  );
+	  
+	  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-delete" {...props}>
+		  Eliminar
+		</Tooltip>
+	  );
 
   return (
     <div className="App">
@@ -175,35 +167,34 @@ const Risks: React.FC = () => {
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
-                <thead className="text-center"
-                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
+                <thead className="text-center" 
+                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
+                  color: '#fff' }}>
                   <tr>
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Descripción</th>
-                    <th>Fecha de Creación</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {Risks.map((risk, i) => (
-                    <tr key={risk.id} className="text-center">
+                  {risk.map((cit, i) => (
+                    <tr key={cit.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{risk.name}</td>
-                      <td>{risk.description}</td>
-                      <td>29/7/2024</td>
+                      <td>{cit.name}</td>
+                      <td>{cit.description}</td>
                       <td className="text-center">
-                      <OverlayTrigger placement="top" overlay={renderEditTooltip}>
+                        <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button
-                          onClick={() => openModal("2", risk)}
+                          onClick={() => openModal("2", cit)}
                           className="btn btn-custom-editar m-2"
                           data-bs-toggle="modal"
-                          data-bs-target="#modalRisk"
+                          data-bs-target="#modalUsers"
                         >
                           <i className="fa-solid fa-edit"></i>
                         </button>
                       </OverlayTrigger>
-                      <OverlayTrigger placement="top" overlay={renderDeleteTooltip}>
+                      <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
                         <button className="btn btn-custom-danger" onClick={() => {
                           MySwal.fire({
                             title: "¿Estás seguro?",
@@ -214,13 +205,14 @@ const Risks: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteRisk(risk.id);
+                              deleteRisk(cit.id);
                             }
                           });
-                        }}>
+                        }}
+                        >
                           <FontAwesomeIcon icon={faCircleXmark} />
                         </button>
-                        </OverlayTrigger>
+                      </OverlayTrigger>
                       </td>
                     </tr>
                   ))}
@@ -231,16 +223,18 @@ const Risks: React.FC = () => {
         </div>
         <div
           className="modal fade"
-          id="modalRisk"
+          id="modalUsers"
+          ref={modalRef}
           data-bs-backdrop="true"
-          data-bs-keyboard="true"
-          aria-labelledby="staticBackdropLabel"
+          data-bs-keyboard="false"
+          tabIndex={-1}
+          aria-labelledby="modalTitle"
           aria-hidden="true"
         >
           <div className="modal-dialog">
             <div className="modal-content">
-              <div className="modal-header text-white">
-                <label className="h5">{title}</label>
+              <div className="modal-header">
+              <h5 className="modal-title w-100">{title}</h5>
                 <button
                   type="button"
                   className="btn-close"
@@ -249,14 +243,13 @@ const Risks: React.FC = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-user"></i>
+                  <i className="fa-solid fa-circle-exclamation"></i>
                   </span>
                   <input
                     type="text"
-                    id="nombre"
+                    id="name"
                     className="form-control"
                     placeholder="Nombre"
                     value={name}
@@ -265,7 +258,7 @@ const Risks: React.FC = () => {
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-regular fa-envelope"></i>
+                  <i className="fa-regular fa-solid fa-file-alt"></i>
                   </span>
                   <input
                     type="text"
@@ -276,35 +269,19 @@ const Risks: React.FC = () => {
                     onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-solid fa-calendar"></i>
-                  </span>
-                  <input
-                    type="text"
-                    id="createDate"
-                    className="form-control"
-                    placeholder="Fecha de creación"
-                    value={createDate}
-                    onChange={(e) => setCreateDate(e.target.value)}
-                  />
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-solid fa-tasks"></i>
-                  </span>
-                </div>
-                <div className="d-grid col-6 mx-auto">
-                  <button onClick={validar} className="btn btn-success">
-                    <i className="fa-solid fa-floppy-disk m-2"></i>Guardar
-                  </button>
-                </div>
               </div>
               <div className="modal-footer">
-                <button type="button"
-                  className="btn btn-secondary m-2"
+                <button
+                  type="button"
+                  className="btn btn-secondary"
                   data-bs-dismiss="modal"
-                  id="btnCerrar">Cerrar</button>
+                  id="btnCerrar"
+                >
+                  Cerrar
+                </button>
+                <button type="button" className="btn btn-primary" onClick={validar}>
+                  Guardar
+                </button>
               </div>
             </div>
           </div>
@@ -314,4 +291,4 @@ const Risks: React.FC = () => {
   );
 };
 
-export default Risks; 
+export default Risk;

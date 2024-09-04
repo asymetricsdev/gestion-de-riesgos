@@ -52,7 +52,7 @@ const Checkpoint: React.FC = () => {
 			const response: AxiosResponse<Checkpoint[]> = await axios.get(`${baseURL}/checkpoint/`);
 			setCheckpoint(response.data);
 		} catch (error) {
-			showAlert("Error al obtener los Checkpoint", "error");
+			showAlert("Error al obtener los Items", "error");
 		}
 	};
 
@@ -61,7 +61,7 @@ const Checkpoint: React.FC = () => {
 			const response = await axios.get<Checker[]>(`${baseURL}/checker/`);
 			setChecker(response.data);
 		} catch (error) {
-			showAlert("Error al obtener el cargo del Perfiles", "error");
+			showAlert("Error al obtener els verificadores", "error");
 		}
 	};
 
@@ -75,7 +75,7 @@ const Checkpoint: React.FC = () => {
 			setName("");
 			setDescription("");
 		}
-		setTitle(op === "1" ? "Registrar el Tipo de Checkpoint" : "Editar el Tipo de Checkpoint");
+		setTitle(op === "1" ? "Registrar Item" : "Editar Item");
 
 		if (modalRef.current) {
 			const modal = new bootstrap.Modal(modalRef.current);
@@ -100,7 +100,7 @@ const Checkpoint: React.FC = () => {
 			return;
 		}
 		if (selectedCheckpointId === 0) {
-			showAlert("Selecciona un tipo de Checker", "warning");
+			showAlert("Selecciona un verificador", "warning");
 			return;
 		}
 
@@ -152,7 +152,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 		} catch (error) {
 		  Swal.fire({
 			title: "Error",
-			text: "Error al eliminar Checkpoint.",
+			text: "Error al eliminar el Item.",
 			icon: "error",
 			confirmButtonText: "OK",
 		  });
@@ -287,7 +287,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 										className="form-select"
 										value={selectedCheckpointId}
 										onChange={(e) => setSelectedCheckpointId(Number(e.target.value))}>
-										<option value={0}>Selecciona el Verificador</option>
+										<option value={0}>Selecciona...</option>
 										{checkpoint.map((chec) => (
 										<option key={JSON.stringify(chec)} value={chec.checker.id}>{chec.checker.name}</option>
 										))}
