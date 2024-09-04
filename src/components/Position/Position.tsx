@@ -334,7 +334,7 @@ const Position: React.FC = () => {
                     value={selectedManagerId}
                     onChange={(e) => setSelectedManagerId(Number(e.target.value))}
                   >
-                    <option value={0}>Selecciona la Jefatura</option>
+                    <option value={0}>Selecciona...</option>
                     {managerPosition.map((proc) => (
                       <option key={proc.id} value={proc.id}>
                         {proc.name}

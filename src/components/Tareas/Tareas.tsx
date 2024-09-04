@@ -339,7 +339,7 @@ function Tareas() {
 					</div>
 					<div className="table-responsive">
 						<table className="table table-bordered">
-							<thead
+							<thead 
 								className="text-center"
 								style={{
 									background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
@@ -444,7 +444,7 @@ function Tareas() {
 				<div className="modal-dialog modal-lg">
 					<div className="modal-content">
 						<div className="modal-header">
-							<h5 className="modal-title" id="exampleModalLabel">
+							<h5 className="modal-title w-100" id="exampleModalLabel">
 								{title}
 							</h5>
 							<button type="button" className="btn-close" data-bs-dismiss="modal"></button>
@@ -452,7 +452,7 @@ function Tareas() {
 						<div className="modal-body">
 							<div className="input-group mb-3">
 								<span className="input-group-text">
-									<i className="fa-solid fa-user"></i>
+								<i className="fa-solid fa-bars-progress"></i>
 								</span>
 								<input
 									type="text"
@@ -465,7 +465,7 @@ function Tareas() {
 							</div>
 							<div className="input-group mb-3">
 								<span className="input-group-text">
-									<i className="fa-solid fa-envelope"></i>
+								<i className="fa-regular fa-solid fa-file-alt"></i>
 								</span>
 								<input
 									type="text"
