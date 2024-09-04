@@ -162,8 +162,6 @@ const Profiles: React.FC = () => {
     
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
-
-    console.log("Payload enviado:", parametros);
 };
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
@@ -188,7 +186,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
       );
     }
 
-    // Cerrar el modal después de la operación
     if (modalRef.current) {
       const modal = bootstrap.Modal.getInstance(modalRef.current);
       modal?.hide();
@@ -236,7 +233,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
 
   const handleHazzardSelection = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOptions = Array.from(event.target.selectedOptions, option => Number(option.value));
-    console.log(selectedOptions); // Verifica si las opciones seleccionadas están presentes
+    console.log(selectedOptions);
     setSelectedTaskIds(selectedOptions);
   };
   

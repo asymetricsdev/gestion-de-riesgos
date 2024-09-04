@@ -5,7 +5,6 @@ import Menu from './components/Menu/Menu';
 import Home from './pages/HomePage';
 import MatrizPeligro from './pages/MatrizPeligroPage';
 import PlanificadorActividad from './pages/PlanificadorActividadPage';
-import MatrizLegal from './pages/MatrizLegalPage';
 import Usuarios from './pages/UsuariosPage';
 import Perfiles from  './pages/PerfilesPage';
 import Compañia from './pages/CompanyPage';

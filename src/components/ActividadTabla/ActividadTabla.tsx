@@ -413,7 +413,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
                       value={opcionesPeligros.filter(option => selectedHazzardIds.includes(option.value))}
                       onChange={(selectedOptions) => {
                         const selectedIds = selectedOptions.map((option) => option.value);
-                        setSelectedHazzardIds(selectedIds); // Aquí actualizamos el estado con los IDs seleccionados
+                        setSelectedHazzardIds(selectedIds); 
                       }}
                       options={opcionesPeligros}
                     />

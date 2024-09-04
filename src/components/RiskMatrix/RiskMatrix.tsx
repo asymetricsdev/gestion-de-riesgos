@@ -16,7 +16,6 @@ interface Risk {
   name: string;
   description: string;
   createDate: string;
-  // createDate: Date;
 }
 
 const Risks: React.FC = () => { 
@@ -26,7 +25,6 @@ const Risks: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [createDate, setCreateDate] = useState<string>(""); 
-  // const [createDate, setCreateDate] = useState<Date | null>(null);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -61,13 +59,11 @@ const Risks: React.FC = () => {
       setId("");
       setName(risk.name);
       setDescription(risk.description);
-      // setCreateDate(new Date(profile.createDate));
       setCreateDate(risk.createDate);
     } else {
       setId("");
       setName("");
       setDescription("");
-      // setCreateDate(null);
       setCreateDate("");
     }
     setTitle(op === "1" ? "Registrar Riesgo" : "Editar Riesgo");
@@ -107,7 +103,6 @@ const Risks: React.FC = () => {
       id,
       name: name.trim(),
       description: description.trim(),
-      // createDate: createDate || new Date(),
       createDate: createDate.trim(),
     };
     const metodo = id ? "PUT" : "POST";
@@ -198,8 +193,6 @@ const Risks: React.FC = () => {
                       <td>{i + 1}</td>
                       <td>{risk.name}</td>
                       <td>{risk.description}</td>
-                      {/* <td>{new Date(Risk.createDate).toLocaleString()}</td> */}
-                      {/* <td>{Risk.createDate}</td> */}
                       <td>29/7/2024</td>
                       <td className="text-center">
                       <OverlayTrigger placement="top" overlay={renderEditTooltip}>
@@ -297,13 +290,6 @@ const Risks: React.FC = () => {
                     value={createDate}
                     onChange={(e) => setCreateDate(e.target.value)}
                   />
-                  {/* <input
-                    type="datetime-local"
-                    id="createDate"
-                    className="form-control"
-                    value={createDate ? createDate.toISOString().substring(0, 16) : ""}
-                    onChange={(e) => setCreateDate(e.target.value ? new Date(e.target.value) : null)}
-                  /> */}
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
