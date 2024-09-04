@@ -124,7 +124,6 @@ const Process: React.FC = () => {
       Swal.fire("Proceso eliminado correctamente", "", "success");
       getProcess();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar el Proceso.",

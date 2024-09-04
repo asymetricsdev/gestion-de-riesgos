@@ -126,7 +126,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
       Swal.fire("Compañia eliminada correctamente", "", "success");
       getCompany();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar la Compañia.",

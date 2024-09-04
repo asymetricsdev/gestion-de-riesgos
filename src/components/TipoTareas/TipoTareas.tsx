@@ -122,7 +122,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 		  Swal.fire("Tipo de Tareas eliminado correctamente", "", "success");
 		  getTipoTareas();
 		} catch (error) {
-		  console.error(error);
 		  Swal.fire({
 			title: "Error",
 			text: "Error al eliminar el Tipo de Tareas.",

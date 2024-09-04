@@ -99,16 +99,14 @@ function Tareas() {
 			setTareas(response.data);
 		} catch (error) {
 			showAlert("Error al obtener Tareas", "error");
-			console.error(error);
+
 		}
 	};
 	const getTasksType = async () => {
 		try {
 			const response: AxiosResponse<TaskType[]> = await axios.get(`${baseURL}/task_type/`);
-			console.log(response.data); 
 			setTaskType(response.data);
 		} catch (error) {
-			console.error(error); 
 			showAlert("Error al obtener la tarea", "error");
 		}
 	};
@@ -193,7 +191,6 @@ function Tareas() {
 			getTareas();
 		} catch (error) {
 			showAlert("Error al eliminar la tarea", "error");
-			console.error(error);
 		}
 	};
 
@@ -302,7 +299,6 @@ function Tareas() {
 
 		  window.URL.revokeObjectURL(link.href);
 		} catch (error) {
-		  console.error("Error al descargar el archivo:", error);
 		  Swal.fire({
 			title: "Error",
 			text: "Hubo un error al descargar el archivo.",

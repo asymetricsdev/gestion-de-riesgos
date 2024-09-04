@@ -133,7 +133,6 @@ const Risks: React.FC = () => {
       }
     } catch (error) {
       showAlert("Error al enviar la solicitud", "error");
-      console.error(error);
     }
   };
 
@@ -145,7 +144,6 @@ const Risks: React.FC = () => {
       Swal.fire("Tipo de Peligro eliminado correctamente", "", "success");
       getRisks();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar el Tipo de Peligro.",

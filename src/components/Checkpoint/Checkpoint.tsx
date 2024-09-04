@@ -150,7 +150,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 		  Swal.fire("Checkpoint eliminado correctamente", "", "success");
 		  getCheckpoint();
 		} catch (error) {
-		  console.error(error);
 		  Swal.fire({
 			title: "Error",
 			text: "Error al eliminar Checkpoint.",

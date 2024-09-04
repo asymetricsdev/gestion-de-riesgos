@@ -122,7 +122,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
       Swal.fire("Tipo de Jerarquía eliminada correctamente", "", "success");
       getCheckerType();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar el Tipo de Jerarquía.",

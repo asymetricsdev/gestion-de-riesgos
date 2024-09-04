@@ -161,7 +161,6 @@ const Checker: React.FC = () => {
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
 
-    console.log("Payload enviado:", parametros);
 };
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: CheckerData) => {
@@ -211,7 +210,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckerData) => {
       setChecker((prev) => prev.filter((check) => check.id !== id));
       getChecker();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar el verificador.",
@@ -236,7 +234,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckerData) => {
 
   const handleHazzardSelection = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOptions = Array.from(event.target.selectedOptions, option => Number(option.value));
-    console.log(selectedOptions); 
     setSelectedCheckpointIds(selectedOptions);
   };
   

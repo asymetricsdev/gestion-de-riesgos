@@ -83,7 +83,6 @@ const Division: React.FC<Props> = ({ isNewRecord }) => {
     try {
 	  const response: AxiosResponse<Division[]> = await axios.get(`${baseURL}/division/`);
       setDivision(response.data);
-      console.log("Datos de Division:", response.data);
     } catch (error) {
       showAlert("Error al obtener los peligros", "error");
     }
@@ -129,7 +128,6 @@ const Division: React.FC<Props> = ({ isNewRecord }) => {
       setSelectedCityId(division.city.id);
       setTitle("Editar Área");
 
-	  console.log("Nombre en el modal:", name);
     }
 
     if (modalRef.current) {
@@ -169,7 +167,6 @@ const Division: React.FC<Props> = ({ isNewRecord }) => {
         return;
     }
 
-	console.log("Valor de description al validar:", description);
 
 	const positionIds = id ? [2] : [];
 	const parametros: DivisionData = {
@@ -219,7 +216,6 @@ const deleteDivision = async (id: number) => {
       Swal.fire("Área eliminada correctamente", "", "success");
       getDivision();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar el Área.",

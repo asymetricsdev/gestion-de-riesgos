@@ -189,7 +189,6 @@ const Actividad: React.FC = () => {
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
 
-    console.log("Payload enviado:", parametros);
 };
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
@@ -236,7 +235,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
       setActividad((prev) => prev.filter((act) => act.id !== id));
       getActivity();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar la tarea.",
@@ -261,7 +259,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
 
   const handleHazzardSelection = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOptions = Array.from(event.target.selectedOptions, option => Number(option.value));
-    console.log(selectedOptions); 
     setSelectedHazzardIds(selectedOptions);
   };
   
