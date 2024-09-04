@@ -222,7 +222,7 @@ const deleteDivision = async (id: number) => {
       console.error(error);
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar la Área.",
+        text: "Error al eliminar el Área.",
         icon: "error",
         confirmButtonText: "OK",
       });
