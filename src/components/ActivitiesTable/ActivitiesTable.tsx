@@ -31,7 +31,7 @@ export const ActivitiesTable: React.FC<TableHeaderProps> = ({ title }: TableHead
   return (
     <div className="table-container">
       <div className="tabla-contenedor-header">
-      <TableHeaderComponent title='Planificación de Actividades' />
+      <TableHeaderComponent title='Planificador de Actividad'/>
       </div>
       <div className="table-responsives">
         <table id="tableta" className="table table-bordered">
