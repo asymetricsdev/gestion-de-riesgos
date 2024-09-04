@@ -207,7 +207,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                         {isOpen ? (
                     <NavLink to="/matriz-de-peligro/peligro" className="nav-link text-white d-flex align-items-center">
                         <i className="fa-solid fa-circle-radiation"></i>
-                        <span>Peligro</span>
+                        <span>Peligros</span>
                     </NavLink>
                 ) : (
                     <OverlayTrigger placement="right" overlay={renderTooltip('Peligro')}>
@@ -333,7 +333,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                                 </NavLink>
                             </OverlayTrigger>
                         )}
-                        {isOpen ? (
+                       {/*  {isOpen ? (
                             <NavLink to="/organizacion/usuarios" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-users"></i>
                                 <span>Usuarios</span>
@@ -344,7 +344,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                                 <i className="fa-solid fa-users"></i>
                                 </NavLink>
                             </OverlayTrigger>
-                        )}
+                        )} */}
                     </div>
                     )}
                 </Nav> 
