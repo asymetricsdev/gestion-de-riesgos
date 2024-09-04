@@ -208,7 +208,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
       Swal.fire("Perfil eliminado correctamente", "", "success");
       getProfiles();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar el Perfil.",
@@ -233,7 +232,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
 
   const handleHazzardSelection = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOptions = Array.from(event.target.selectedOptions, option => Number(option.value));
-    console.log(selectedOptions);
     setSelectedTaskIds(selectedOptions);
   };
   

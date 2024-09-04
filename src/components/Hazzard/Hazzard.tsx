@@ -76,7 +76,6 @@ const Hazzard: React.FC = () => {
     try {
       const response: AxiosResponse<Hazzard[]> = await axios.get(`${baseURL}/hazzard/`);
       setHazzard(response.data);
-      console.log("Datos de Hazzard:", response.data);
     } catch (error) {
       showAlert("Error al obtener los peligros", "error");
     }
@@ -153,7 +152,6 @@ const Hazzard: React.FC = () => {
         riskIds: selectedRiskIds,                      
     };
 
-    console.log("Datos a enviar:", parametros);
 
 
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
@@ -194,7 +192,6 @@ const Hazzard: React.FC = () => {
       setHazzard((prev) => prev.filter((check) => check.id !== id));
       getHazzard();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar el peligro.",

@@ -190,7 +190,6 @@ const Empleado: React.FC = () => {
       Swal.fire("Colaborador eliminado correctamente", "", "success");
       getEmpleado();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar el Colaborador.",

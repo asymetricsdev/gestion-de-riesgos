@@ -119,6 +119,7 @@ const Risk: React.FC = () => {
         modal?.hide();
       }
     } catch (error) {
+
       if (axios.isAxiosError(error) && error.response) {
         showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
       } else {
@@ -135,7 +136,6 @@ const Risk: React.FC = () => {
       Swal.fire("Riesgo eliminado correctamente", "", "success");
       getRisk();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar el Riesgo.",

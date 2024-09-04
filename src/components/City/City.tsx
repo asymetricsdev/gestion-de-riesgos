@@ -146,7 +146,6 @@ const City: React.FC = () => {
       Swal.fire("Ciudad eliminada correctamente", "", "success");
       getCity();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar la Ciudad.",

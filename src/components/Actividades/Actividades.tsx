@@ -122,7 +122,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
       Swal.fire("Actividades eliminada correctamente", "", "success");
       getActivityType();
     } catch (error) {
-      console.error(error);
       Swal.fire({
         title: "Error",
         text: "Error al eliminar Actividades.",
