@@ -499,7 +499,7 @@ function Tareas() {
 									value={selectedTaskTypeId}
 									onChange={(e) => setselectedTaskTypeId(Number(e.target.value))}
 								>
-									<option value={0}>Selecciona tipo de tarea</option>
+									<option value={0}>Selecciona...</option>
 									{taskType.map((ts) => (
 										<option key={ts.id} value={ts.id}>
 											{ts.description + " - " + ts.name}
