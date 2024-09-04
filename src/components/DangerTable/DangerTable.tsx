@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import { showAlert } from "../functions";
 import DangerHead from "../DangerHead/DangerHead";
-import { OverlayTrigger, Tooltip } from "react-bootstrap"; // Importa los componentes de react-bootstrap
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import "./DangerTableStyle.css";
 
 interface Danger {
@@ -130,8 +130,7 @@ const Danger: React.FC = () => {
                           <Tooltip id={`tooltip-${item.activityId}`} className="custom-tooltip">
                             {item.securityMeasures}
                           </Tooltip>
-                        }
-                      >
+                        }>
                         <span>
                           {expandedRows.has(item.activityId)
                             ? formatSecurityMeasures(item.securityMeasures)

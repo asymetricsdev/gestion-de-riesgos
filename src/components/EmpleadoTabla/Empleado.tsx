@@ -216,21 +216,17 @@ const Empleado: React.FC = () => {
     return dateString.split('T')[0];
   };
 
-   //VALIDACIÓN RUT CHILENO
+
   const validarRut = (rut: string): boolean => {
-    // Remover puntos y guiones
     const rutSinFormato = rut.replace(/\./g, "").replace(/-/g, "");
-    
-    // Separar número del dígito verificador
+  
     const rutNumero = rutSinFormato.slice(0, -1);
     const verificador = rutSinFormato.slice(-1).toUpperCase();
   
-    // Validar largo del RUT
     if (rutNumero.length < 7 || rutNumero.length > 8) {
       return false;
     }
   
-    // Calcular dígito verificador esperado
     let suma = 0;
     let multiplicador = 2;
   
@@ -242,7 +238,6 @@ const Empleado: React.FC = () => {
     const residuo = suma % 11;
     const digitoCalculado = residuo === 0 ? "0" : residuo === 1 ? "K" : String(11 - residuo);
   
-    // Verificar si el dígito verificador es correcto
     return digitoCalculado === verificador;
   }; 
   

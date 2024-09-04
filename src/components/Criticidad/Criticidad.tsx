@@ -263,8 +263,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                   type="button"
                   className="btn btn-secondary"
                   data-bs-dismiss="modal"
-                  id="btnCerrar"
-                >
+                  id="btnCerrar">
                   Cerrar
                 </button>
                 <button

@@ -1,4 +1,3 @@
-// EncabezadoTabla.tsx
 import React from "react";
 import './EncabezadoTablaStyle.css';
 import ActionButton from "../Boton/ActionButton";

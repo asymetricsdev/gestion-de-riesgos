@@ -1,4 +1,3 @@
-// import './DangerHeadStyle.css';
 
 interface DangerHeadProps {
     title: string;

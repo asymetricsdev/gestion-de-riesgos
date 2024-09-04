@@ -45,7 +45,6 @@ interface HazzardData {
 }
 
 const Hazzard: React.FC = () => {
-  // const URL = "https://testbackend-433922.uk.r.appspot.com/hazzard/";
   const baseURL = import.meta.env.VITE_API_URL;
   const [hazzard, setHazzard] = useState<Hazzard[]>([]);
   const [risk, setRisk] = useState<Risk[]>([]);
@@ -147,7 +146,6 @@ const Hazzard: React.FC = () => {
   }
 
     
-    // Tipado explícito para los parámetros a enviar
     const parametros: HazzardData = {
         name: name.trim(),
         description: description.trim(),
@@ -187,7 +185,6 @@ const Hazzard: React.FC = () => {
     }
   };
 
-  //BORRAMOS EL DATO DE LA TABLA
   const deleteHazzard = async (id: number) => {
     try {
       await axios.delete(`${baseURL}/hazzard/${id}`, {
@@ -222,7 +219,7 @@ const Hazzard: React.FC = () => {
   const formatDate = (dateString: string) => {
     return dateString.split('T')[0];
   };
-  /*Selección multiple */
+
 
   const opcionesPeligros = risk.map(risk => ({
     value: risk.id,
@@ -353,7 +350,7 @@ const Hazzard: React.FC = () => {
                       value={opcionesPeligros.filter(option => selectedRiskIds.includes(option.value))}
                       onChange={(selectedOptions) => {
                         const selectedIds = selectedOptions.map((option) => option.value);
-                        setSelectedRiskIds(selectedIds); // Aquí actualizamos el estado con los IDs seleccionados
+                        setSelectedRiskIds(selectedIds);
                       }}
                       options={opcionesPeligros}
                     />
