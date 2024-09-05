@@ -336,7 +336,7 @@ const deleteDivision = async (id: number) => {
 											type="text"
 											id="nombre"
 											className="form-control"
-											placeholder="Nombre de la División"
+											placeholder="Nombre del Área"
 											value={name}
 											onChange={(e) => setName(e.target.value)}
 										/>
