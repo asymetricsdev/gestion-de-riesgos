@@ -369,7 +369,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                     value={selectedProcessId}  
                     onChange={(e) => setSelectedProcessId(Number(e.target.value))}
                   >
-                    <option value={0}>Selecciona el Proceso</option>
+                    <option value={0}>Selecciona...</option>
                     {process.map(proc => (
                       <option key={JSON.stringify(proc)} value={proc.id}>{proc.name}</option>
                     ))}
