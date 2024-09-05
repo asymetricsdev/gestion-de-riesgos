@@ -166,7 +166,7 @@ const Position: React.FC = () => {
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: PositionData) => {
     try {
-      const url = method === "PUT" && id ? `${baseURL}/profile/${id}` : `${baseURL}/profile/`;
+      const url = method === "PUT" && id ? `${baseURL}/position/${id}` : `${baseURL}/position/`;
       const response = await axios({
         method,
         url,
