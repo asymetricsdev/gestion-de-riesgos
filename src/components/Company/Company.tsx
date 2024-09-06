@@ -10,18 +10,16 @@ import * as bootstrap from 'bootstrap';
 const MySwal = withReactContent(Swal);
 
 interface Company {
-  id: number;                  
+  id: number;
   name: string;
   description: string;
-  createDate: string;  
-  updateDate: string; 
+  createDate: string;
 }
-
 
 const Company: React.FC = () => {
 
   const baseURL = import.meta.env.VITE_API_URL;
-  const [company, setCompany] = useState<Company[]>([]);
+  const [company, setProcess] = useState<Company[]>([]);
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -44,25 +42,24 @@ const Company: React.FC = () => {
   const getCompany = async () => {
     try {
       const response: AxiosResponse<Company[]> = await axios.get(`${baseURL}/company/`);
-      setCompany(response.data);
+      setProcess(response.data);
     } catch (error) {
-      showAlert("Error al obtener Compañias", "error");
+      showAlert("Error al obtener Compañia", "error");
     }
   };
-
 
   
   const openModal = (op: string, company?: Company) => {
     if (company) {
-      setId(null);
+      setId(company.id);
       setName(company.name);
       setDescription(company.description);
     } else {
-      setId(0);
+      setId(null);
       setName("");
       setDescription("");
     }
-    setTitle(op === "1" ? "Registrar Compañia" : "Editar Compañia");
+    setTitle(op === "1" ? "Registrar Coma" : "Editar Compañia");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -79,7 +76,7 @@ const Company: React.FC = () => {
 
   const validar = () => {
     if (name.trim() === "") {
-      showAlert("Escribe el nombre", "warning", "nombre de la compañia");
+      showAlert("Escribe el nombre", "warning", "nombre del Compañia");
       return;
     }
     if (description.trim() === "") {
@@ -92,43 +89,42 @@ const Company: React.FC = () => {
     enviarSolicitud(metodo, parametros);
   };
 
-const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
-  try {
-    const url = method === "PUT" && id ? `${baseURL}/company/${id}` : `${baseURL}/company/`;
-    const response = await axios({
+  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+    try {
+      const url = method === "PUT" && id ? `${baseURL}/company/${id}` : `${baseURL}/company/`;
+      const response = await axios({
       method,
       url,
       data,
       headers: { "Content-Type": "application/json" },
-    });
-
-    showAlert("Operación realizada con éxito", "success");
-    getCompany();
-    if (modalRef.current) {
+      });
+    
+      showAlert("Operación realizada con éxito", "success");
+      getCompany();
+      if (modalRef.current) {
       const modal = bootstrap.Modal.getInstance(modalRef.current);
       modal?.hide();
-    }
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
       showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
-    } else {
+      } else {
       showAlert("Error al realizar la solicitud", "error");
+      }
     }
-  }
-}; 
-
+    }; 
 
   const deleteCompany = async (id: number) => {
     try {
       await axios.delete(`${baseURL}/company/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-      Swal.fire("Compañia eliminada correctamente", "", "success");
+      Swal.fire("Compañia eliminado correctamente", "", "success");
       getCompany();
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar la Compañia.",
+        text: "Error al eliminar el Compañia.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -148,9 +144,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 	  );
 
     const formatDate = (dateString: string) => {
-      return dateString.split('T')[0];
-    };
-
+    return dateString.split('T')[0];
+  };
 
   return (
     <div className="App">
@@ -158,7 +153,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Compañías' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Procesos' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
@@ -168,7 +163,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    <th>Descripción</th>
+                    <th>Descripción </th>
                     <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
@@ -186,8 +181,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                         onClick={() => openModal("2", comp)}
                         className="btn btn-custom-editar m-2"
                         data-bs-toggle="modal"
-                        data-bs-target="#modalUsers"
-                      >
+                        data-bs-target="#modalUsers">
                         <i className="fa-solid fa-edit"></i>
                       </button>
                       </OverlayTrigger>
@@ -233,13 +227,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                 <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-building"></i>
+                  <i className="fa-solid fa-list-check"></i>
                   </span>
                   <input
                     type="text"
                     id="nombre"
                     className="form-control"
-                    placeholder="Nombre de la Compañia"
+                    placeholder="Nombre del Compañia"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -256,6 +250,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
+                </div>
+                <div className="input-group mb-3">
                 </div>
               </div>
               <div className="modal-footer">
@@ -285,3 +281,4 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 };
 
 export default Company;
+
