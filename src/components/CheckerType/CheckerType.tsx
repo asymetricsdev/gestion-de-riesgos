@@ -14,12 +14,19 @@ interface CheckerType {
   name: string;
   description: string;
   createDate: string;
+  updateDate: string;
+  checkerType: CheckerType;
+}
+
+interface CheckerTypeData {
+  name: string;
+  description: string;
 }
 
 const CheckerType: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
   const [checker, setChecker] = useState<CheckerType[]>([]);
-  const [id, setId] = useState<string>("");
+  const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [title, setTitle] = useState<string>("");
@@ -48,17 +55,18 @@ const CheckerType: React.FC = () => {
   };
 
   
-  const openModal = (op: string, checker?: CheckerType) => {
-    if (checker) {
-      setId("");
-      setName(checker.name);
-      setDescription(checker.description);
-    } else {
-      setId("");
+  const openModal = (op: string, checkerType?: CheckerType) => {
+    if (op === "1") {
+      setId(null);
       setName("");
       setDescription("");
+      setTitle("Registrar Jerarquía de Control");
+    } else if (op === "2" && checkerType) {
+      setId(checkerType.id);
+      setName(checkerType.name);
+      setDescription(checkerType.description);
+      setTitle("Editar Jerarquía de Control");
     }
-    setTitle(op === "1" ? "Registrar Jerarquía de control" : "Editar Jerarquía de control");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -83,13 +91,16 @@ const CheckerType: React.FC = () => {
       return;
     }
     
-    const parametros = { id, name: name.trim(), description: description.trim() };
+    const parametros: CheckerTypeData = { 
+      name: name.trim(), 
+      description: description.trim() };
+    
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
 
 
-const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+const enviarSolicitud = async (method: "POST" | "PUT", data: CheckerTypeData) => {
 	try {
 	  const url = method === "PUT" && id ? `${baseURL}/checker_type/${id}` : `${baseURL}/checker_type/`;
 	  const response = await axios({
