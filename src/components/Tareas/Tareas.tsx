@@ -67,9 +67,8 @@ function Tareas() {
 	const [selectedTaskTypeId, setselectedTaskTypeId] = useState<number>(0);
 	const [title, setTitle] = useState<string>("");
 	const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
-	const [dataGuardada, setDataGuardada] = useState(false);
 	const [uploadedFiles, setUploadedFiles] = useState<{ base64: string; type: string }[]>([]);
-	const [selectedFile, setSelectedFile] = useState<File | null>(null);
+	const [isEditMode, setIsEditMode] = useState<boolean>(false); 
 	const modalRef = useRef<HTMLDivElement | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	
@@ -120,6 +119,15 @@ function Tareas() {
 		}
 	  };
 
+	  const validarTamañoArchivo = (file: File): boolean => {
+		const fileSizeInKB = file.size / 1024;
+		if (fileSizeInKB > 500) {
+		  showAlert("El archivo supera los 500 KB, por favor sube uno más pequeño", "warning");
+		  return false;
+		}
+		return true;
+	  };
+
 	const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 		try {
 		  const url = method === "PUT" && id ? `${baseURL}/task/${id}` : `${baseURL}/task/`;
@@ -157,10 +165,11 @@ function Tareas() {
 			return;
 		}
 
-		if (file.length === 0) {
-			showAlert("Escribe el archivo", "warning");
+		if (!isEditMode && file.length === 0) {
+			showAlert("Sube un archivo", "warning");
 			return;
-		}
+		  }
+
 		if (selectedTaskTypeId === 0) {
 			showAlert("Selecciona un tipo de tarea", "warning");
 			return;
@@ -197,12 +206,14 @@ function Tareas() {
 
 	const openModal = (op: string, tarea?: Tareas) =>  {
 		if (op === "1") {
+		  setIsEditMode(false);
 		  setId(0);
 		  setName("");
 		  setDescription("");
 		  setSelectedCheckerIds([]);
 		  setTitle("Registrar Tareas");
 		} else if (op === "2" && tarea) {
+		 setIsEditMode(true);
 		  setId(tarea.id);
 		  setName(tarea.name);
 		  setDescription(tarea.description);
@@ -227,6 +238,11 @@ function Tareas() {
 		if (acceptedFiles.length > 0) {
 			const file = acceptedFiles[0];
 
+			if (!validarTamañoArchivo(file)) {
+				return; 
+				
+			  }
+
 			const reader = new FileReader();
 			reader.onload = () => {
 				const base64 = reader.result as string;
@@ -239,6 +255,11 @@ function Tareas() {
 			reader.readAsDataURL(file);
 		}
 	}, []);
+
+	const eliminarImagen = () => {
+		setFile([]);
+		setUploadedImageUrl(null);
+	  };
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		onDrop,
@@ -261,7 +282,7 @@ function Tareas() {
 	};
 
 
-	const downloadFile = async (fileUrl: string, fileName: string, fileExtension: string) => {
+		const downloadFile = async (fileUrl: string, fileName: string, fileExtension: string) => {
 		try {
 		  const response = await axios.get(fileUrl, {
 			responseType: "json", 
@@ -292,7 +313,7 @@ function Tareas() {
 
 		  const link = document.createElement("a");
 		  link.href = window.URL.createObjectURL(blob);
-		link.setAttribute("download", `${name}.${fileExtension}`);
+		link.setAttribute("download", `${""}.${fileExtension}`);
 		  document.body.appendChild(link);
 		  link.click();
 		  document.body.removeChild(link);
@@ -335,7 +356,7 @@ function Tareas() {
 					</div>
 					<div className="table-responsive">
 						<table className="table table-bordered">
-							<thead 
+							<thead
 								className="text-center"
 								style={{
 									background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
@@ -378,16 +399,20 @@ function Tareas() {
 											<OverlayTrigger
 												overlay={
 													<Tooltip id={`tooltip-download-${tr.id}`}>Descargar Archivo</Tooltip>
-												}>
+												}
+											>
 												<button
-                                                  onClick={() => downloadFile
-													// (`${baseURL}/task/${id}/download/`, 
-													// 	tr.fileExtension, tr.name)}
-							                    (`https://testbackend-433922.uk.r.appspot.com/task/${tr.id}/download`, 
-							                     tr.fileExtension, tr.name)}
-                                                className="btn btn-custom-editar m-2">
-                                               <FontAwesomeIcon icon={faDownload} /> Descargar
-                                               </button>
+													onClick={() =>
+														downloadFile(
+															`https://testbackend-433922.uk.r.appspot.com/task/${tr.id}/download`,
+															tr.fileExtension,
+															tr.name
+														)
+													}
+													className="btn btn-custom-editar m-2"
+												>
+													<FontAwesomeIcon icon={faDownload} /> Descargar
+												</button>
 											</OverlayTrigger>
 										</td>
 										<td>
@@ -448,7 +473,7 @@ function Tareas() {
 						<div className="modal-body">
 							<div className="input-group mb-3">
 								<span className="input-group-text">
-								<i className="fa-solid fa-bars-progress"></i>
+									<i className="fa-solid fa-bars-progress"></i>
 								</span>
 								<input
 									type="text"
@@ -461,7 +486,7 @@ function Tareas() {
 							</div>
 							<div className="input-group mb-3">
 								<span className="input-group-text">
-								<i className="fa-regular fa-solid fa-file-alt"></i>
+									<i className="fa-regular fa-solid fa-file-alt"></i>
 								</span>
 								<input
 									type="text"
@@ -507,7 +532,8 @@ function Tareas() {
 								<label htmlFor="hazzard">Verificadores:</label>
 								<Select
 									isMulti
-									value={opcionesVerificadores.filter((option) =>selectedCheckerIds.includes(option.value)
+									value={opcionesVerificadores.filter((option) =>
+										selectedCheckerIds.includes(option.value)
 									)}
 									onChange={(selectedOptions) => {
 										const selectedIds = selectedOptions.map((option) => option.value);
@@ -519,25 +545,42 @@ function Tareas() {
 							<div className="modal-body">
 								<div className="container">
 									<div className="col-md-12">
-										<div {...getRootProps()} className="dropzone">
+										<div className={`dropzone ${isEditMode ? "hidden" : ""}`} {...getRootProps()}>
 											<input {...getInputProps()} />
 											{isDragActive ? (
 												<p>Carga los archivos acá ...</p>
 											) : (
 												<p>Puede arrastrar y soltar archivos aquí para añadirlos</p>
 											)}
+											<div>
+												<br />
+												<p className="text-parrafo-dropzone mt-1">
+													Tamaño máximo de archivo: 500kb, número máximo de archivos: 2
+												</p>
+											</div>
 										</div>
-										<p className="text-parrafo-dropzone mt-1">
-											Tamaño máximo de archivo: 500kb, número máximo de archivos: 2
-										</p>
 									</div>
 									{uploadedImageUrl && (
 										<div className="uploaded-image-preview">
-											<h6>Archivo subido:</h6>
-											{uploadedImageUrl.startsWith("data:image/") && (
-												<img src={uploadedImageUrl} alt="Vista previa" />
-											)}
-										</div>
+										<img src={uploadedImageUrl} alt="Vista previa" />
+										<span className="delete-icon" onClick={eliminarImagen}>
+										  &#10006; {/* Esto es la X */}
+										</span>
+									  </div>
+										// <div className="uploaded-image-preview">
+										// 	<h6>Archivo subido:</h6>
+										// 	{uploadedImageUrl.startsWith("data:image/") && (
+										// 		<img
+										// 			src={uploadedImageUrl}
+										// 			alt="Vista previa"
+										// 			style={{ width: "200px", height: "auto" }}
+										// 			onClick={eliminarImagen}
+										// 		/>
+										// 	)}
+										// 	<button className="btn btn-danger mt-2" onClick={eliminarImagen}>
+										// 		Eliminar
+										// 	</button>
+										// </div>
 									)}
 									<div className="mb-3">
 										{uploadedFiles.length > 0 && (
@@ -575,6 +618,5 @@ function Tareas() {
 }
 
 export default Tareas;
-
 
 

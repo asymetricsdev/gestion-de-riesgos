@@ -286,7 +286,7 @@ const Position: React.FC = () => {
             <div className="tabla-contenedor">
               <EncabezadoTabla title="Cargos" onClick={() => openModal("1")} />
             </div>
-            <div className="table-responsive">
+            <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
                 <thead
                   className="text-center"

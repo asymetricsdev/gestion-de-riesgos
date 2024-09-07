@@ -47,18 +47,18 @@ const Criticity: React.FC = () => {
     }
   };
 
-  
   const openModal = (op: string, criticity?: Criticity) => {
-    if (criticity) {
-      setId("");
-      setName(criticity.name);
-      setDescription(criticity.description);
-    } else {
+    if (op === "1") {
       setId("");
       setName("");
       setDescription("");
+      setTitle("Registrar Criticidad");
+    } else if (op === "2" && criticity) {
+      setId(criticity.id.toString());
+      setName(criticity.name);
+      setDescription(criticity.description);
+      setTitle("Editar Criticidad");
     }
-    setTitle(op === "1" ? "Registrar Criticidad" : "Editar Criticidad");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -88,32 +88,40 @@ const Criticity: React.FC = () => {
     enviarSolicitud(metodo, parametros);
   };
 
+  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+    try {
+      const url = method === "PUT" && id ? `${baseURL}/criticity/${id}` : `${baseURL}/criticity/`;
+      const response = await axios({
+        method,
+        url,
+        data,
+        headers: { "Content-Type": "application/json" },
+      });
 
-const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
-	try {
-	  const url = method === "PUT" && id ? `${baseURL}/criticity/${id}` : `${baseURL}/criticity/`;
-	  const response = await axios({
-		method,
-		url,
-		data,
-		headers: { "Content-Type": "application/json" },
-	  });
-  
-	  showAlert("Operación realizada con éxito", "success");
-	  getCriticity();
-	  if (modalRef.current) {
-		const modal = bootstrap.Modal.getInstance(modalRef.current);
-		modal?.hide();
-	  }
-	} catch (error) {
-	  if (axios.isAxiosError(error) && error.response) {
-		showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
-	  } else {
-		showAlert("Error al realizar la solicitud", "error");
-	  }
-	}
-  }; 
+      showAlert("Operación realizada con éxito", "success");
 
+      if (method === "POST") {
+        setCriticityType((prev) => [...prev, response.data]);
+      } else if (method === "PUT") {
+        setCriticityType((prev) =>
+          prev.map((item) => (item.id === response.data.id ? response.data : item))
+        );
+      }
+
+      if (modalRef.current) {
+        const modal = bootstrap.Modal.getInstance(modalRef.current);
+        modal?.hide();
+      }
+
+      getCriticity();
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+      } else {
+        showAlert("Error al realizar la solicitud", "error");
+      }
+    }
+  };
 
   const deleteCriticity = async (id: number) => {
     try {
@@ -133,19 +141,18 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
   };
 
   const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-		<Tooltip id="button-tooltip-edit" {...props}>
-		  Editar
-		</Tooltip>
-	  );
-	  
-	  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-		<Tooltip id="button-tooltip-delete" {...props}>
-		  Eliminar
-		</Tooltip>
-	  );
+    <Tooltip id="button-tooltip-edit" {...props}>
+      Editar
+    </Tooltip>
+  );
 
+  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+    <Tooltip id="button-tooltip-delete" {...props}>
+      Eliminar
+    </Tooltip>
+  );
 
-    const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string) => {
     return dateString.split('T')[0];
   };
 
@@ -160,12 +167,11 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center" 
-                style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
-                color: '#fff' }}>
+                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
                   <tr>
                     <th>N°</th>
                     <th>Nivel</th>
-                    <th>Descripción </th>
+                    <th>Descripción</th>
                     <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
@@ -179,33 +185,33 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                       <td>{formatDate(crit.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
-                        <button
-                        onClick={() => openModal("2", crit)}
-                        className="btn btn-custom-editar m-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modalUsers"
-                      >
-                        <i className="fa-solid fa-edit"></i>
-                      </button>
-                      </OverlayTrigger>
-                      <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
-                        <button className="btn btn-custom-danger" onClick={() => {
-                          MySwal.fire({
-                            title: "¿Estás seguro?",
-                            text: "No podrás revertir esto",
-                            icon: "warning",
-                            showCancelButton: true,
-                            confirmButtonText: "Sí, bórralo",
-                            cancelButtonText: "Cancelar",
-                          }).then((result) => {
-                            if (result.isConfirmed) {
-                              deleteCriticity(crit.id);
-                            }
-                          });
-                        }}>
-                          <i className="fa-solid fa-circle-xmark"></i>
-                        </button>
-                      </OverlayTrigger>
+                          <button
+                            onClick={() => openModal("2", crit)}
+                            className="btn btn-custom-editar m-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalUsers"
+                          >
+                            <i className="fa-solid fa-edit"></i>
+                          </button>
+                        </OverlayTrigger>
+                        <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+                          <button className="btn btn-custom-danger" onClick={() => {
+                            MySwal.fire({
+                              title: "¿Estás seguro?",
+                              text: "No podrás revertir esto",
+                              icon: "warning",
+                              showCancelButton: true,
+                              confirmButtonText: "Sí, bórralo",
+                              cancelButtonText: "Cancelar",
+                            }).then((result) => {
+                              if (result.isConfirmed) {
+                                deleteCriticity(crit.id);
+                              }
+                            });
+                          }}>
+                            <i className="fa-solid fa-circle-xmark"></i>
+                          </button>
+                        </OverlayTrigger>
                       </td>
                     </tr>
                   ))}
@@ -230,7 +236,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                 <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-bolt"></i>
+                    <i className="fa-solid fa-bolt"></i>
                   </span>
                   <input
                     type="text"
@@ -254,15 +260,14 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
                     onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
-                <div className="input-group mb-3">
-                </div>
               </div>
               <div className="modal-footer">
                 <button
                   type="button"
                   className="btn btn-secondary"
                   data-bs-dismiss="modal"
-                  id="btnCerrar">
+                  id="btnCerrar"
+                >
                   Cerrar
                 </button>
                 <button
@@ -278,8 +283,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
         </div>
       </div>
     </div>
-  
   );
 };
 
 export default Criticity;
+
