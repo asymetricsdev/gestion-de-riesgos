@@ -255,7 +255,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckerData) => {
             <div className="tabla-contenedor">
               <EncabezadoTabla title='Verificadores' onClick={() => openModal("1")} />
             </div>
-            <div className="table-responsive">
+            <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
                 <thead className="text-center"
                   style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>

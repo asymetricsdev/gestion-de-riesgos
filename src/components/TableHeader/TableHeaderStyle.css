@@ -27,6 +27,12 @@
   font-size: 1.5rem;
 }
 
+.tabla-scroll {
+  max-height: 400px; /* Puedes ajustar esta altura */
+  overflow-y: auto;
+}
+
+
   
 
 

@@ -231,14 +231,13 @@ const Hazzard: React.FC = () => {
             <div className="tabla-contenedor">
               <EncabezadoTabla title='Peligros' onClick={() => openModal("1")} />
             </div>
-            <div className="table-responsive">
+            <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
                 <thead className="text-center"
                   style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    <th>Descripción</th>
                     <th>Verificación</th>
                     <th>Riesgos</th> 
                     <th>Fecha</th>
@@ -250,7 +249,6 @@ const Hazzard: React.FC = () => {
                     <tr key={JSON.stringify(hazz)} className="text-center">
                       <td>{i + 1}</td>
                       <td>{hazz.name}</td>
-                      <td>{hazz.description}</td>
                       <td>{hazz.checker.name}</td>
                       <td>{hazz.risks.map(h => h.name).join(', ')}</td>
                       <td>{formatDate(hazz.createDate)}</td>

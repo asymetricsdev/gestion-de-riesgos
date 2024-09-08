@@ -74,7 +74,7 @@ const Danger: React.FC = () => {
           <div className="tabla-contenedor-matriz">
             <DangerHead title="Matriz de Peligro" />
           </div>
-          <div className="table-responsive-xl">
+          <div className="table-responsive-xl tabla-scroll">
             <table className="table table-bordered">
               <thead
                 className="text-center"

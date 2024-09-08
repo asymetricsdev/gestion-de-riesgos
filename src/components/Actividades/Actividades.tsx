@@ -154,9 +154,9 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Actividades' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Tipo de Actividad' onClick={() => openModal("1")} />
             </div>
-            <div className="table-responsive">
+            <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
                 <thead className="text-center" 
                 style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 

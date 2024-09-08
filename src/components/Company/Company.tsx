@@ -59,7 +59,7 @@ const Company: React.FC = () => {
       setName("");
       setDescription("");
     }
-    setTitle(op === "1" ? "Registrar Coma" : "Editar Compañia");
+    setTitle(op === "1" ? "Registrar Compañia" : "Editar Compañia");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -153,7 +153,7 @@ const Company: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Procesos' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Compañías' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
