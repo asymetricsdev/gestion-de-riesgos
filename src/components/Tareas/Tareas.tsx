@@ -564,23 +564,9 @@ function Tareas() {
 										<div className="uploaded-image-preview">
 										<img src={uploadedImageUrl} alt="Vista previa" />
 										<span className="delete-icon" onClick={eliminarImagen}>
-										  &#10006; {/* Esto es la X */}
+										  &#10006;
 										</span>
 									  </div>
-										// <div className="uploaded-image-preview">
-										// 	<h6>Archivo subido:</h6>
-										// 	{uploadedImageUrl.startsWith("data:image/") && (
-										// 		<img
-										// 			src={uploadedImageUrl}
-										// 			alt="Vista previa"
-										// 			style={{ width: "200px", height: "auto" }}
-										// 			onClick={eliminarImagen}
-										// 		/>
-										// 	)}
-										// 	<button className="btn btn-danger mt-2" onClick={eliminarImagen}>
-										// 		Eliminar
-										// 	</button>
-										// </div>
 									)}
 									<div className="mb-3">
 										{uploadedFiles.length > 0 && (
