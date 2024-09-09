@@ -16,10 +16,15 @@ interface Activity {
   createDate: string;
 }
 
+interface ActivityData {
+  name: string;
+  description: string;
+}
+
 const Activity: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
   const [activity, setActivity] = useState<Activity[]>([]);
-  const [id, setId] = useState<string>("");
+  const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [title, setTitle] = useState<string>("");
@@ -49,16 +54,17 @@ const Activity: React.FC = () => {
 
   
   const openModal = (op: string, activity?: Activity) => {
-    if (activity) {
-      setId("");
-      setName(activity.name);
-      setDescription(activity.description);
-    } else {
-      setId("");
+    if (op === "1") {
+      setId(null);
       setName("");
       setDescription("");
+      setTitle("Registrar Peligro");
+    } else if (op === "2" && activity) {
+      setId(activity.id);
+      setName(activity.name);
+      setDescription(activity.description);
+      setTitle("Editar Peligro");
     }
-    setTitle(op === "1" ? "Registrar Actividades" : "Editar Actividades");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -66,7 +72,6 @@ const Activity: React.FC = () => {
       setIsModalOpen(true);
     }
   };
-
   const handleModalHidden = () => {
     setIsModalOpen(false);
     const modals = document.querySelectorAll('.modal-backdrop');
@@ -83,13 +88,17 @@ const Activity: React.FC = () => {
       return;
     }
     
-    const parametros = { id, name: name.trim(), description: description.trim() };
+    const parametros : ActivityData = {
+      name: name.trim(), 
+      description: description.trim() 
+    };
+
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
 
 
-const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+const enviarSolicitud = async (method: "POST" | "PUT", data: ActivityData) => {
 	try {
 	  const url = method === "PUT" && id ? `${baseURL}/activity_type/${id}` : `${baseURL}/activity_type/`;
 	  const response = await axios({
@@ -154,7 +163,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Tipo de Actividad' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Actividades' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
