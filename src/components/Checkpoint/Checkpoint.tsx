@@ -190,7 +190,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 									<tr>
 										<th>N°</th>
 										<th>Nombre</th>
-										<th>Descripción </th>
 										<th>Tipo de Verificación</th>
 										<th>Acciones</th>
 									</tr>
@@ -252,32 +251,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 							</div>
 							<div className="modal-body">
 								<input type="hidden" id="id" />
-								<div className="input-group mb-3">
-									<span className="input-group-text">
-										<i className="fa-solid fa-list-check"></i>
-									</span>
-									<input
-										type="text"
-										id="nombre"
-										className="form-control"
-										placeholder="Nombre del Item"
-										value={name}
-										onChange={(e) => setName(e.target.value)}
-									/>
-								</div>
-								<div className="input-group mb-3">
-									<span className="input-group-text">
-										<i className="fa-regular fa-solid fa-file-alt"></i>
-									</span>
-									<input
-										type="text"
-										id="descripcion"
-										className="form-control"
-										placeholder="Descripción"
-										value={description}
-										onChange={(e) => setDescription(e.target.value)}
-									/>
-								</div>
 								<div className="mb-3">
 									<label htmlFor="Checkpoint" className="form-label">
 									Verificador:
@@ -292,6 +265,19 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 										<option key={JSON.stringify(chec)} value={chec.checker.id}>{chec.checker.name}</option>
 										))}
 									</select>
+								</div>
+								<div className="input-group mb-3">
+									<span className="input-group-text">
+										<i className="fa-solid fa-list-check"></i>
+									</span>
+									<input
+										type="text"
+										id="nombre"
+										className="form-control"
+										placeholder="Nombre del Item"
+										value={name}
+										onChange={(e) => setName(e.target.value)}
+									/>
 								</div>
 							</div>
 							<div className="modal-footer">

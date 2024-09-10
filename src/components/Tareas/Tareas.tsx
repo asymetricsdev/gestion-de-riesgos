@@ -120,13 +120,14 @@ function Tareas() {
 	  };
 
 	  const validarTamañoArchivo = (file: File): boolean => {
-		const fileSizeInKB = file.size / 1024;
-		if (fileSizeInKB > 500) {
-		  showAlert("El archivo supera los 500 KB, por favor sube uno más pequeño", "warning");
+		const fileSizeInMB = file.size / (1024 * 1024);
+		if (fileSizeInMB > 2) {
+		  showAlert("El archivo supera los 2 MB, por favor sube uno más pequeño", "warning");
 		  return false;
 		}
 		return true;
 	  };
+	  
 
 	const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 		try {
