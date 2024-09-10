@@ -194,7 +194,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
 									<tr>
 										<th>N°</th>
 										<th>Nombre</th>
-										<th>Descripción </th>
 										<th>Tipo de Verificación</th>
 										<th>Acciones</th>
 									</tr>
@@ -256,6 +255,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
 							</div>
 							<div className="modal-body">
 								<input type="hidden" id="id" />
+
 								<div className="input-group mb-3">
 									<span className="input-group-text">
 										<i className="fa-solid fa-list-check"></i>
@@ -284,6 +284,10 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
 								</div>
                 <div className="mb-3">
 									<label htmlFor="Checker" className="form-label">
+
+								<div className="mb-3">
+									<label htmlFor="Checkpoint" className="form-label">
+
 									Verificador:
 									</label>
                     <select
@@ -296,6 +300,19 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
                       <option key={JSON.stringify(chec)} value={chec.id}>{chec.name}</option>
                       ))}
                     </select>
+								</div>
+								<div className="input-group mb-3">
+									<span className="input-group-text">
+										<i className="fa-solid fa-list-check"></i>
+									</span>
+									<input
+										type="text"
+										id="nombre"
+										className="form-control"
+										placeholder="Nombre del Item"
+										value={name}
+										onChange={(e) => setName(e.target.value)}
+									/>
 								</div>
 							</div>
 							<div className="modal-footer">
