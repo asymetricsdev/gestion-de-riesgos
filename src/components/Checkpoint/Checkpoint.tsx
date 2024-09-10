@@ -22,6 +22,12 @@ interface Checker {
 	checkerId: number;
 }
 
+interface CheckpointData {
+	name: string;
+	description: string;
+	checkerId: number;
+}
+
 const Checkpoint: React.FC = () => {
 	const baseURL = import.meta.env.VITE_API_URL;
 	const [checkpoint, setCheckpoint] = useState<Checkpoint[]>([]);
@@ -29,7 +35,7 @@ const Checkpoint: React.FC = () => {
 	const [name, setName] = useState<string>("");
 	const [description, setDescription] = useState<string>("");
 	const [checker, setChecker] = useState<Checker[]>([]);
-	const [selectedCheckpointId, setSelectedCheckpointId] = useState<number>(0);
+	const [selectedCheckerId, setSelectedCheckerId] = useState<number>(0);
 	const [title, setTitle] = useState<string>("");
 	const modalRef = useRef<HTMLDivElement | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -99,25 +105,23 @@ const Checkpoint: React.FC = () => {
 			showAlert("Escribe la descripción", "warning", "descripción");
 			return;
 		}
-		if (selectedCheckpointId === 0) {
+		if (selectedCheckerId === 0) {
 			showAlert("Selecciona un verificador", "warning");
 			return;
 		}
 
-		const parametros = { id, name: name.trim(), description: description.trim(), checkerId: selectedCheckpointId };
+		const parametros : CheckpointData = { 
+			name: name.trim(), 
+			description: description.trim(), 
+			checkerId: selectedCheckerId 
+		};
+
 		const metodo = id ? "PUT" : "POST";
 		enviarSolicitud(metodo, parametros);
 	};
 
-	const parametros: Checker = {
-		id: 0,
-		name: name.trim(),
-		checkerId: selectedCheckpointId,
-	};
 
-	
-
-const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => {
 		try {
 		  const url = method === "PUT" && id ? `${baseURL}/checkpoint/${id}` : `${baseURL}/checkpoint/`;
 		  const response = await axios({
@@ -251,20 +255,51 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 							</div>
 							<div className="modal-body">
 								<input type="hidden" id="id" />
+
+								<div className="input-group mb-3">
+									<span className="input-group-text">
+										<i className="fa-solid fa-list-check"></i>
+									</span>
+									<input
+										type="text"
+										id="nombre"
+										className="form-control"
+										placeholder="Nombre del Item"
+										value={name}
+										onChange={(e) => setName(e.target.value)}
+									/>
+								</div>
+								<div className="input-group mb-3">
+									<span className="input-group-text">
+										<i className="fa-regular fa-solid fa-file-alt"></i>
+									</span>
+									<input
+										type="text"
+										id="descripcion"
+										className="form-control"
+										placeholder="Descripción"
+										value={description}
+										onChange={(e) => setDescription(e.target.value)}
+									/>
+								</div>
+                <div className="mb-3">
+									<label htmlFor="Checker" className="form-label">
+
 								<div className="mb-3">
 									<label htmlFor="Checkpoint" className="form-label">
+
 									Verificador:
 									</label>
-									<select
-										id="checkpoint"
-										className="form-select"
-										value={selectedCheckpointId}
-										onChange={(e) => setSelectedCheckpointId(Number(e.target.value))}>
-										<option value={0}>Selecciona...</option>
-										{checkpoint.map((chec) => (
-										<option key={JSON.stringify(chec)} value={chec.checker.id}>{chec.checker.name}</option>
-										))}
-									</select>
+                    <select
+                      id="checker"
+                      className="form-select"
+                      value={selectedCheckerId}
+                      onChange={(e) => setSelectedCheckerId(Number(e.target.value))}>
+                      <option value={0}>Selecciona...</option>
+                      {checker.map((chec) => (
+                      <option key={JSON.stringify(chec)} value={chec.id}>{chec.name}</option>
+                      ))}
+                    </select>
 								</div>
 								<div className="input-group mb-3">
 									<span className="input-group-text">
