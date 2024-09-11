@@ -194,6 +194,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
 									<tr>
 										<th>N°</th>
 										<th>Nombre</th>
+										<th>Descripción</th>
 										<th>Tipo de Verificación</th>
 										<th>Acciones</th>
 									</tr>
@@ -282,37 +283,20 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
 										onChange={(e) => setDescription(e.target.value)}
 									/>
 								</div>
-                <div className="mb-3">
-									<label htmlFor="Checker" className="form-label">
-
 								<div className="mb-3">
 									<label htmlFor="Checkpoint" className="form-label">
-
-									Verificador:
+                      				Verificador:
 									</label>
-                    <select
-                      id="checker"
-                      className="form-select"
-                      value={selectedCheckerId}
-                      onChange={(e) => setSelectedCheckerId(Number(e.target.value))}>
-                      <option value={0}>Selecciona...</option>
-                      {checker.map((chec) => (
-                      <option key={JSON.stringify(chec)} value={chec.id}>{chec.name}</option>
-                      ))}
-                    </select>
-								</div>
-								<div className="input-group mb-3">
-									<span className="input-group-text">
-										<i className="fa-solid fa-list-check"></i>
-									</span>
-									<input
-										type="text"
-										id="nombre"
-										className="form-control"
-										placeholder="Nombre del Item"
-										value={name}
-										onChange={(e) => setName(e.target.value)}
-									/>
+										<select
+										id="checker"
+										className="form-select"
+										value={selectedCheckerId}
+										onChange={(e) => setSelectedCheckerId(Number(e.target.value))}>
+										<option value={0}>Selecciona...</option>
+										{checker.map((chec) => (
+										<option key={JSON.stringify(chec)} value={chec.id}>{chec.name}</option>
+										))}
+										</select>
 								</div>
 							</div>
 							<div className="modal-footer">
