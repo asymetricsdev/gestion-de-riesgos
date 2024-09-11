@@ -10,6 +10,7 @@ import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
+
 interface Actividad {
   id: number;
   name: string;
@@ -17,9 +18,23 @@ interface Actividad {
   createDate: string;
   updateDate: string;
   activityType: ActivityType;
+
   process: Process;
-  hazzards: Hazzard[];
   criticities: Criticity[];
+  hazzards: HazzardCriticity[];
+}
+
+interface HazzardCriticity {
+  hazzardId: number;
+  criticityId: number;
+}
+
+interface Hazzard {
+  id: number;
+  name: string;
+  description: string;
+  createDate: string;
+  updateDate: string;
 }
 
 interface ActivityType {
@@ -38,13 +53,6 @@ interface Process {
   updateDate?: string;
 }
 
-interface Hazzard {
-  id: number;
-  name: string;
-  description: string;
-  createDate: string;
-  updateDate: string;
-}
 
 interface Criticity {
   id: number;
@@ -58,9 +66,9 @@ interface ActividadData {
   description: string;
   activityTypeId: number;
   processId: number;
-  hazzardIds: number[];
-  criticityIds: number[]; // Criticidad seleccionada
+  hazzards: HazzardCriticity[];
 }
+
 
 interface Option {
   value: number;
@@ -69,17 +77,17 @@ interface Option {
 
 const Actividad: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
-  const [actividad, setActividad] = useState<Actividad[]>([]); // Siempre inicializar como un array vacío
+  const [actividad, setActividad] = useState<Actividad[]>([]); 
   const [description, setDescription] = useState<string>("");
-  const [activityType, setActivityType] = useState<ActivityType[]>([]); // Siempre inicializar como un array vacío
-  const [process, setProcess] = useState<Process[]>([]); // Siempre inicializar como un array vacío
-  const [hazzard, setHazzard] = useState<Hazzard[]>([]); // Siempre inicializar como un array vacío
-  const [criticity, setCriticity] = useState<Criticity[]>([]); // Siempre inicializar como un array vacío
+  const [activityType, setActivityType] = useState<ActivityType[]>([]); 
+  const [process, setProcess] = useState<Process[]>([]); 
+  const [hazzards, setHazzard] = useState<Hazzard[]>([]); 
+  const [criticity, setCriticity] = useState<Criticity[]>([]); 
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [selectedActivityTypeId, setSelectedActivityTypeId] = useState<number>(0);
   const [selectedProcessId, setSelectedProcessId] = useState<number>(0);
-  const [selectedHazzardIds, setSelectedHazzardIds] = useState<number[]>([]);
+  const [selectedHazzardCriticity, setSelectedHazzardCriticity] = useState<number[]>([]);
   const [selectedCriticityIds, setSelectedCriticityIds] = useState<number[]>([]);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
@@ -106,7 +114,7 @@ const Actividad: React.FC = () => {
   const getActivity = async () => {
     try {
       const response: AxiosResponse<Actividad[]> = await axios.get(`${baseURL}/activity/`);
-      setActividad(response.data || []); // Asegurarse de que se define un array vacío si la data es undefined
+      setActividad(response.data || []);
     } catch (error) {
       showAlert("Error al obtener las actividades", "error");
     }
@@ -115,7 +123,7 @@ const Actividad: React.FC = () => {
   const getActivityType = async () => {
     try {
       const response: AxiosResponse<ActivityType[]> = await axios.get(`${baseURL}/activity_type/`);
-      setActivityType(response.data || []); // Asegurarse de que se define un array vacío si la data es undefined
+      setActivityType(response.data || []);
     } catch (error) {
       showAlert("Error al obtener los tipos de actividad", "error");
     }
@@ -124,25 +132,26 @@ const Actividad: React.FC = () => {
   const getProcess = async () => {
     try {
       const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
-      setProcess(response.data || []); // Asegurarse de que se define un array vacío si la data es undefined
+      setProcess(response.data || []);
     } catch (error) {
       showAlert("Error al obtener los procesos", "error");
     }
   };
 
+
   const getHazzard = async () => {
     try {
       const response: AxiosResponse<Hazzard[]> = await axios.get(`${baseURL}/hazzard/`);
-      setHazzard(response.data || []); // Asegurarse de que se define un array vacío si la data es undefined
+      setHazzard(response.data || []);
     } catch (error) {
       showAlert("Error al obtener los peligros", "error");
     }
   };
-
+  
   const getCriticity = async () => {
     try {
       const response: AxiosResponse<Criticity[]> = await axios.get(`${baseURL}/criticity/`);
-      setCriticity(response.data || []); // Asegurarse de que se define un array vacío si la data es undefined
+      setCriticity(response.data || []);
     } catch (error) {
       showAlert("Error al obtener las criticidades", "error");
     }
@@ -150,7 +159,7 @@ const Actividad: React.FC = () => {
 
   const handleHazzardSelection = (selectedOptions: Option[]) => {
     const selectedIds = selectedOptions.map((option) => option.value);
-    setSelectedHazzardIds(selectedIds);
+    setSelectedHazzardCriticity(selectedIds);
 
     const filteredOptions = criticity
       .filter((criticityItem) => selectedIds.includes(criticityItem.id))
@@ -160,6 +169,7 @@ const Actividad: React.FC = () => {
       }));
     setFilteredCriticity(filteredOptions);
   };
+  
 
 const openModal = (op: string, actividad?: Actividad) => {
     if (op === "1") {
@@ -167,7 +177,7 @@ const openModal = (op: string, actividad?: Actividad) => {
       setName("");
       setDescription("");
       setSelectedActivityTypeId(0);
-      setSelectedHazzardIds([]);
+      setSelectedHazzardCriticity([]);
       setSelectedProcessId(0);
       setTitle("Registrar Actividad");
     } else if (op === "2" && actividad) {
@@ -175,7 +185,7 @@ const openModal = (op: string, actividad?: Actividad) => {
       setName(actividad.name);
       setDescription(actividad.description);
       setSelectedActivityTypeId(actividad.activityType.id); 
-      setSelectedHazzardIds(actividad.hazzards.map(h => h.id));
+      setSelectedHazzardCriticity(actividad.hazzards.map(h => h.hazzardId));
       setSelectedProcessId(actividad.process.id);
       setTitle("Editar Actividad");
     }
@@ -210,29 +220,46 @@ const handleModalHidden = () => {
       showAlert("Selecciona un tipo de proceso", "warning");
       return;
     }
-    if (selectedHazzardIds.length === 0) {
+    if (setSelectedHazzardCriticity.length === 0) {
       showAlert("Selecciona al menos un peligro", "warning");
       return;
     }
   
-    // Validación adicional: asegurarse de que los peligros no sean nulos
-    const hazzardIdsToSend = selectedHazzardIds || [];
+    const setSelectedHazzardCriticitySend = setSelectedHazzardCriticity || [];
   
     const parametros: ActividadData = {
       name: name.trim(),
       description: description.trim(),
       activityTypeId: selectedActivityTypeId,
       processId: selectedProcessId,
-      hazzardIds: hazzardIdsToSend,
-      criticityIds: selectedCriticityIds,
+      hazzards: selectedHazzardCriticity.map((hazzardId, index) => ({
+        hazzardId,
+        criticityId: selectedCriticityIds[index],
+      })),
     };
+    
   
     enviarSolicitud(id ? "PUT" : "POST", parametros);
   };
   
 
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadData) => {
+  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+    console.log("data:",data)
+    const dataPostman=    {
+      "name": "CONDUCCION Y ESTACIONAMIENTO DE VEHICULOS",
+      "description": "ACTIVIDAD DE CONDUCCION Y ESTACIONAMIENTO DE VEHICULOS",
+      "activityTypeId": 1,
+      "processId": 1,
+      "hazzards": [
+          {
+          "hazzardId": 1,
+          "criticityId": 4
+          }
+      ]
+
+    }
+    console.log("dataPostman:",dataPostman)
     try {
       const url = method === "PUT" && id ? `${baseURL}/activity/${id}` : `${baseURL}/activity/`;
       const response = await axios({
@@ -259,16 +286,13 @@ const handleModalHidden = () => {
         modal?.hide();
       }
     } catch (error: any) {
-      // Verificar si el error es de Axios y mostrar detalles más específicos
       if (axios.isAxiosError(error) && error.response) {
         console.error("Detalles del error:", error.response);
         showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
       } else if (error.request) {
-        // Error que ocurre si no hay respuesta del servidor
         console.error("No hay respuesta del servidor:", error.request);
         showAlert("Error: El servidor no respondió. Verifica tu conexión o intenta más tarde.", "error");
       } else {
-        // Cualquier otro tipo de error
         console.error("Error inesperado:", error.message);
         showAlert(`Error inesperado: ${error.message}`, "error");
       }
@@ -307,216 +331,216 @@ const handleModalHidden = () => {
   );
 
   return (
-    <div className="App">
-      <div className="container-fluid">
-        <div className="row mt-3">
-          <div className="col-12">
-            <div className="tabla-contenedor">
-              <EncabezadoTabla title="Actividad" onClick={() => openModal("1")} />
-            </div>
-            <div className="table-responsive">
-              <table className="table table-bordered">
-                <thead
-                  className="text-center"
-                  style={{
-                    background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
-                    color: "#fff",
-                  }}
-                >
-                  <tr>
-                    <th>N°</th>
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Tipo de Actividad</th>
-                    <th>Proceso</th>
-                    <th>Peligro / Criticidad</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="table-group-divider">
-                  {actividad.length > 0 ? (
-                    actividad.map((act, i) => (
-                      <tr key={act.id} className="text-center">
-                        <td>{i + 1}</td>
-                        <td>{act.name}</td>
-                        <td>{act.description}</td>
-                        <td>{act.activityType.description}</td>
-                        <td>{act.process.name}</td>
-                        {/* <td>
-                          {act.hazzards.map((h) => h.name).join(", ")} / 
-                          {act.criticities?.map((c) => c.description).join(", ")}
-                        </td> */}
-                        <td>
-                          <b>Peligros:</b> {act.hazzards.map((h) => h.name).join(", ")}<br />
-                          <b>Criticidades:</b> {act.criticities?.map((c) => c.description).join(", ")}
-                        </td>
-                        <td className="text-center">
-                          <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
-                            <button
-                              onClick={() => openModal("2", act)}
-                              className="btn btn-custom-editar m-2"
-                            >
-                              <i className="fa-solid fa-edit"></i>
-                            </button>
-                          </OverlayTrigger>
-                          <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
-                            <button
-                              className="btn btn-custom-danger"
-                              onClick={() => {
-                                MySwal.fire({
-                                  title: "¿Estás seguro?",
-                                  text: "No podrás revertir esto",
-                                  icon: "warning",
-                                  showCancelButton: true,
-                                  confirmButtonText: "Sí, bórralo",
-                                  cancelButtonText: "Cancelar",
-                                }).then((result) => {
-                                  if (result.isConfirmed) {
-                                    deleteActividad(act.id);
-                                  }
-                                });
-                              }}
-                            >
-                              <i className="fa-solid fa-circle-xmark"></i>
-                            </button>
-                          </OverlayTrigger>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={7}>No hay actividades disponibles</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
-          <div className="modal-dialog modal-dialog-top modal-md">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title w-100">{title}</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div className="modal-body">
-              <div className="mb-3">
-                  <label htmlFor="process" className="form-label">
-                    Proceso:
-                  </label>
-                  <select
-                    id="process"
-                    className="form-select"
-                    value={selectedProcessId}
-                    onChange={(e) => setSelectedProcessId(Number(e.target.value))}>
-                    <option value={0}>Selecciona...</option>
-                    {process.map((proc) => (
-                      <option key={proc.id} value={proc.id}>
-                        {proc.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-solid fa-chart-line"></i>
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nombre de la actividad"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-regular fa-solid fa-file-alt"></i>
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Descripción de la actividad"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="activityType" className="form-label">
-                    Tipo de Actividad:
-                  </label>
-                  <select
-                    id="activityType"
-                    className="form-select"
-                    value={selectedActivityTypeId}
-                    onChange={(e) => setSelectedActivityTypeId(Number(e.target.value))}
-                  >
-                    <option value={0}>Selecciona...</option>
-                    {activityType.map((actv) => (
-                      <option key={actv.id} value={actv.id}>
-                        {actv.description}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+		<div className="App">
+			<div className="container-fluid">
+				<div className="row mt-3">
+					<div className="col-12">
+						<div className="tabla-contenedor">
+							<EncabezadoTabla title="Actividad" onClick={() => openModal("1")} />
+						</div>
+						<div className="table-responsive">
+							<table className="table table-bordered">
+								<thead
+									className="text-center"
+									style={{
+										background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
+										color: "#fff",
+									}}
+								>
+									<tr>
+										<th>N°</th>
+										<th>Nombre</th>
+										<th>Descripción</th>
+										<th>Tipo de Actividad</th>
+										<th>Proceso</th>
+										<th>Peligro / Criticidad</th>
+										<th>Acciones</th>
+									</tr>
+								</thead>
+								<tbody className="table-group-divider">
+									{actividad.length > 0 ? (
+										actividad.map((act, i) => (
+											<tr key={act.id} className="text-center">
+												<td>{i + 1}</td>
+												<td>{act.name}</td>
+												<td>{act.description}</td>
+												<td>{act.activityType?.description || "Sin tipo de actividad"}</td>
+												<td>{act.process?.name || "Sin proceso"}</td>
+												<td>
+													<b>Peligros:</b>{" "}
+													{act.hazzards?.map((h) => h.hazzardId).join(", ") || "Sin peligros"}
+													<br />
+													<b>Criticidades:</b>{" "}
+													{act.criticities?.map((c) => c.description).join(", ") ||
+														"Sin criticidades"}
+												</td>
+												<td className="text-center">
+													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
+														<button
+															onClick={() => openModal("2", act)}
+															className="btn btn-custom-editar m-2"
+														>
+															<i className="fa-solid fa-edit"></i>
+														</button>
+													</OverlayTrigger>
+													<OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+														<button
+															className="btn btn-custom-danger"
+															onClick={() => {
+																MySwal.fire({
+																	title: "¿Estás seguro?",
+																	text: "No podrás revertir esto",
+																	icon: "warning",
+																	showCancelButton: true,
+																	confirmButtonText: "Sí, bórralo",
+																	cancelButtonText: "Cancelar",
+																}).then((result) => {
+																	if (result.isConfirmed) {
+																		deleteActividad(act.id);
+																	}
+																});
+															}}
+														>
+															<i className="fa-solid fa-circle-xmark"></i>
+														</button>
+													</OverlayTrigger>
+												</td>
+											</tr>
+										))
+									) : (
+										<tr>
+											<td colSpan={7}>No hay actividades disponibles</td>
+										</tr>
+									)}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
+					<div className="modal-dialog modal-dialog-top modal-md">
+						<div className="modal-content">
+							<div className="modal-header">
+								<h5 className="modal-title w-100">{title}</h5>
+								<button
+									type="button"
+									className="btn-close"
+									data-bs-dismiss="modal"
+									aria-label="Close"
+								></button>
+							</div>
+							<div className="modal-body">
+								<div className="mb-3">
+									<label htmlFor="process" className="form-label">
+										Proceso:
+									</label>
+									<select
+										id="process"
+										className="form-select"
+										value={selectedProcessId}
+										onChange={(e) => setSelectedProcessId(Number(e.target.value))}
+									>
+										<option value={0}>Selecciona...</option>
+										{process.map((proc) => (
+											<option key={proc.id} value={proc.id}>
+												{proc.name}
+											</option>
+										))}
+									</select>
+								</div>
+								<div className="input-group mb-3">
+									<span className="input-group-text">
+										<i className="fa-solid fa-chart-line"></i>
+									</span>
+									<input
+										type="text"
+										className="form-control"
+										placeholder="Nombre de la actividad"
+										value={name}
+										onChange={(e) => setName(e.target.value)}
+									/>
+								</div>
+								<div className="input-group mb-3">
+									<span className="input-group-text">
+										<i className="fa-regular fa-solid fa-file-alt"></i>
+									</span>
+									<input
+										type="text"
+										className="form-control"
+										placeholder="Descripción de la actividad"
+										value={description}
+										onChange={(e) => setDescription(e.target.value)}
+									/>
+								</div>
+								<div className="mb-3">
+									<label htmlFor="activityType" className="form-label">
+										Tipo de Actividad:
+									</label>
+									<select
+										id="activityType"
+										className="form-select"
+										value={selectedActivityTypeId}
+										onChange={(e) => setSelectedActivityTypeId(Number(e.target.value))}
+									>
+										<option value={0}>Selecciona...</option>
+										{activityType.map((actv) => (
+											<option key={actv.id} value={actv.id}>
+												{actv.description}
+											</option>
+										))}
+									</select>
+								</div>
 
-                <div className="form-group mt-3">
-                  <label htmlFor="hazzard">Peligros2:</label>
-                  <Select
-                    isMulti
-                    value={hazzard
-                      .filter((h) => selectedHazzardIds.includes(h.id))
-                      .map((h) => ({ value: h.id, label: h.name }))}
-                    onChange={(selectedOptions) => {
-                      handleHazzardSelection(selectedOptions as Option[]);
-                    }}
-                    options={hazzard.map((h) => ({
-                      value: h.id,
-                      label: h.name,
-                    }))}
-                  />
-                </div>
-                <div className="form-group mt-3">
-                  <label htmlFor="criticity">Criticidad2:</label>
-                  <Select
-                    isMulti
-                    value={filteredCriticity.filter((option) =>
-                      selectedCriticityIds.includes(option.value)
-                    )}
-                    onChange={(selectedOptions) => {
-                      const selectedIds = selectedOptions.map((option) => option.value);
-                      setSelectedCriticityIds(selectedIds);
-                    }}
-                    options={filteredCriticity}
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                  id="btnCerrar"
-                >
-                  Cerrar
-                </button>
-                <button type="button" className="btn btn-primary" onClick={validar}>
-                  Guardar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+								<div className="form-group mt-3">
+									<label htmlFor="hazzard">Peligros2:</label>
+									<Select
+										isMulti
+										value={hazzards
+											.filter((h) => selectedHazzardCriticity.includes(h.id)) 
+											.map((h) => ({ value: h.id, label: h.name }))} 
+										onChange={(selectedOptions) => {
+											handleHazzardSelection(selectedOptions as Option[]);
+										}}
+										options={hazzards.map((h) => ({
+											value: h.id,
+											label: h.name,
+										}))}
+									/>
+								</div>
+								<div className="form-group mt-3">
+									<label htmlFor="criticity">Criticidad2:</label>
+									<Select
+										isMulti
+										value={filteredCriticity.filter((option) =>
+											selectedCriticityIds.includes(option.value)
+										)}
+										onChange={(selectedOptions) => {
+											const selectedIds = selectedOptions.map((option) => option.value);
+											setSelectedCriticityIds(selectedIds);
+										}}
+										options={filteredCriticity}
+									/>
+								</div>
+							</div>
+							<div className="modal-footer">
+								<button
+									type="button"
+									className="btn btn-secondary"
+									data-bs-dismiss="modal"
+									id="btnCerrar"
+								>
+									Cerrar
+								</button>
+								<button type="button" className="btn btn-primary" onClick={validar}>
+									Guardar
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default Actividad;
-
