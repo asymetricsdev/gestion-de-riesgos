@@ -1,0 +1,19 @@
+runtime: nodejs20
+
+# Utilizar la versión LTS de Node.js
+#runtime_version: 14
+
+handlers:
+  # Ruta para servir el archivo index.html
+  - url: /
+    static_files: dist/index.html
+    upload: dist/index.html
+
+  # Ruta para servir los archivos estáticos generados por Vite
+  - url: /assets
+    static_dir: dist/assets
+
+  # Ruta para servir el resto de archivos estáticos (por ejemplo, favicon.ico)
+  - url: /(.+)
+    static_files: dist/\1
+    upload: dist/(.*)
