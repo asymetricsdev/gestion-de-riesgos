@@ -405,7 +405,7 @@ function Tareas() {
 												<button
 													onClick={() =>
 														downloadFile(
-															`https://testbackend-433922.uk.r.appspot.com/task/${tr.id}/download`,
+															`https://testbackend-433922.uk.r.appspot.com/api/task/${tr.id}/download`,
 															tr.fileExtension,
 															tr.name
 														)
