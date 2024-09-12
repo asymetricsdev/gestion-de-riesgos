@@ -178,16 +178,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckerData) => {
     showAlert("Operación realizada con éxito", "success");
 
     if (method === "POST") {
-      // Si es un nuevo checker, la añadimos al estado
       setChecker((prev) => [...prev, newChecker]);
     } else if (method === "PUT") {
-      // Si es una actualización, modificamos el checker en el estado
       setChecker((prev) =>
         prev.map((check) => (check.id === newChecker.id ? newChecker : check))
       );
     }
 
-    // Cerrar el modal después de la operación
     if (modalRef.current) {
       const modal = bootstrap.Modal.getInstance(modalRef.current);
       modal?.hide();
