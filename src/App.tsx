@@ -5,7 +5,6 @@ import Menu from './components/Menu/Menu';
 import Home from './pages/HomePage';
 import MatrizPeligro from './pages/MatrizPeligroPage';
 import PlanificadorActividad from './pages/PlanificadorActividadPage';
-import Usuarios from './pages/UsuariosPage';
 import Perfiles from  './pages/PerfilesPage';
 import Compañia from './pages/CompanyPage';
 import Actividades from './pages/ActividadesPage';
@@ -46,30 +45,32 @@ export function App() {
                         <Col xs={isMenuOpen ? 10 : 11} className="main-content">
                                 <Routes>
                                 <Route path="/home" element={<Home />} />
+                                {/*PLANIFICACIÓN*/}
                                 <Route path="/planificacion" element={< PlanificadorActividad/>} />
                                 <Route path="/planificacion/planificador-de-actividad" element={< PlanificadorActividad/>} />
-                                <Route path="/planificacion/checkpoint" element={< Checkpoint/>} />
+                                <Route path="/planificacion/actividades" element={<Actividad />} />
                                 <Route path="/planificacion/perfiles" element={<Perfiles />} />
-                                <Route path="/planificacion/tareas" element={<Tareas />} />
-                                <Route path="/planificacion/tipos-de-tareas" element={<TipoTareas />} />
-
+                                {/*VERIFICACION*/}
+                                <Route path="/verificacion/verificadores-de-control" element={<Checker />} />
+                                <Route path="/verificacion/items" element={<Checkpoint />} />
+                                {/*MATRIZ DE PELIGRO*/}
                                 <Route path="/matriz-de-peligro" element={<MatrizPeligro />} />
-                                <Route path="/matriz-de-peligro/actividad" element={<Actividad />} />
-                                <Route path="/matriz-de-peligro/actividades" element={<Actividades />} />
-                                <Route path="/matriz-de-peligro/criticidad-de-peligro" element={<Criticidad />} />
-                                <Route path="/matriz-de-peligro/jerarquia-de-control" element={<CheckerType />} />
-                                <Route path="/matriz-de-peligro/verificadores" element={<Checker />} />
-                                <Route path="/matriz-de-peligro/peligro" element={<Peligro />} />
                                 <Route path="/matriz-de-peligro/matriz-peligro" element={<MatrizPeligro />} />
-                                <Route path="/matriz-de-peligro/riesgos" element={<Riesgo />} />
-
+                                <Route path="/matriz-de-peligro/configuracion/tareas" element={<Tareas />} />
+                                <Route path="/matriz-de-peligro/configuracion/tipo-de-tareas" element={<TipoTareas />} />
+                                <Route path="/matriz-de-peligro/configuracion/criticidad-de-peligro" element={<Criticidad />} />
+                                <Route path="/matriz-de-peligro/configuracion/jerarquia-de-control" element={<CheckerType />} />
+                                <Route path="/matriz-de-peligro/configuracion/peligro" element={<Peligro />} />
+                                <Route path="/matriz-de-peligro/configuracion/riesgos" element={<Riesgo />} />
+                                {/*TIPOS DE ACTIVIDAD */}
+                                <Route path="/tipo-de-actividad/tipo-de-actividad" element={<Actividades />} />
+                                {/*ORGANIZACION */}
                                 <Route path="/organizacion/ciudad" element={<Ciudad />} />
-                                <Route path="/organizacion/compañia" element={<Compañia />} />
-                                <Route path="/organizacion/division" element={<Division isNewRecord={false} />} />
-                                <Route path="/organizacion/empleados" element={<Empleados />} />
-                                <Route path="/organizacion/posicion" element={<Posicion />} />
+                                <Route path="/organizacion/compañias" element={<Compañia />} />
+                                <Route path="/organizacion/areas" element={<Division isNewRecord={false} />} />
+                                <Route path="/organizacion/colaboradores" element={<Empleados />} />
+                                <Route path="/organizacion/cargos" element={<Posicion />} />
                                 <Route path="/organizacion/procesos" element={<Procesos />} />
-                                <Route path="/organizacion/usuarios" element={<Usuarios />} />
                             </Routes>
                         </Col>
                     </Row>
