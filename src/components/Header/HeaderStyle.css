@@ -6,12 +6,12 @@
     display: flex;
     align-items: center;
     width: 100%;
-    z-index: 1000; /* Asegúrate de que esté encima del sidebar */
+    z-index: 1000;
 }
 
 .custom-icon .fa-circle-user {
     color: #E6007D;
-    font-size: 2rem; /* Ajusta el tamaño según lo necesites */
+    font-size: 2rem;
 }
 
 .custom-icon .fa-circle-info,
@@ -53,10 +53,10 @@
 
 .custom-button {
     background-color: #009EE2; 
-    border: none; /* Opcional: elimina el borde del botón */
-    color: white; /* Opcional: cambia el color del texto/icono si es necesario */
-    padding: 0.4rem 1rem; /* Opcional: ajusta el padding si es necesario */
-    border-radius: 0.25rem; /* Opcional: ajusta el borde redondeado si es necesario */
+    border: none; 
+    color: white; 
+    padding: 0.4rem 1rem;
+    border-radius: 0.25rem;
 }
 
 .custom-button:hover {

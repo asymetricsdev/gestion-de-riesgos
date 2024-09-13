@@ -1,7 +1,7 @@
 
 .custom-tooltip {
-  max-width: 500px; /* Ajusta el ancho máximo */
-  white-space: pre-wrap; /* Permite que el texto se envuelva en múltiples líneas */
+  max-width: 500px;
+  white-space: pre-wrap;
   text-transform: lowercase;
   text-align: left;
 }

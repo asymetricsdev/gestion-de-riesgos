@@ -8,10 +8,10 @@
     color: white;
     padding: 20px;
     margin: 0; 
-    border-radius: 8px 8px 0 0; /* Opcional: para coincidir con el estilo */
+    border-radius: 8px 8px 0 0;
     text-align: center;
-    width: 100%; /*ancho del contenedor */
-    box-sizing: border-box; /*padding y border en el ancho */
+    width: 100%; 
+    box-sizing: border-box; 
   }
   
   .encabezado-tabla h2 {
@@ -20,26 +20,25 @@
   }
   
   .tabla-contenedor {
-    width: 100%; /* Ajustar el ancho al 100% */
-    margin: 0 auto; /* Centrar el contenedor */
+    width: 100%; 
+    margin: 0 auto; 
     margin-top: 55px;
-    box-sizing: border-box; /* Incluir padding y border en el ancho */
-    overflow-x: auto; /* Asegurarse de que el contenido no se desborde */
+    box-sizing: border-box; 
+    overflow-x: auto;
   }
 
   .tabla-contenedor-matriz {
-    width: 100%; /* Ajustar el ancho al 100% */
-    margin: 0 auto; /* Centrar el contenedor */
+    width: 100%; 
+    margin: 0 auto; 
     margin-top: 5px;
-    box-sizing: border-box; /* Incluir padding y border en el ancho */
-    overflow-x: auto; /* Asegurarse de que el contenido no se desborde */
+    box-sizing: border-box; 
+    overflow-x: auto; 
   }
 
-  /*Posición botón agregar nuevo usuario*/
+
   .action-button {
     position: absolute;
     left: 758px;
     top: 20%;
-    /*transform: translateY(-50%);*/
   }
   
