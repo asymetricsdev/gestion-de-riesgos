@@ -107,7 +107,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						)}	
 						{isOpen ? (	
 						<NavLink
-							to="/matriz-de-peligro/actividad"
+							to="/planificacion/actividades"
 							className="nav-link text-white d-flex align-items-center"
 						>
 							<i className="fa-solid fa-chart-line"></i>
@@ -116,7 +116,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						) : (
 							<OverlayTrigger placement="right" overlay={renderTooltip("Actividades")}>
 								<NavLink
-									to="/matriz-de-peligro/actividad"
+									to="/planificacion/actividades"
 									className="nav-link text-white d-flex align-items-center"
 								>
 									<i className="fa-solid fa-chart-line"></i>
@@ -173,16 +173,16 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 					<div className="submenu">
 						{isOpen ? (
 						<NavLink
-							to="/matriz-de-peligro/verificadores"
+							to="/verificacion/verificadores-de-control"
 							className="nav-link text-white d-flex align-items-center"
 						>
 							<i className="fa-solid fa-list-check"></i>
-							<span>Verificadores</span>
+							<span>Verificadores de Control</span>
 						</NavLink>
 						) : (
 							<OverlayTrigger placement="right" overlay={renderTooltip("Verificadores")}>
 								<NavLink
-									to="/matriz-de-peligro/verificadores"
+									to="/verificacion/verificadores-de-control"
 									className="nav-link text-white d-flex align-items-center"
 								>
 									<i className="fa-solid fa-list-check"></i>
@@ -191,7 +191,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						)}
 						{isOpen ? (
 						<NavLink
-							to="/planificacion/checkpoint"
+							to="/verificacion/items"
 							className="nav-link text-white d-flex align-items-center"
 						>
 							<i className="fa-solid fa-rectangle-list"></i>
@@ -200,7 +200,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						) : (
 							<OverlayTrigger placement="right" overlay={renderTooltip("Items")}>
 								<NavLink
-									to="/planificacion/checkpoint"
+									to="/verificacion/items"
 									className="nav-link text-white d-flex align-items-center"
 								>
 									<i className="fa-solid fa-rectangle-list"></i>
@@ -289,7 +289,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 							<div className="submenu">
 								{isOpen ? (
 									<NavLink
-										to="/planificacion/tareas"
+										to="/matriz-de-peligro/configuracion/tareas"
 										className="nav-link text-white d-flex align-items-center"
 									>
 										<i className="fa-solid fa-bars-progress"></i>
@@ -298,7 +298,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 								) : (
 									<OverlayTrigger placement="right" overlay={renderTooltip("Tareas")}>
 										<NavLink
-											to="/planificacion/tareas"
+											to="/matriz-de-peligro/configuracion/tareas"
 											className="nav-link text-white d-flex align-items-center"
 										>
 											<i className="fa-solid fa-bars-progress"></i>
@@ -307,7 +307,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 								)}
 								{isOpen ? (
 									<NavLink
-										to="/planificacion/tipos-de-tareas"
+										to="/matriz-de-peligro/configuracion/tipo-de-tareas"
 										className="nav-link text-white d-flex align-items-center"
 									>
 										<i className="fa-solid fa-list-check"></i>
@@ -316,7 +316,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 								) : (
 									<OverlayTrigger placement="right" overlay={renderTooltip("TiposDeTareas")}>
 										<NavLink
-											to="/planificacion/tipos-de-tareas"
+											to="/matriz-de-peligro/configuracion/tipo-de-tareas"
 											className="nav-link text-white d-flex align-items-center"
 										>
 											<i className="fa-solid fa-list-check"></i>
@@ -325,7 +325,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 								)}
 								{isOpen ? (
 									<NavLink
-										to="/matriz-de-peligro/criticidad-de-peligro"
+										to="/matriz-de-peligro/configuracion/criticidad-de-peligro" 
 										className="nav-link text-white d-flex align-items-center"
 									>
 										<i className="fa-solid fa-bolt"></i>
@@ -334,7 +334,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 								) : (
 									<OverlayTrigger placement="right" overlay={renderTooltip("Criticidad")}>
 										<NavLink
-											to="/matriz-de-peligro/criticidad-de-peligro"
+											to="/matriz-de-peligro/configuracion/criticidad-de-peligro" 
 											className="nav-link text-white d-flex align-items-center"
 										>
 											<i className="fa-solid fa-bolt"></i>
@@ -343,7 +343,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 								)}
 								{isOpen ? (
 									<NavLink
-										to="/matriz-de-peligro/jerarquia-de-control"
+										to="/matriz-de-peligro/configuracion/jerarquia-de-control"
 										className="nav-link text-white d-flex align-items-center"
 									>
 										<i className="fa-solid fa-network-wired"></i>
@@ -352,7 +352,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 								) : (
 									<OverlayTrigger placement="right" overlay={renderTooltip("Comprobaciones")}>
 										<NavLink
-											to="/matriz-de-peligro/jerarquia-de-control"
+											to="/matriz-de-peligro/configuracion/jerarquia-de-control"
 											className="nav-link text-white d-flex align-items-center"
 										>
 											<i className="fa-solid fa-network-wired"></i>
@@ -361,7 +361,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 								)}
 								{isOpen ? (
 									<NavLink
-										to="/matriz-de-peligro/peligro"
+										to="/matriz-de-peligro/configuracion/peligro"
 										className="nav-link text-white d-flex align-items-center"
 									>
 										<i className="fa-solid fa-circle-radiation"></i>
@@ -370,7 +370,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 								) : (
 									<OverlayTrigger placement="right" overlay={renderTooltip("Peligro")}>
 										<NavLink
-											to="/matriz-de-peligro/peligro"
+											to="/matriz-de-peligro/configuracion/peligro"
 											className="nav-link text-white d-flex align-items-center"
 										>
 											<i className="fa-solid fa-circle-radiation"></i>
@@ -379,7 +379,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 								)}
 								{isOpen ? (
 									<NavLink
-										to="/matriz-de-peligro/riesgos"
+										to="/matriz-de-peligro/configuracion/riesgos"
 										className="nav-link text-white d-flex align-items-center"
 									>
 										<i className="fa-solid fa-circle-exclamation"></i>
@@ -388,7 +388,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 								) : (
 									<OverlayTrigger placement="right" overlay={renderTooltip("Riesgos")}>
 										<NavLink
-											to="/matriz-de-peligro/riesgos"
+											to="/matriz-de-peligro/configuracion/riesgos"
 											className="nav-link text-white d-flex align-items-center"
 										>
 											<i className="fa-solid fa-circle-exclamation"></i>
@@ -418,13 +418,13 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 {isActividadesOpen && (
                     <div className="submenu">
                         {isOpen ? (
-                            <NavLink to="/matriz-de-peligro/actividades" className="nav-link text-white d-flex align-items-center">
+                            <NavLink to="/tipo-de-actividad/tipo-de-actividad" className="nav-link text-white d-flex align-items-center">
                                 <i className="fa-solid fa-people-robbery"></i>
                                 <span>Tipo de Actividad</span>
                             </NavLink>
                         ) : (
                             <OverlayTrigger placement="right" overlay={renderTooltip('Actividades')}>
-                                <NavLink to="/matriz-de-peligro/actividades" className="nav-link text-white d-flex align-items-center">
+                                <NavLink to="/tipo-de-actividad/tipo-de-actividad" className="nav-link text-white d-flex align-items-center">
                                     <i className="fa-solid fa-people-robbery"></i>
                                 </NavLink>
                             </OverlayTrigger>
@@ -477,7 +477,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						)}
 						{isOpen ? (
 						<NavLink
-							to="/organizacion/compañia"
+							to="/organizacion/compañias"
 							className="nav-link text-white d-flex align-items-center"
 						>
 							<i className="fa-solid fa-building"></i>
@@ -486,7 +486,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						 ) : (
 							<OverlayTrigger placement="right" overlay={renderTooltip("Compañias")}>
 								<NavLink
-									to="/organizacion/compañia"
+									to="/organizacion/compañias"
 									className="nav-link text-white d-flex align-items-center"
 								>
 									<i className="fa-solid fa-building"></i>
@@ -495,7 +495,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						)}
 						{isOpen ? (
 						<NavLink
-							to="/organizacion/division"
+							to="/organizacion/areas"
 							className="nav-link text-white d-flex align-items-center"
 						>
 							<i className="fa-solid fa-sitemap"></i>
@@ -504,7 +504,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						 ) : (
 							<OverlayTrigger placement="right" overlay={renderTooltip("Áreas")}>
 								<NavLink
-									to="/organizacion/division"
+									to="/organizacion/areas"
 									className="nav-link text-white d-flex align-items-center"
 								>
 									<i className="fa-solid fa-sitemap"></i>
@@ -513,7 +513,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						)}
 						{isOpen ? (
 						<NavLink
-							to="/organizacion/empleados"
+							to="/organizacion/colaboradores"
 							className="nav-link text-white d-flex align-items-center"
 						>
 							<i className="fa-solid fa-id-card-clip"></i>
@@ -522,7 +522,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						 ) : (
 							<OverlayTrigger placement="right" overlay={renderTooltip("Colaboradores")}>
 								<NavLink
-									to="/organizacion/empleados"
+									to="/organizacion/colaboradores"
 									className="nav-link text-white d-flex align-items-center"
 								>
 									<i className="fa-solid fa-id-card-clip"></i>
@@ -531,7 +531,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						)}
 						{isOpen ? (
 						<NavLink
-							to="/organizacion/posicion"
+							to="/organizacion/cargos"
 							className="nav-link text-white d-flex align-items-center"
 						>
 							<i className="fa-solid fa-address-card"></i>
@@ -540,7 +540,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						 ) : (
 							<OverlayTrigger placement="right" overlay={renderTooltip("Cargos")}>
 								<NavLink
-									to="/organizacion/posicion"
+									to="/organizacion/cargos"
 									className="nav-link text-white d-flex align-items-center"
 								>
 									<i className="fa-solid fa-address-card"></i>
