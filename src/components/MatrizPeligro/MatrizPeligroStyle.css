@@ -1,0 +1,17 @@
+
+.custom-tooltip {
+  max-width: 500px;
+  white-space: pre-wrap;
+  text-transform: lowercase;
+  text-align: left;
+}
+
+
+/* .text-center {
+  background: linear-gradient(90deg, #009FE3 0%, #00CFFF 100%);
+  color: #fff;
+} */
+
+.table-responsive-xl {
+  margin-top: -20px;
+}
