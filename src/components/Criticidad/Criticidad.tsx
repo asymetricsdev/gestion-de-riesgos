@@ -79,8 +79,8 @@ const Criticidad: React.FC = () => {
   };
 
   const validar = () => {
-    if (name.trim() === "") {
-      showAlert("Escribe la criticidad", "warning", "criticidad");
+    if (!/^\d+$/.test(name.trim())) {
+      showAlert("Solo se permiten números en el campo de nivel de criticidad", "warning", "nombre");
       return;
     }
     if (description.trim() === "") {
