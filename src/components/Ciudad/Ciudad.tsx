@@ -3,36 +3,51 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-interface Criticidad {
+interface Ciudad {
+  id: string;
+  name: string;
+  description: string;
+  createDate: string;  
+  updateDate: string; 
+  divisions: Division[];
+}
+
+interface Division {
   id: number;
   name: string;
-  description: string;
-  createDate: string;
 }
 
-interface CriticidadData {
+interface CiudadData {
+  id?: number;
   name: string;
   description: string;
+  createDate?: string;
+  updateDate?: string;
 }
 
-const Criticidad: React.FC = () => {
+const Ciudad: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
-  const [criticity, setCriticityType] = useState<Criticidad[]>([]);
+  const [city, setCity] = useState<Ciudad[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [createDate, setCreateDate] = useState<string>("");
+  const [updateDate, setUpdateDate] = useState<string>("");
+  const [divisions, setDivisions] = useState<Division[]>([]);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getCriticity();
+    getCity();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -43,27 +58,33 @@ const Criticidad: React.FC = () => {
     };
   }, []);
 
-  const getCriticity = async () => {
+  const getCity = async () => {
     try {
-      const response: AxiosResponse<Criticidad[]> = await axios.get(`${baseURL}/criticity/`);
-      setCriticityType(response.data);
+      const response: AxiosResponse<Ciudad[]> = await axios.get(`${baseURL}/city/`);
+      const data = response.data.map(City => ({
+        ...City,
+       
+      }));
+      setCity(data);
     } catch (error) {
-      showAlert("Error al obtener criticidad", "error");
+      showAlert("Error al obtener la Ciudad", "error");
     }
   };
 
-  const openModal = (op: string, criticity?: Criticidad) => {
-    if (op === "1") {
+  const openModal = (op: string, city?: Ciudad) => {
+    if (city) {
+      setId(city.id);
+      setName(city.name);
+      setDescription(city.description);
+      setDivisions(city.divisions || []);
+      
+    } else {
       setId("");
       setName("");
       setDescription("");
-      setTitle("Registrar Criticidad");
-    } else if (op === "2" && criticity) {
-      setId(criticity.id.toString());
-      setName(criticity.name);
-      setDescription(criticity.description);
-      setTitle("Editar Criticidad");
+      setDivisions([]);
     }
+    setTitle(op === "1" ? "Registrar Ciudad" : "Editar Ciudad");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -79,49 +100,39 @@ const Criticidad: React.FC = () => {
   };
 
   const validar = () => {
-    if (name.trim() === "") {
-      showAlert("Escribe la criticidad", "warning", "criticidad");
+    if (!name.trim()) {
+      showAlert("Escribe el nombre", "warning", "nombre");
       return;
     }
-    if (description.trim() === "") {
+    if (!description.trim()) {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
     
-    const parametros : CriticidadData = {  
+    const parametros : CiudadData = {  
       name: name.trim(), 
-      description: description.trim() };
-
+      description: description.trim(), 
+    };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: CriticidadData) => {
+  const enviarSolicitud = async (method: "POST" | "PUT", data: CiudadData) => {
     try {
-      const url = method === "PUT" && id ? `${baseURL}/criticity/${id}` : `${baseURL}/criticity/`;
+      const url = method === "PUT" && id ? `${baseURL}/city/${id}` : `${baseURL}/city/`;
       const response = await axios({
         method,
         url,
         data,
         headers: { "Content-Type": "application/json" },
       });
-
+  
       showAlert("Operación realizada con éxito", "success");
-
-      if (method === "POST") {
-        setCriticityType((prev) => [...prev, response.data]);
-      } else if (method === "PUT") {
-        setCriticityType((prev) =>
-          prev.map((item) => (item.id === response.data.id ? response.data : item))
-        );
-      }
-
+      getCity();
       if (modalRef.current) {
         const modal = bootstrap.Modal.getInstance(modalRef.current);
         modal?.hide();
       }
-
-      getCriticity();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
@@ -129,19 +140,19 @@ const Criticidad: React.FC = () => {
         showAlert("Error al realizar la solicitud", "error");
       }
     }
-  };
+  }; 
 
-  const deleteCriticity = async (id: number) => {
+  const deleteCity = async (id: string) => {
     try {
-      await axios.delete(`${baseURL}/criticity/${id}`, {
+      await axios.delete(`${baseURL}/city/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-      Swal.fire("Criticidad eliminada correctamente", "", "success");
-      getCriticity();
+      Swal.fire("Ciudad eliminada correctamente", "", "success");
+      getCity();
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar Criticidad.",
+        text: "Error al eliminar la Ciudad.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -149,20 +160,16 @@ const Criticidad: React.FC = () => {
   };
 
   const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-    <Tooltip id="button-tooltip-edit" {...props}>
-      Editar
-    </Tooltip>
-  );
-
-  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-    <Tooltip id="button-tooltip-delete" {...props}>
-      Eliminar
-    </Tooltip>
-  );
-
-  const formatDate = (dateString: string) => {
-    return dateString.split('T')[0];
-  };
+		<Tooltip id="button-tooltip-edit" {...props}>
+		  Editar
+		</Tooltip>
+	  );
+	  
+	  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-delete" {...props}>
+		  Eliminar
+		</Tooltip>
+	  );
 
   return (
     <div className="App">
@@ -170,56 +177,56 @@ const Criticidad: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Criticidad' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Ciudad' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center" 
-                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
+                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
+                  color: '#fff' }}>
                   <tr>
-                    <th>N°</th>
-                    <th>Nivel</th>
+                    <th>ID</th>
+                    <th>Nombre</th>
                     <th>Descripción</th>
-                    <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {criticity.map((crit, i) => (
-                    <tr key={crit.id} className="text-center">
+                  {city.map((cit, i) => (
+                    <tr key={cit.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{crit.name}</td>
-                      <td>{crit.description}</td>
-                      <td>{formatDate(crit.createDate)}</td>
+                      <td>{cit.name}</td>
+                      <td>{cit.description}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
-                          <button
-                            onClick={() => openModal("2", crit)}
-                            className="btn btn-custom-editar m-2"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalUsers"
-                          >
-                            <i className="fa-solid fa-edit"></i>
-                          </button>
-                        </OverlayTrigger>
-                        <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
-                          <button className="btn btn-custom-danger" onClick={() => {
-                            MySwal.fire({
-                              title: "¿Estás seguro?",
-                              text: "No podrás revertir esto",
-                              icon: "warning",
-                              showCancelButton: true,
-                              confirmButtonText: "Sí, bórralo",
-                              cancelButtonText: "Cancelar",
-                            }).then((result) => {
-                              if (result.isConfirmed) {
-                                deleteCriticity(crit.id);
-                              }
-                            });
-                          }}>
-                            <i className="fa-solid fa-circle-xmark"></i>
-                          </button>
-                        </OverlayTrigger>
+                        <button
+                          onClick={() => openModal("2", cit)}
+                          className="btn btn-custom-editar m-2"
+                          data-bs-toggle="modal"
+                          data-bs-target="#modalUsers"
+                        >
+                          <i className="fa-solid fa-edit"></i>
+                        </button>
+                      </OverlayTrigger>
+                      <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+                        <button className="btn btn-custom-danger" onClick={() => {
+                          MySwal.fire({
+                            title: "¿Estás seguro?",
+                            text: "No podrás revertir esto",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonText: "Sí, bórralo",
+                            cancelButtonText: "Cancelar",
+                          }).then((result) => {
+                            if (result.isConfirmed) {
+                              deleteCity(cit.id);
+                            }
+                          });
+                        }}
+                        >
+                          <FontAwesomeIcon icon={faCircleXmark} />
+                        </button>
+                      </OverlayTrigger>
                       </td>
                     </tr>
                   ))}
@@ -228,11 +235,22 @@ const Criticidad: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>
-          <div className="modal-dialog modal-dialog-top modal-md">
+        <div
+          className="modal fade"
+          id="modalUsers"
+          ref={modalRef}
+          data-bs-backdrop="true"
+          data-bs-keyboard="false"
+          tabIndex={-1}
+          aria-labelledby="modalTitle"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title w-100">{title}</h5>
+                <h1 className="modal-title fs-5" id="modalTitle">
+                  {title}
+                </h1>
                 <button
                   type="button"
                   className="btn-close"
@@ -241,27 +259,26 @@ const Criticidad: React.FC = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-bolt"></i>
+                  <i className="fa-solid fa-tree-city"></i>
                   </span>
                   <input
                     type="text"
-                    id="nombre"
+                    id="name"
                     className="form-control"
-                    placeholder="Nivel de Criticidad"
+                    placeholder="Nombre"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-regular fa-solid fa-file-alt"></i>
+                  <i className="fa-regular fa-solid fa-file-alt"></i>
                   </span>
                   <input
                     type="text"
-                    id="descripcion"
+                    id="description"
                     className="form-control"
                     placeholder="Descripción"
                     value={description}
@@ -278,11 +295,7 @@ const Criticidad: React.FC = () => {
                 >
                   Cerrar
                 </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                >
+                <button type="button" className="btn btn-primary" onClick={validar}>
                   Guardar
                 </button>
               </div>
@@ -294,5 +307,4 @@ const Criticidad: React.FC = () => {
   );
 };
 
-export default Criticidad;
-
+export default Ciudad;

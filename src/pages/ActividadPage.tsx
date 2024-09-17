@@ -1,4 +1,4 @@
-import Actividad from '../components/ActividadTabla/ActividadTabla';
+import Actividad from '../components/Actividades/Actividades';
 
 export default function ActividadPage() {
   return (

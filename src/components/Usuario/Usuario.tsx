@@ -3,36 +3,35 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-interface Criticidad {
-  id: number;
+interface Usuario {
+  id: string;
   name: string;
-  description: string;
-  createDate: string;
+  email: string;
+  priority: string;
+  
 }
 
-interface CriticidadData {
-  name: string;
-  description: string;
-}
-
-const Criticidad: React.FC = () => {
-  const baseURL = import.meta.env.VITE_API_URL;
-  const [criticity, setCriticityType] = useState<Criticidad[]>([]);
+const ShowUsers: React.FC = () => {
+  const URL = "https://asymetricsbackend.uk.r.appspot.com/user/";
+  const [users, setUsers] = useState<Usuario[]>([]);
   const [id, setId] = useState<string>("");
   const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [priority, setPriority] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getCriticity();
+    getUsers();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -43,27 +42,28 @@ const Criticidad: React.FC = () => {
     };
   }, []);
 
-  const getCriticity = async () => {
+  const getUsers = async () => {
     try {
-      const response: AxiosResponse<Criticidad[]> = await axios.get(`${baseURL}/criticity/`);
-      setCriticityType(response.data);
+      const response: AxiosResponse<Usuario[]> = await axios.get(URL);
+      setUsers(response.data);
     } catch (error) {
-      showAlert("Error al obtener criticidad", "error");
+      showAlert("Error al obtener los usuarios", "error");
     }
   };
 
-  const openModal = (op: string, criticity?: Criticidad) => {
-    if (op === "1") {
+  const openModal = (op: string, user?: Usuario) => {
+    if (user) {
+      setId(user.id);
+      setName(user.name);
+      setEmail(user.email);
+      setPriority(user.priority.toString());
+    } else {
       setId("");
       setName("");
-      setDescription("");
-      setTitle("Registrar Criticidad");
-    } else if (op === "2" && criticity) {
-      setId(criticity.id.toString());
-      setName(criticity.name);
-      setDescription(criticity.description);
-      setTitle("Editar Criticidad");
+      setEmail("");
+      setPriority("");
     }
+    setTitle(op === "1" ? "Registrar Usuario" : "Editar Usuario");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -80,25 +80,26 @@ const Criticidad: React.FC = () => {
 
   const validar = () => {
     if (name.trim() === "") {
-      showAlert("Escribe la criticidad", "warning", "criticidad");
+      showAlert("Escribe el nombre", "warning", "nombre");
       return;
     }
-    if (description.trim() === "") {
-      showAlert("Escribe la descripción", "warning", "descripción");
+    if (email.trim() === "") {
+      showAlert("Escribe el email", "warning", "email");
       return;
     }
-    
-    const parametros : CriticidadData = {  
-      name: name.trim(), 
-      description: description.trim() };
+    if (priority.trim() === "") {
+      showAlert("Escribe la prioridad", "warning", "priority");
+      return;
+    }
 
+    const parametros = { id, name: name.trim(), email: email.trim(), priority: priority.trim() };
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: CriticidadData) => {
+  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
-      const url = method === "PUT" && id ? `${baseURL}/criticity/${id}` : `${baseURL}/criticity/`;
+      const url = method === "PUT" && id ? `${URL}` : URL;
       const response = await axios({
         method,
         url,
@@ -106,45 +107,36 @@ const Criticidad: React.FC = () => {
         headers: { "Content-Type": "application/json" },
       });
 
-      showAlert("Operación realizada con éxito", "success");
-
-      if (method === "POST") {
-        setCriticityType((prev) => [...prev, response.data]);
-      } else if (method === "PUT") {
-        setCriticityType((prev) =>
-          prev.map((item) => (item.id === response.data.id ? response.data : item))
-        );
+      const { tipo, msj } = response.data;
+      showAlert(msj, tipo);
+      getUsers();
+      if (tipo === "success") {
+        setTimeout(() => {
+          const closeModalButton = document.getElementById("btnCerrar");
+          if (closeModalButton) {
+            closeModalButton.click();
+          }
+          getUsers();
+        }, 500);
       }
-
-      if (modalRef.current) {
-        const modal = bootstrap.Modal.getInstance(modalRef.current);
-        modal?.hide();
-      }
-
-      getCriticity();
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
-      } else {
-        showAlert("Error al realizar la solicitud", "error");
-      }
+      showAlert("Error al enviar la solicitud", "error");
+      console.error(error);
     }
   };
 
-  const deleteCriticity = async (id: number) => {
+  const deleteUser = async (id: string) => {
     try {
-      await axios.delete(`${baseURL}/criticity/${id}`, {
-        headers: { "Content-Type": "application/json" },
+      await axios.delete(`${URL}${id}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
-      Swal.fire("Criticidad eliminada correctamente", "", "success");
-      getCriticity();
+      showAlert("Usuario eliminado correctamente", "success");
+      getUsers(); 
     } catch (error) {
-      Swal.fire({
-        title: "Error",
-        text: "Error al eliminar Criticidad.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
+      showAlert("Error al eliminar el usuario", "error");
+      console.error(error);
     }
   };
 
@@ -153,16 +145,12 @@ const Criticidad: React.FC = () => {
       Editar
     </Tooltip>
   );
-
+  
   const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
     <Tooltip id="button-tooltip-delete" {...props}>
       Eliminar
     </Tooltip>
   );
-
-  const formatDate = (dateString: string) => {
-    return dateString.split('T')[0];
-  };
 
   return (
     <div className="App">
@@ -170,31 +158,32 @@ const Criticidad: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Criticidad' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Usuarios' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center" 
-                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
+                style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
+                color: '#fff' }}>
                   <tr>
-                    <th>N°</th>
-                    <th>Nivel</th>
-                    <th>Descripción</th>
-                    <th>Fecha</th>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Prioridad</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {criticity.map((crit, i) => (
-                    <tr key={crit.id} className="text-center">
+                  {users.map((user, i) => (
+                    <tr key={user.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{crit.name}</td>
-                      <td>{crit.description}</td>
-                      <td>{formatDate(crit.createDate)}</td>
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td>{user.priority}</td>
                       <td className="text-center">
-                        <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
+                        <OverlayTrigger placement="top" overlay={renderEditTooltip}>
                           <button
-                            onClick={() => openModal("2", crit)}
+                            onClick={() => openModal("2", user)}
                             className="btn btn-custom-editar m-2"
                             data-bs-toggle="modal"
                             data-bs-target="#modalUsers"
@@ -202,7 +191,7 @@ const Criticidad: React.FC = () => {
                             <i className="fa-solid fa-edit"></i>
                           </button>
                         </OverlayTrigger>
-                        <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+                        <OverlayTrigger placement="top" overlay={renderDeleteTooltip}>
                           <button className="btn btn-custom-danger" onClick={() => {
                             MySwal.fire({
                               title: "¿Estás seguro?",
@@ -213,11 +202,12 @@ const Criticidad: React.FC = () => {
                               cancelButtonText: "Cancelar",
                             }).then((result) => {
                               if (result.isConfirmed) {
-                                deleteCriticity(crit.id);
+                                deleteUser(user.id);
                               }
                             });
-                          }}>
-                            <i className="fa-solid fa-circle-xmark"></i>
+                          }}
+                          >
+                            <FontAwesomeIcon icon={faCircleXmark} />
                           </button>
                         </OverlayTrigger>
                       </td>
@@ -228,11 +218,19 @@ const Criticidad: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>
-          <div className="modal-dialog modal-dialog-top modal-md">
+        <div
+          className="modal fade"
+          id="modalUsers"
+          ref={modalRef}
+        data-bs-backdrop="true"
+        data-bs-keyboard="true"
+          aria-labelledby="staticBackdropLabel"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog">
             <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title w-100">{title}</h5>
+              <div className="modal-header text-white">
+                <label className="h5">{title}</label>
                 <button
                   type="button"
                   className="btn-close"
@@ -244,28 +242,41 @@ const Criticidad: React.FC = () => {
                 <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-bolt"></i>
+                    <i className="fa-solid fa-user"></i>
                   </span>
                   <input
                     type="text"
                     id="nombre"
                     className="form-control"
-                    placeholder="Nivel de Criticidad"
+                    placeholder="Nombre"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-regular fa-solid fa-file-alt"></i>
+                    <i className="fa-regular fa-envelope"></i>
+                  </span>
+                  <input
+                    type="email"
+                    id="email"
+                    className="form-control"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="input-group mb-3">
+                  <span className="input-group-text">
+                    <i className="fa-solid fa-thumbtack"></i>
                   </span>
                   <input
                     type="text"
-                    id="descripcion"
+                    id="priority"
                     className="form-control"
-                    placeholder="Descripción"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Prioridad"
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value)}
                   />
                 </div>
               </div>
@@ -294,5 +305,4 @@ const Criticidad: React.FC = () => {
   );
 };
 
-export default Criticidad;
-
+export default Usuario;
