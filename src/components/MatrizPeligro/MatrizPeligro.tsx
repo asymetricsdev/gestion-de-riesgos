@@ -3,9 +3,9 @@ import axios, { AxiosResponse } from "axios";
 import { showAlert } from "../functions";
 import DangerHead from "../DangerHead/DangerHead";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import "./DangerTableStyle.css";
+import "./MatrizPeligroStyle.css";
 
-interface Danger {
+interface MatrizPeligro {
   id: string;
   processId: string;
   process: string;
@@ -21,17 +21,18 @@ interface Danger {
   securityMeasures: string;
   checker: string;
   checkerType: string;
+  updateDate: string;
 }
 
-const Danger: React.FC = () => {
+const MatrizPeligro: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  const [danger, setDanger] = useState<Danger[]>([]);
+  const [danger, setDanger] = useState<MatrizPeligro[]>([]);
 
   useEffect(() => {
     const getDangers = async () => {
       try {
-        const response: AxiosResponse<Danger[]> = await axios.get(`${baseURL}/matrix/hazzard`);
+        const response: AxiosResponse<MatrizPeligro[]> = await axios.get(`${baseURL}/matrix/hazzard`);
         setDanger(response.data);
       } catch (error) {
         showAlert("Error al obtener Peligro", "error");
@@ -67,6 +68,7 @@ const Danger: React.FC = () => {
       ));
   };
 
+  
   return (
     <div className="container-fluid">
       <div className="row mt-3">
@@ -76,13 +78,7 @@ const Danger: React.FC = () => {
           </div>
           <div className="table-responsive-xl tabla-scroll">
             <table className="table table-bordered">
-              <thead
-                className="text-center"
-                style={{
-                  background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
-                  color: "#fff",
-                }}
-              >
+              <thead className="text-center">
                 <tr>
                   <th>Proceso</th>
                   <th>Actividad</th>
@@ -151,4 +147,4 @@ const Danger: React.FC = () => {
   );
 };
 
-export default Danger;
+export default MatrizPeligro;
