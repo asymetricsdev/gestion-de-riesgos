@@ -7,32 +7,54 @@ import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
 
-const MySwal = withReactContent(Swal);
 
-interface Criticidad {
+const MySwal = withReactContent(Swal);
+interface Colaboradores {
   id: number;
   name: string;
   description: string;
-  createDate: string;
+  rut: string;
+  firstName: string;
+  lastName: string;
+  createDate?: string;
+  updateDate?: string;
+  position: Position;
 }
 
-interface CriticidadData {
+interface Position {
+  id: number;
   name: string;
   description: string;
+  createDate?: string;
+  updateDate?: string;
 }
 
-const Criticidad: React.FC = () => {
+interface EmpleadoData {
+  rut: string;
+  firstName: string;
+  lastName: string;
+  positionId: number;
+}
+
+
+const Colaboradores: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
-  const [criticity, setCriticityType] = useState<Criticidad[]>([]);
-  const [id, setId] = useState<string>("");
+  const [empleado, setEmpleado] = useState<Colaboradores[]>([]);
+  const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+  const [description, setDescription] = useState<string>(""); 
+  const [rut, setRut] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [position, setPosition] = useState<Position[]>([]);
+  const [selectedPositionId, setSelectedPositionId] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getCriticity();
+    getEmpleado();
+    getPosition();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -43,26 +65,44 @@ const Criticidad: React.FC = () => {
     };
   }, []);
 
-  const getCriticity = async () => {
+  const getEmpleado = async () => {
     try {
-      const response: AxiosResponse<Criticidad[]> = await axios.get(`${baseURL}/criticity/`);
-      setCriticityType(response.data);
+      const response: AxiosResponse<Colaboradores[]> = await axios.get(`${baseURL}/employee/`);
+      setEmpleado(response.data);
     } catch (error) {
-      showAlert("Error al obtener criticidad", "error");
+      showAlert("Error al obtener el cargo del colaborador", "error");
     }
   };
+  
+  const getPosition = async () => {
+    try {
+      const response: AxiosResponse<Position[]> = await axios.get(`${baseURL}/position/`);
 
-  const openModal = (op: string, criticity?: Criticidad) => {
+      setPosition(response.data);
+    } catch (error) {
+      showAlert("Error al obtener el cargo del colaborador", "error");
+    }
+  };
+  
+  const openModal = (op: string, empleado?: Colaboradores) => {
     if (op === "1") {
-      setId("");
+      setId(null);
       setName("");
-      setDescription("");
-      setTitle("Registrar Criticidad");
-    } else if (op === "2" && criticity) {
-      setId(criticity.id.toString());
-      setName(criticity.name);
-      setDescription(criticity.description);
-      setTitle("Editar Criticidad");
+      setDescription(""); 
+      setRut("");
+      setFirstName("");
+      setLastName("");
+      setSelectedPositionId(0);
+      setTitle("Registrar Colaborador");
+    } else if (op === "2" && empleado) {
+      setId(empleado.id);
+      setName(empleado.name);
+      setDescription(empleado.description); 
+      setRut(empleado.rut);
+      setFirstName(empleado.firstName);
+      setLastName(empleado.lastName);
+      setSelectedPositionId(empleado.position.id);
+      setTitle("Editar colaborador");
     }
 
     if (modalRef.current) {
@@ -78,50 +118,60 @@ const Criticidad: React.FC = () => {
     modals.forEach(modal => modal.parentNode?.removeChild(modal));
   };
 
-  const validar = () => {
-    if (name.trim() === "") {
-      showAlert("Escribe la criticidad", "warning", "criticidad");
-      return;
+  const validar = (): void => {
+    if (firstName.trim() === "") {
+        showAlert("Escribe el nombre del colaborador", "warning");
+        return;
     }
-    if (description.trim() === "") {
-      showAlert("Escribe la descripción", "warning", "descripción");
-      return;
+
+    if (lastName.trim() === "") {
+        showAlert("Escribe el apellido del colaborador", "warning");
+        return;
+    }
+
+    if (rut.trim() === "") {
+        showAlert("Escribe el rut del colaborador", "warning");
+        return;
+    }
+
+     if (!validarRut(rut.trim())) {
+    showAlert("El RUT ingresado no es válido", "warning");
+    return;
+    } 
+
+    if (selectedPositionId === 0) {
+        showAlert("Escribe el cargo del colaborador", "warning");
+        return;
     }
     
-    const parametros : CriticidadData = {  
-      name: name.trim(), 
-      description: description.trim() };
+      const parametros: EmpleadoData = {
+        rut: rut.trim(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        positionId:  selectedPositionId               
+    };  
 
-    const metodo = id ? "PUT" : "POST";
-    enviarSolicitud(metodo, parametros);
-  };
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: CriticidadData) => {
+    const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
+    enviarSolicitud(metodo, parametros); 
+};
+
+   const enviarSolicitud = async (method: "POST" | "PUT", data: EmpleadoData) => {
     try {
-      const url = method === "PUT" && id ? `${baseURL}/criticity/${id}` : `${baseURL}/criticity/`;
+      const url = method === "PUT" && id ? `${baseURL}/employee/${id}` : `${baseURL}/employee/`;
       const response = await axios({
         method,
         url,
         data,
         headers: { "Content-Type": "application/json" },
       });
-
+  
       showAlert("Operación realizada con éxito", "success");
-
-      if (method === "POST") {
-        setCriticityType((prev) => [...prev, response.data]);
-      } else if (method === "PUT") {
-        setCriticityType((prev) =>
-          prev.map((item) => (item.id === response.data.id ? response.data : item))
-        );
-      }
-
+      getEmpleado();
       if (modalRef.current) {
         const modal = bootstrap.Modal.getInstance(modalRef.current);
         modal?.hide();
       }
-
-      getCriticity();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
@@ -129,19 +179,20 @@ const Criticidad: React.FC = () => {
         showAlert("Error al realizar la solicitud", "error");
       }
     }
-  };
+  }; 
 
-  const deleteCriticity = async (id: number) => {
+
+  const deleteEmpleado = async (id: number) => {
     try {
-      await axios.delete(`${baseURL}/criticity/${id}`, {
+      await axios.delete(`${baseURL}/employee/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-      Swal.fire("Criticidad eliminada correctamente", "", "success");
-      getCriticity();
+      Swal.fire("Colaborador eliminado correctamente", "", "success");
+      getEmpleado();
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar Criticidad.",
+        text: "Error al eliminar el Colaborador.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -164,40 +215,65 @@ const Criticidad: React.FC = () => {
     return dateString.split('T')[0];
   };
 
+
+  const validarRut = (rut: string): boolean => {
+    const rutSinFormato = rut.replace(/\./g, "").replace(/-/g, "");
+  
+    const rutNumero = rutSinFormato.slice(0, -1);
+    const verificador = rutSinFormato.slice(-1).toUpperCase();
+  
+    if (rutNumero.length < 7 || rutNumero.length > 8) {
+      return false;
+    }
+  
+    let suma = 0;
+    let multiplicador = 2;
+  
+    for (let i = rutNumero.length - 1; i >= 0; i--) {
+      suma += Number(rutNumero.charAt(i)) * multiplicador;
+      multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+    }
+  
+    const residuo = suma % 11;
+    const digitoCalculado = residuo === 0 ? "0" : residuo === 1 ? "K" : String(11 - residuo);
+  
+    return digitoCalculado === verificador;
+  }; 
+  
   return (
     <div className="App">
       <div className="container-fluid">
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Criticidad' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Colaboradores' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive">
               <table className="table table-bordered">
-                <thead className="text-center" 
+                <thead className="text-center"
                   style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
                   <tr>
                     <th>N°</th>
-                    <th>Nivel</th>
-                    <th>Descripción</th>
-                    <th>Fecha</th>
+                    <th>Rut</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Cargo</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {criticity.map((crit, i) => (
-                    <tr key={crit.id} className="text-center">
+                  {empleado.map((emp, i) => (
+                    <tr key={JSON.stringify(emp)} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{crit.name}</td>
-                      <td>{crit.description}</td>
-                      <td>{formatDate(crit.createDate)}</td>
+                      <td>{emp.rut}</td>
+                      <td>{emp.firstName}</td>
+                      <td>{emp.lastName}</td>
+                      <td>{emp.position.name}</td> 
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                           <button
-                            onClick={() => openModal("2", crit)}
+                            onClick={() => openModal("2", emp)}
                             className="btn btn-custom-editar m-2"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalUsers"
                           >
                             <i className="fa-solid fa-edit"></i>
                           </button>
@@ -213,7 +289,7 @@ const Criticidad: React.FC = () => {
                               cancelButtonText: "Cancelar",
                             }).then((result) => {
                               if (result.isConfirmed) {
-                                deleteCriticity(crit.id);
+                                deleteEmpleado(emp.id);
                               }
                             });
                           }}>
@@ -228,7 +304,7 @@ const Criticidad: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>
+        <div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
           <div className="modal-dialog modal-dialog-top modal-md">
             <div className="modal-content">
               <div className="modal-header">
@@ -241,33 +317,56 @@ const Criticidad: React.FC = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-bolt"></i>
+                  <i className="fa-solid fa-id-card-clip"></i>
                   </span>
                   <input
                     type="text"
-                    id="nombre"
                     className="form-control"
-                    placeholder="Nivel de Criticidad"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Nombre"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                   />
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-regular fa-solid fa-file-alt"></i>
+                  <i className="fa-solid fa-id-card-clip"></i>
                   </span>
                   <input
                     type="text"
-                    id="descripcion"
                     className="form-control"
-                    placeholder="Descripción"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Apellidos"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                   />
                 </div>
+                <div className="input-group mb-3">
+                  <span className="input-group-text">
+                  <i className="fa-solid fa-id-card-clip"></i>
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Rut ej. 12345678-9"
+                    value={rut}
+                    onChange={(e) => setRut(e.target.value)}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="position" className="form-label">Cargo:</label>
+                  <select
+                    id="position"
+                    className="form-select"
+                    value={selectedPositionId}
+                    onChange={(e) => setSelectedPositionId(Number(e.target.value))}
+                  >
+                    <option value={0}>Selecciona...</option>
+                    {position.map(pos => (
+                      <option key={JSON.stringify(pos)} value={pos.id}>{pos.name}</option>
+                    ))}
+                  </select>
+                </div> 
               </div>
               <div className="modal-footer">
                 <button
@@ -294,5 +393,4 @@ const Criticidad: React.FC = () => {
   );
 };
 
-export default Criticidad;
-
+export default Colaboradores;
