@@ -80,7 +80,7 @@ const VerificadorControl: React.FC = () => {
       const response: AxiosResponse<VerificadorControl[]> = await axios.get(`${baseURL}/checker/`);
       setChecker(response.data);
     } catch (error) {
-      showAlert("Error al obtener los verificadores", "error");
+      showAlert("Error al obtener los verificadores de control", "error");
     }
   };
   
@@ -89,7 +89,7 @@ const VerificadorControl: React.FC = () => {
       const response: AxiosResponse<CheckerType[]> = await axios.get(`${baseURL}/checker_type/`);
       setCheckerType(response.data);
     } catch (error) {
-      showAlert("Error al obtener los tipos de jerarquía", "error");
+      showAlert("Error al obtener al jerarquía de control", "error");
     }
   };
 
@@ -110,14 +110,14 @@ const VerificadorControl: React.FC = () => {
       setDescription("");
       setSelectedCheckerTypeId(0);
       setSelectedCheckpointIds([]);
-      setTitle("Registrar Verificación");
+      setTitle("Registrar Verificación de Control");
     } else if (op === "2" && checker) {
       setId(checker?.id || null);
       setName(checker.name);
       setDescription(checker.description);
       setSelectedCheckerTypeId(checker.checkerType.id); 
       setSelectedCheckpointIds(checker.checkpoints.map(h => h.id));
-      setTitle("Editar Verificación");
+      setTitle("Editar Verificación de Control");
     }
 
     if (modalRef.current) {
@@ -203,13 +203,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
       await axios.delete(`${baseURL}/checker/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-      Swal.fire("Verificador eliminado correctamente", "", "success");
+      Swal.fire("Verificador de control eliminado correctamente", "", "success");
       setChecker((prev) => prev.filter((check) => check.id !== id));
       getChecker();
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar el verificador.",
+        text: "Error al eliminar el verificador de control.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -250,7 +250,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Verificadores' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Verificadores de Control' onClick={() => openModal("1")} />
             </div>
             <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
@@ -339,7 +339,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
               <div className="modal-body">
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-rectangle-list"></i>
+                  <i className="fa-solid fa-list-check"></i>
                   </span>
                   <input
                     type="text"
@@ -382,7 +382,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                       value={opcionesPeligros.filter(option => selectedCheckpointIds.includes(option.value))}
                       onChange={(selectedOptions) => {
                         const selectedIds = selectedOptions.map((option) => option.value);
-                        setSelectedCheckpointIds(selectedIds); // Aquí actualizamos el estado con los IDs seleccionados
+                        setSelectedCheckpointIds(selectedIds); 
                       }}
                       options={opcionesPeligros}
                     />
