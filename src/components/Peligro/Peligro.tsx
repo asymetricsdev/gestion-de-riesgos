@@ -6,6 +6,7 @@ import { showAlert } from '../functions';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import Select from 'react-select';
+import { capitalizeFirstLetter } from '../functions';
 import * as bootstrap from 'bootstrap';
 
 
@@ -248,9 +249,9 @@ const Peligro: React.FC = () => {
                   {hazzard.map((hazz, i) => (
                     <tr key={JSON.stringify(hazz)} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{hazz.name}</td>
+                      <td>{capitalizeFirstLetter(hazz.name)}</td>
                       <td>{hazz.checker.name}</td>
-                      <td>{hazz.risks.map(h => h.name).join(', ')}</td>
+                      <td>{hazz.risks.map(h => capitalizeFirstLetter(h.name)).join(', ')}</td>
                       <td>{formatDate(hazz.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>

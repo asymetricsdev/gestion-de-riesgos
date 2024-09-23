@@ -5,6 +5,7 @@ import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+import { capitalizeFirstLetter } from '../functions';
 import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
@@ -182,7 +183,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) 
                   {activity.map((act, i) => (
                     <tr key={act.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{act.name}</td>
+                      <td>{capitalizeFirstLetter(act.name)}</td>
                       <td>{act.description}</td>
                       <td>{formatDate(act.createDate)}</td>
                       <td className="text-center">

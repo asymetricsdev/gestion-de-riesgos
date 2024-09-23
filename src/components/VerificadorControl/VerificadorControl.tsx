@@ -7,6 +7,7 @@ import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import { Accordion, AccordionItem, AccordionHeader, AccordionBody } from 'react-bootstrap';
 import Select from 'react-select';
+import { capitalizeFirstLetter } from '../functions';
 import * as bootstrap from 'bootstrap';
 
 
@@ -280,7 +281,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                                   .split('-') 
                                   .filter(Boolean) 
                                   .map((item, index) => (
-                                    <li key={index}>{item.trim()}</li>
+                                    <li key={index}>
+                                      {capitalizeFirstLetter(item.trim())}</li>
                                   ))}
                               </ul>
                             </Accordion.Body>
