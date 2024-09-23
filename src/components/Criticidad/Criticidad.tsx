@@ -5,6 +5,7 @@ import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+import { capitalizeFirstLetter } from '../functions';
 import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
@@ -189,7 +190,7 @@ const Criticidad: React.FC = () => {
                     <tr key={crit.id} className="text-center">
                       <td>{i + 1}</td>
                       <td>{crit.name}</td>
-                      <td>{crit.description}</td>
+                      <td>{capitalizeFirstLetter(crit.description)}</td>
                       <td>{formatDate(crit.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>

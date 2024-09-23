@@ -6,6 +6,7 @@ import { showAlert } from "../functions";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import Select from "react-select";
+import { capitalizeFirstLetter } from '../functions';
 import * as bootstrap from "bootstrap";
 
 const MySwal = withReactContent(Swal);
@@ -345,8 +346,8 @@ const Actividades: React.FC = () => {
 										actividad.map((act, i) => (
 											<tr key={act.id} className="text-center">
 												<td>{i + 1}</td>
-												<td>{act.name}</td>
-												<td>{act.description}</td>
+												<td>{capitalizeFirstLetter(act.name)}</td>
+												<td>{capitalizeFirstLetter(act.description)}</td>
 												<td>{act.activityType?.description || "Sin tipo de actividad"}</td>
 												<td>{act.process?.name || "Sin proceso"}</td>
 												<td>
@@ -355,7 +356,7 @@ const Actividades: React.FC = () => {
 															<ul>
 																{act.hazzards.map((h) => (
 																	<li key={h.hazzard.id}>
-																		{`${h.hazzard.name} / ${h.criticity.description}`}
+																		 {`${capitalizeFirstLetter(h.hazzard.name)} / ${capitalizeFirstLetter(h.criticity.description)}`}
 																	</li>
 																))}
 															</ul>

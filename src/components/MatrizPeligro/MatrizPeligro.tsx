@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import { showAlert } from "../functions";
 import DangerHead from "../DangerHead/DangerHead";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { capitalizeFirstLetter } from '../functions';
 import "./MatrizPeligroStyle.css";
 
 interface MatrizPeligro {
@@ -106,9 +107,9 @@ const MatrizPeligro: React.FC = () => {
                     <td>
                       {item.hazzard.charAt(0).toUpperCase() + item.hazzard.slice(1).toLowerCase()}
                     </td>
-                    <td>{item.risk}</td>
+                    <td>{capitalizeFirstLetter(item.risk)}</td>
                     <td>{item.criticityName}</td>
-                    <td>{item.criticityDescription}</td>
+                    <td>{capitalizeFirstLetter(item.criticityDescription)}</td>
                     <td
                       onClick={() => toggleRowExpansion(item.activityId)}
                       style={{

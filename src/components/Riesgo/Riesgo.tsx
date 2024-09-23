@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+import { capitalizeFirstLetter } from '../functions';
 import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
@@ -187,8 +188,8 @@ const Riesgo: React.FC = () => {
                   {risk.map((cit, i) => (
                     <tr key={cit.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{cit.name}</td>
-                      <td>{cit.description}</td>
+                      <td>{capitalizeFirstLetter(cit.name)}</td>
+                      <td>{capitalizeFirstLetter(cit.description)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button

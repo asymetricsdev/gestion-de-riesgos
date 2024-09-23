@@ -22,3 +22,15 @@ function setFocus(elementId: string): void {
         element.focus();
     }
 }
+
+//CAPITALIZAR COLUMNA DESCRIPCIÓN
+export function capitalizeFirstLetter (str: string) {
+    if (!str) return str;
+  
+    return str
+      .toLowerCase()
+      .split('. ')
+      .map(sentence => sentence.charAt(0).toUpperCase() + sentence.slice(1))
+      .join('. ');
+};
+
