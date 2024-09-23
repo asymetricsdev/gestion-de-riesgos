@@ -183,7 +183,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
 						<div className="tabla-contenedor">
 							<EncabezadoTabla title="Items" onClick={() => openModal("1")} />
 						</div>
-						<div className="table-responsive">
+						<div className="table-responsive tabla-scroll">
 							<table className="table table-bordered">
 								<thead
 									className="text-center"
