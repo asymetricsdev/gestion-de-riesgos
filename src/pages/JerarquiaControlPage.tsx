@@ -1,4 +1,4 @@
-import JerarquiaControl from  '../components/JararquiaControl/JerarquiaControl';
+import JerarquiaControl from  '../components/JerarquiaControl/JerarquiaControl';
 
 export default function JerarquiaControlPage() {
     return (
