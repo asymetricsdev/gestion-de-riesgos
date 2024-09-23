@@ -239,7 +239,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: JerarquiaControlDat
                 <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-check-circle"></i>
+                  <i className="fa-solid fa-network-wired"></i>
                   </span>
                   <input
                     type="text"

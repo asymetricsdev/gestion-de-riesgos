@@ -238,7 +238,7 @@ const Proceso: React.FC = () => {
                 <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-list-check"></i>
+                  <i className="fa-solid fa-arrows-rotate"></i>
                   </span>
                   <input
                     type="text"

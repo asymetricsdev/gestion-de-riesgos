@@ -259,7 +259,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
 
 								<div className="input-group mb-3">
 									<span className="input-group-text">
-										<i className="fa-solid fa-list-check"></i>
+									<i className="fa-solid fa-rectangle-list"></i>
 									</span>
 									<input
 										type="text"

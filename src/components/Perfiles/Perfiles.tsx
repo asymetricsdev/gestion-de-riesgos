@@ -339,7 +339,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
               <div className="modal-body">
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-address-card"></i>
+                  <i className="fa-solid fa-id-badge"></i>
                   </span>
                   <input
                     type="text"

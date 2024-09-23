@@ -58,12 +58,12 @@ const Activity: React.FC = () => {
       setId(null);
       setName("");
       setDescription("");
-      setTitle("Registrar Peligro");
+      setTitle("Registrar Tipo de Actividad");
     } else if (op === "2" && activity) {
       setId(activity.id);
       setName(activity.name);
       setDescription(activity.description);
-      setTitle("Editar Peligro");
+      setTitle("Editar Tipo de Actividad");
     }
 
     if (modalRef.current) {

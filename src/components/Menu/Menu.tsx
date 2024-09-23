@@ -311,7 +311,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 										className="nav-link text-white d-flex align-items-center"
 									>
 										<i className="fa-solid fa-list-check"></i>
-										<span>Tipos de Tareas</span>
+										<span>Tipo de Tareas</span>
 									</NavLink>
 								) : (
 									<OverlayTrigger placement="right" overlay={renderTooltip("TiposDeTareas")}>
