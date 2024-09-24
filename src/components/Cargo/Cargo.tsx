@@ -109,20 +109,21 @@ const Cargo: React.FC = () => {
       setSelectedManagerId(0);
       setTitle("Registrar Cargo");
     } else if (op === "2" && position) {
-      setId(position.id );
+      setId(position.id);
       setName(position.name);
       setDescription(position.description);
       setSelectedDivisionIds(position.subordinatePositions.map(sp => sp.id));
-      setSelectedManagerId(position.managerPosition && position.managerPosition.id);
+      setSelectedManagerId(position.managerPosition?.id || 0);
       setTitle("Editar Área");
     }
-
+  
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
       modal.show();
       setIsModalOpen(true);
     }
   };
+  
 
   const handleModalHidden = () => {
     setIsModalOpen(false);
@@ -158,7 +159,6 @@ const Cargo: React.FC = () => {
 
     const openModal = (position: CargoData | null) => {
       if (position && position.id) {
-        // Lógica para abrir el modal
       } else {
         console.error("Position is null or does not have an id");
       }
@@ -179,7 +179,6 @@ const Cargo: React.FC = () => {
       const newActividad = response.data; 
   
       showAlert("Operación realizada con éxito", "success");
-      console.log("prueba" + " " + newActividad);
   
       if (method === "POST") {
         setPositions((prev) => [...prev, newActividad]);
@@ -196,12 +195,12 @@ const Cargo: React.FC = () => {
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
-        console.log("prueba de error2" + " " + error.response.data.message);
       } else {
         showAlert("Error al realizar la solicitud", "error");
       }
     }
   };
+  
 
   const deletePosition = async (id: number | null) => {
     try {
@@ -279,145 +278,161 @@ const Cargo: React.FC = () => {
   }));
 
   return (
-    <div className="App">
-      <div className="container-fluid">
-        <div className="row mt-3">
-          <div className="col-12">
-            <div className="tabla-contenedor">
-              <EncabezadoTabla title="Cargos" onClick={() => openModal("1")} />
-            </div>
-            <div className="table-responsive tabla-scroll">
-              <table className="table table-bordered">
-                <thead
-                  className="text-center"
-                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
-                  <tr>
-                    <th>ID</th>
-                    <th>Cargo</th>
-                    <th>Jefatura</th>
-                    <th>Equipo</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="table-group-divider">
-                  {positions.map((pos, i) => (
-                    <tr key={pos.id} className="text-center">
-                      <td>{i + 1}</td>
-                      <td>{pos.name}</td>
-                      <td>{pos.managerPosition?.name || 'N/A'}</td>
-                      <td>
-                        <Accordion>
-                          <Accordion.Item eventKey="0">
-                            <Accordion.Header>Equipo de Jefatura</Accordion.Header>
-                            <Accordion.Body>
-                              <ul>
-                                {pos.subordinatePositions.map(sub => (
-                                  <li key={sub.id}>{sub.description}</li>
-                                ))}
-                              </ul>
-                            </Accordion.Body>
-                          </Accordion.Item>
-                        </Accordion>
-                      </td>
-                      <td className="text-center">
-                        <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
-                          <button
-                            onClick={() => openModal("2", pos)}
-                            className="btn btn-custom-editar m-2"
-                          >
-                            <i className="fa-solid fa-edit"></i>
-                          </button>
-                        </OverlayTrigger>
-                        <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
-                          <button className="btn btn-custom-danger" onClick={() => {
-                            MySwal.fire({
-                              title: "¿Estás seguro?",
-                              text: "No podrás revertir esto",
-                              icon: "warning",
-                              showCancelButton: true,
-                              confirmButtonText: "Sí, bórralo",
-                              cancelButtonText: "Cancelar",
-                              }).then((result) => {
-                              if (result.isConfirmed) {
-                                deletePosition(pos.id);
-                              }
-                            });
-                            }}>
-                            <i className="fa-solid fa-circle-xmark"></i>
-                          </button>
-                        </OverlayTrigger>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+		<div className="App">
+			<div className="container-fluid">
+				<div className="row mt-3">
+					<div className="col-12">
+						<div className="tabla-contenedor">
+							<EncabezadoTabla title="Cargos" onClick={() => openModal("1")} />
+						</div>
+						<div className="table-responsive tabla-scroll">
+							<table className="table table-bordered">
+								<thead
+									className="text-center"
+									style={{
+										background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
+										color: "#fff",
+									}}
+								>
+									<tr>
+										<th>ID</th>
+										<th>Cargo</th>
+										<th>Jefatura</th>
+										<th>Equipo</th>
+										<th>Acciones</th>
+									</tr>
+								</thead>
+								<tbody className="table-group-divider">
+									{positions &&
+										positions.length > 0 &&
+										positions.map((pos, i) => (
+											<tr key={pos.id} className="text-center">
+												<td>{i + 1}</td>
+												<td>{pos.name}</td>
+												<td>{pos.managerPosition?.name || "N/A"}</td>
+												<td>
+													<Accordion>
+														<Accordion.Item eventKey="0">
+															<Accordion.Header>Equipo de Jefatura</Accordion.Header>
+															<Accordion.Body>
+																<ul>
+																	{pos.subordinatePositions &&
+																	pos.subordinatePositions.length > 0 ? (
+																		pos.subordinatePositions.map((sub) => (
+																			<li key={sub.id}>{sub.description}</li>
+																		))
+																	) : (
+																		<li>No hay subordinados</li>
+																	)}
+																</ul>
+															</Accordion.Body>
+														</Accordion.Item>
+													</Accordion>
+												</td>
+												<td className="text-center">
+													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
+														<button
+															onClick={() => openModal("2", pos)}
+															className="btn btn-custom-editar m-2"
+														>
+															<i className="fa-solid fa-edit"></i>
+														</button>
+													</OverlayTrigger>
+													<OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+														<button
+															className="btn btn-custom-danger"
+															onClick={() => {
+																MySwal.fire({
+																	title: "¿Estás seguro?",
+																	text: "No podrás revertir esto",
+																	icon: "warning",
+																	showCancelButton: true,
+																	confirmButtonText: "Sí, bórralo",
+																	cancelButtonText: "Cancelar",
+																}).then((result) => {
+																	if (result.isConfirmed) {
+																		deletePosition(pos.id);
+																	}
+																});
+															}}
+														>
+															<i className="fa-solid fa-circle-xmark"></i>
+														</button>
+													</OverlayTrigger>
+												</td>
+											</tr>
+										))}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
 
-        <div className="modal fade" id="modalEquipo" tabIndex={-1} ref={modalRef}>
-          <div className="modal-dialog modal-dialog-top modal-md">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title w-100">{title}</h5>
-                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-              <div className="modal-body">
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-solid fa-address-card"></i>
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nombre del Cargo"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="managerPosition">Jefatura:</label>
-                  <select
-                    id="managerPosition"
-                    className="form-select"
-                    value={selectedManagerId}
-                    onChange={(e) => setSelectedManagerId(Number(e.target.value))}
-                  >
-                    <option value={0}>Selecciona...</option>
-                    {managerPosition.map((proc) => (
-                      <option key={proc.id} value={proc.id}>
-                        {proc.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group mt-3">
-                  <label htmlFor="equipo">Área:</label>
-                  <Select
-                    isMulti
-                    value={opcionesEquipo.filter((option) => selectedDivisionIds.includes(option.value))}
-                    onChange={(selectedOptions) => {
-                      const selectedIds = selectedOptions.map((option) => option.value);
-                      setSelectedDivisionIds(selectedIds);
-                    }}
-                    options={opcionesEquipo}
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
-                  Cerrar
-                </button>
-                <button type="button" className="btn btn-primary" onClick={validar}>
-                  Guardar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+				<div className="modal fade" id="modalEquipo" tabIndex={-1} ref={modalRef}>
+					<div className="modal-dialog modal-dialog-top modal-md">
+						<div className="modal-content">
+							<div className="modal-header">
+								<h5 className="modal-title w-100">{title}</h5>
+								<button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+							</div>
+							<div className="modal-body">
+								<div className="input-group mb-3">
+									<span className="input-group-text">
+										<i className="fa-solid fa-address-card"></i>
+									</span>
+									<input
+										type="text"
+										className="form-control"
+										placeholder="Nombre del Cargo"
+										value={name}
+										onChange={(e) => setName(e.target.value)}
+									/>
+								</div>
+								<div className="mb-3">
+									<label htmlFor="managerPosition">Jefatura:</label>
+									<select
+										id="managerPosition"
+										className="form-select"
+										value={selectedManagerId}
+										onChange={(e) => setSelectedManagerId(Number(e.target.value))}
+									>
+										<option value={0}>Selecciona...</option>
+										{managerPosition.map((proc) => (
+											<option key={proc.id} value={proc.id}>
+												{proc.name}
+											</option>
+										))}
+									</select>
+								</div>
+								<div className="form-group mt-3">
+									<label htmlFor="equipo">Área:</label>
+									<Select
+										isMulti
+										value={opcionesEquipo.filter((option) =>
+											selectedDivisionIds.includes(option.value)
+										)}
+										onChange={(selectedOptions) => {
+											const selectedIds = selectedOptions.map((option) => option.value);
+											setSelectedDivisionIds(selectedIds);
+										}}
+										options={opcionesEquipo}
+									/>
+								</div>
+							</div>
+							<div className="modal-footer">
+								<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+									Cerrar
+								</button>
+								<button type="button" className="btn btn-primary" onClick={validar}>
+									Guardar
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default Cargo;
