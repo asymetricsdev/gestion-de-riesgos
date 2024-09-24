@@ -57,6 +57,7 @@
     color: white; 
     padding: 0.4rem 1rem;
     border-radius: 0.25rem;
+    z-index: 999;
 }
 
 .custom-button:hover {
