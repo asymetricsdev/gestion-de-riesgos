@@ -21,6 +21,7 @@ const MySwal = withReactContent(Swal);
   createDate: string;
   updateDate: string;
   checkerType: CheckerType;
+  task: Task;
   checkpoints: Checkpoint[]; 
 } 
 
@@ -40,12 +41,20 @@ interface Checkpoint {
   updateDate?: string;
 }
 
+interface Task {
+  id: number;
+  name: string;
+  description: string;
+  createDate?: string;
+  updateDate?: string;
+}
 
 interface VerificadorControlData{
   name: string;
   description: string;
   checkerTypeId: number;
-  checkpointIds: number[];
+  taskId: number | null;
+  checkpointIds: number[] | null;
 }
 
 const VerificadorControl: React.FC = () => {
@@ -55,9 +64,11 @@ const VerificadorControl: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [checkerType, setCheckerType] = useState<CheckerType[]>([]);
+  const [task, setTask] = useState<Task[]>([]);
   const [checkpoint, setCheckpoint] = useState<Checkpoint[]>([]);
   const [selectedCheckerTypeId, setSelectedCheckerTypeId] = useState<number>(0);
-  const [selectedCheckpointIds, setSelectedCheckpointIds] = useState<number[]>([]);
+  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
+  const [selectedCheckpointIds, setSelectedCheckpointIds] = useState<number[] | null>(null);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -65,6 +76,7 @@ const VerificadorControl: React.FC = () => {
   useEffect(() => {
     getChecker();
     getCheckerType();
+    getTask();
     getCheckpoint();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
@@ -94,6 +106,15 @@ const VerificadorControl: React.FC = () => {
     }
   };
 
+  const getTask = async () => {
+    try {
+      const response: AxiosResponse<Checkpoint[]> = await axios.get(`${baseURL}/task/`);
+      setTask(response.data);
+    } catch (error) {
+      showAlert("Error al obtener las tareas", "error");
+    }
+  }; 
+  
   const getCheckpoint = async () => {
     try {
       const response: AxiosResponse<Checkpoint[]> = await axios.get(`${baseURL}/checkpoint/`);
@@ -110,6 +131,7 @@ const VerificadorControl: React.FC = () => {
       setName("");
       setDescription("");
       setSelectedCheckerTypeId(0);
+      setSelectedTaskId(0);
       setSelectedCheckpointIds([]);
       setTitle("Registrar Verificación de Control");
     } else if (op === "2" && checker) {
@@ -117,6 +139,7 @@ const VerificadorControl: React.FC = () => {
       setName(checker.name);
       setDescription(checker.description);
       setSelectedCheckerTypeId(checker.checkerType.id); 
+      setSelectedTaskId(checker.task.id); 
       setSelectedCheckpointIds(checker.checkpoints.map(h => h.id));
       setTitle("Editar Verificación de Control");
     }
@@ -146,23 +169,27 @@ const VerificadorControl: React.FC = () => {
         showAlert("Selecciona un tipo de jerarquía", "warning");
         return;
     }
-    if (selectedCheckpointIds.length === 0) {
-        showAlert("Selecciona al menos un items", "warning");
+    /* if (!selectedTaskId) {
+        showAlert("Selecciona una tarea", "warning");
         return;
-    }
+    } */
+     if (!selectedCheckpointIds) {
+        showAlert("Debes seleccionar al menos un checkpoint o dejarlo vacío", "warning");
+        return;
+    } 
+  
 
- 
     const parametros : VerificadorControlData = {
-      name: name.trim(),
-      description: description.trim(),
-      checkerTypeId: selectedCheckerTypeId,  
-      checkpointIds: selectedCheckpointIds,  
+        name: name.trim(),
+        description: description.trim(),
+        checkerTypeId: selectedCheckerTypeId,  
+        taskId: selectedTaskId ? selectedTaskId : null, 
+        checkpointIds: selectedCheckpointIds,
     };
     
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
-
-};
+  };
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlData) => {
   try {
@@ -192,7 +219,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
     }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+      showAlert(`Error: ${error.response.data.message || "La tarea seleccionada ya esta asignada"}`, "error");
     } else {
       showAlert("Error al realizar la solicitud", "error");
     }
@@ -240,7 +267,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
     return dateString.split('T')[0];
   };
 
-  const opcionesPeligros = checkpoint.map(checkpoint => ({
+  const opcionesItems = checkpoint.map(checkpoint => ({
     value: checkpoint.id,
     label: checkpoint.name,
   }));
@@ -260,14 +287,16 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    <th>Descripción</th>
+                    <th>Medidas Preventivas</th>
                     <th>Tipo de jerarquia</th>
+                    <th>Tareas</th>
                     <th>Items</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {checker.map((check, i) => (
+                {checker && checker.length > 0 && checker.map((check, i) => (
+                   
                     <tr key={JSON.stringify(check)} className="text-center">
                       <td>{i + 1}</td>
                       <td>{check.name}</td>
@@ -290,7 +319,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                         </Accordion>
                       </td>
                       <td>{check.checkerType.name}</td>
-                      <td>{check.checkpoints.map(h => h.name).join(', ')}</td>
+                      <td>{check.task ? check.task.name : "Sin Tarea"}</td>
+					  <td>{Array.isArray(check.checkpoints) && check.checkpoints.length > 0 ? check.checkpoints.map((h) => h.name).join(", ") : "Sin Items"}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                           <button
@@ -364,7 +394,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="activityType" className="form-label">Tipo de Jerarquia</label>
+                  <label htmlFor="checkerType" className="form-label">Tipo de Jerarquia:</label>
                   <select
                     id="checkerType"
                     className="form-select"
@@ -377,17 +407,34 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                     ))}
                   </select>
                 </div>
+                <div className="mb-3">
+                  <label htmlFor="task" className="form-label">Tarea:</label>
+                  <select
+                    id="task"
+                    className="form-select"
+                    value={selectedTaskId === null ? 0 : selectedTaskId}
+                    onChange={(e) => setSelectedTaskId(Number(e.target.value))}
+                  >
+                    <option value={0}>Tarea no asignada</option>
+                    {task.map(ts => (
+                      <option key={JSON.stringify(ts)} value={ts.id}>{ts.name}</option>
+                    ))}
+                  </select>
+                </div>
                 <div className="form-group mt-3">
                     <label htmlFor="checkpoints">Items:</label>
                     <Select
                       isMulti
-                      value={opcionesPeligros.filter(option => selectedCheckpointIds.includes(option.value))}
+                      value={opcionesItems.filter(option => selectedCheckpointIds?.includes(option.value))}
                       onChange={(selectedOptions) => {
-                        const selectedIds = selectedOptions.map((option) => option.value);
+                        const selectedIds = selectedOptions.length > 0 
+                          ? selectedOptions.map(option => option.value) 
+                          : null; // Cambia a null si no hay selección
                         setSelectedCheckpointIds(selectedIds); 
                       }}
-                      options={opcionesPeligros}
-                    />
+                  options={opcionesItems}
+                  placeholder="Items no asignados..."
+                />
               </div>
               </div>
               <div className="modal-footer">
