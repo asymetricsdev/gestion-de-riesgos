@@ -27,7 +27,7 @@ interface Tareas {
 	base64: string;
 	type: string;
 	taskType: TaskType;
-	checkers: Checkers[];
+	checker: Checker;
 }
 
 interface TaskType {
@@ -38,7 +38,7 @@ interface TaskType {
 	updateDate?: string;
 }
 
-interface Checkers {
+interface Checker {
 	id: number;
 	name: string;
 	description: string;
@@ -55,7 +55,7 @@ function Tareas() {
 	const baseURL = import.meta.env.VITE_API_URL;
 	const [tareas, setTareas] = useState<Tareas[]>([]);
 	const [taskType, setTaskType] = useState<TaskType[]>([]);
-	const [checkers, setCheckers] = useState<Checkers[]>([]);
+	const [checker, setChecker] = useState<Checker[]>([]);
 	const [isEditMode, setIsEditMode] = useState<boolean>(false);
 	const modalRef = useRef<HTMLDivElement | null>(null);
 
@@ -66,10 +66,7 @@ function Tareas() {
 	const [fileExtension, setFileExtension] = useState<string>("");
 	const [file, setFile] = useState<FileData[]>([]);
 	const [selectedTaskTypeId, setSelectedTaskTypeId] = useState<number>(0);
-	const [selectedCheckerId, setSelectedCheckerId] = useState<{
-		value: number;
-		label: string;
-	} | null>(null);
+	const [selectedCheckerId, setSelectedCheckerId] = useState<number | null>(null);
 	const [title, setTitle] = useState<string>("");
 	const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
 	const [uploadedFiles, setUploadedFiles] = useState<FileData[]>([]);
@@ -110,8 +107,8 @@ function Tareas() {
 
 	const getChecker = async () => {
 		try {
-			const response: AxiosResponse<Checkers[]> = await axios.get(`${baseURL}/checker/`);
-			setCheckers(response.data);
+			const response: AxiosResponse<Checker[]> = await axios.get(`${baseURL}/checker/`);
+			setChecker(response.data);
 		} catch (error) {
 			showAlert("Error al obtener las verificaciones", "error");
 		}
@@ -185,7 +182,7 @@ function Tareas() {
 			file: file.length > 0 ? file[0].base64 : null,
 			fileExtension,
 			taskTypeId: selectedTaskTypeId.toString(),
-			checkerIds: checkers.map((checker) => checker.id),
+			checkerId: selectedCheckerId,
 		});
 	};
 
@@ -199,9 +196,9 @@ function Tareas() {
 			setTareas((prevTareas) => prevTareas.filter((tarea) => tarea.id !== id));
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
-				console.error("Server responded with:", error.response?.data);
+				console.error("Servidor respondiendo:", error.response?.data);
 			} else {
-				console.error("Error deleting task:", error);
+				console.error("Error borrando tareas:", error);
 			}
 			showAlert("Error al eliminar la tarea", "error");
 		}
@@ -226,14 +223,8 @@ function Tareas() {
 			setDescription(tarea.description);
 			setVersion(tarea.version);
 			setSelectedTaskTypeId(tarea.taskType.id);
-			setSelectedCheckerId({
-				value: tarea.checkers[0]?.id || 0,
-				label: tarea.checkers[0]?.description || "",
-			});
-
 			setFile([{ base64: tarea.file, type: tarea.fileExtension }]);
 			setUploadedImageUrl(`data:image/${tarea.fileExtension};base64,${tarea.file}`);
-
 			setTitle("Editar Verificadores");
 			setIsEditMode(true);
 		}
@@ -258,13 +249,7 @@ function Tareas() {
 		modals.forEach((modal) => modal.parentNode?.removeChild(modal));
 	};
 
-	const handleCheckerChange = (selectedOption: any) => {
-		setSelectedCheckerId(selectedOption);
-		const selectedChecker = checkers.find((checker) => checker.id === selectedOption?.value);
-		if (selectedChecker) {
-			setCheckers([selectedChecker]);
-		}
-	};
+
 
 	const onDrop = useCallback((acceptedFiles: File[]) => {
 		if (acceptedFiles.length > 0) {
@@ -305,7 +290,6 @@ function Tareas() {
 			"application/pdf": "pdf",
 		};
 		const type = base64.split(";")[0].split(":")[1];
-
 		return extensionMap[type] || "unknown";
 	};
 
@@ -316,7 +300,6 @@ function Tareas() {
 			});
 
 			const base64Data = response.data.file;
-
 			if (!base64Data) {
 				Swal.fire({
 					title: "Error",
@@ -328,23 +311,19 @@ function Tareas() {
 			}
 
 			const base64String = base64Data.split(",")[1] || base64Data;
-
 			const byteCharacters = atob(base64String);
 			const byteNumbers = new Array(byteCharacters.length);
 			for (let i = 0; i < byteCharacters.length; i++) {
 				byteNumbers[i] = byteCharacters.charCodeAt(i);
 			}
 			const byteArray = new Uint8Array(byteNumbers);
-
 			const blob = new Blob([byteArray], { type: `application/${fileExtension}` });
-
 			const link = document.createElement("a");
 			link.href = window.URL.createObjectURL(blob);
 			link.setAttribute("download", `${""}.${fileExtension}`);
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);
-
 			window.URL.revokeObjectURL(link.href);
 		} catch (error) {
 			Swal.fire({
@@ -362,12 +341,23 @@ function Tareas() {
 			.replace(/^data:application\/\w+;base64,/, "");
 	};
 
-	const opcionesVerificadores = checkers
-		? checkers.map((sp) => ({
+	const opcionesVerificadores = checker
+		? checker.map((sp) => ({
 				value: sp.id,
 				label: sp.description,
 		  }))
 		: [];
+
+
+		const handleCheckerChange = (selectedOption: { value: number; label: string } | null) => {
+			if (selectedOption) {
+			  setSelectedCheckerId(selectedOption.value);
+			} else {
+			  setSelectedCheckerId(null); 
+			}
+		  };
+		
+		  const selectedOption = opcionesVerificadores.find(option => option.value === selectedCheckerId) || null;
 
 	return (
 		<div className="App">
@@ -385,8 +375,7 @@ function Tareas() {
 								style={{
 									background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
 									color: "#fff",
-								}}
-							>
+								}}>
 								<tr>
 									<th>N°</th>
 									<th>Tipo de Tarea</th>
@@ -408,18 +397,12 @@ function Tareas() {
 											<td>{tr.description}</td>
 											<td>{tr.version}</td>
 											<td>
-												<Accordion>
+											<Accordion>
 													<Accordion.Item eventKey="0">
 														<Accordion.Header>Verificadores</Accordion.Header>
 														<Accordion.Body>
 															<ul>
-																{tr.checkers && tr.checkers.length > 0 ? (
-																	tr.checkers.map((check) => (
-																		<li key={check.id}>{check.description}</li>
-																	))
-																) : (
-																	<li>No verificadores</li>
-																)}
+																{tr.checker ? tr.checker.description : "Sin Verificador"}
 															</ul>
 														</Accordion.Body>
 													</Accordion.Item>
@@ -429,8 +412,7 @@ function Tareas() {
 												<OverlayTrigger
 													overlay={
 														<Tooltip id={`tooltip-download-${tr.id}`}>Descargar Archivo</Tooltip>
-													}
-												>
+													}>
 													<button
 														onClick={() =>
 															downloadFile(
@@ -495,8 +477,7 @@ function Tareas() {
 				tabIndex={-1}
 				aria-labelledby="modalTareaLabel"
 				aria-hidden="true"
-				ref={modalRef}
-			>
+				ref={modalRef}>
 				<div className="modal-dialog modal-lg">
 					<div className="modal-content">
 						<div className="modal-header">
@@ -557,8 +538,7 @@ function Tareas() {
 									className="form-select"
 									value={selectedTaskTypeId}
 									onChange={(e) => setSelectedTaskTypeId(Number(e.target.value))}
-									disabled={isEditMode}
-								>
+									disabled={isEditMode}>
 									<option value={0}>Selecciona...</option>
 									{taskType.map((ts) => (
 										<option key={ts.id} value={ts.id}>
@@ -573,7 +553,7 @@ function Tareas() {
 								<Select
 									id="verificador"
 									options={opcionesVerificadores}
-									value={selectedCheckerId}
+									value={selectedOption} 
 									onChange={handleCheckerChange}
 									classNamePrefix="select"
 									placeholder="Selecciona un verificador..."
@@ -616,8 +596,7 @@ function Tareas() {
 								type="button"
 								className="btn btn-secondary"
 								id="btnCerrar"
-								data-bs-dismiss="modal"
-							>
+								data-bs-dismiss="modal">
 								Cerrar
 							</button>
 							<button type="button" className="btn btn-primary" onClick={validar}>
@@ -632,3 +611,6 @@ function Tareas() {
 }
 
 export default Tareas;
+
+
+

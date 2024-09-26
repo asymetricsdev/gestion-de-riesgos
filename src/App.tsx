@@ -7,6 +7,7 @@ import Menu from './components/Menu/Menu';
 import Home from './pages/HomePage';
 import MatrizPeligro from './pages/MatrizPeligroPage';
 import PlanificadorActividad from './pages/PlanificadorActividadPage';
+import Planificacion from './pages/PlanificacionPage';
 import Perfiles from  './pages/PerfilesPage';
 import Compañia from './pages/CompañiaPage';
 import TipoActividad from './pages/TipoActividadesPage';
@@ -47,6 +48,7 @@ export function App() {
                                 <Route path="/home" element={<Home />} />
                                 {/*PLANIFICACIÓN*/}
                                 <Route path="/planificacion" element={< PlanificadorActividad/>} />
+                                <Route path="/planificacion/planificacion" element={< Planificacion/>} />
                                 <Route path="/planificacion/planificador-de-actividad" element={< PlanificadorActividad/>} />
                                 <Route path="/planificacion/actividades" element={<Actividad />} />
                                 <Route path="/planificacion/perfiles" element={<Perfiles />} />

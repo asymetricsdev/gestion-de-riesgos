@@ -89,6 +89,23 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 					<div className="submenu">
 						{isOpen ? (
 						<NavLink
+							to="/planificacion/planificacion"
+							className="nav-link text-white d-flex align-items-center"
+						>
+							<i className="fa-solid fa-calendar-week"></i>
+							<span>Planificación</span>
+						</NavLink>
+						) : (
+							<OverlayTrigger placement="right" overlay={renderTooltip("Planificacion")}>
+								<NavLink
+									to="/planificacion/planificacion"
+									className="nav-link text-white d-flex align-items-center">
+									<i className="fa-solid fa-calendar-week"></i>
+								</NavLink>
+							</OverlayTrigger>
+						)}	
+						{isOpen ? (
+						<NavLink
 							to="/planificacion/planificador-de-actividad"
 							className="nav-link text-white d-flex align-items-center"
 						>
