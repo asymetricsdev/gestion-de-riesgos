@@ -9,29 +9,40 @@ import * as bootstrap from "bootstrap";
 
 const MySwal = withReactContent(Swal);
 
-interface TipoTareas {
+interface Items {
 	id: number;
 	name: string;
 	description: string;
-	createDate: string;
+	checker: Checker;
 }
- interface TipoTareasData {
+
+interface Checker {
+	id: number;
+	name: string;
+	checkerId: number;
+}
+
+interface CheckpointData {
 	name: string;
 	description: string;
-} 
+	checkerId: number;
+}
 
-const TipoTareas: React.FC = () => {
+const Items: React.FC = () => {
 	const baseURL = import.meta.env.VITE_API_URL;
-	const [tipoTareas, setTipoTareas] = useState<TipoTareas[]>([]);
+	const [checkpoint, setCheckpoint] = useState<Items[]>([]);
 	const [id, setId] = useState<number | null>(null);
 	const [name, setName] = useState<string>("");
 	const [description, setDescription] = useState<string>("");
+	const [checker, setChecker] = useState<Checker[]>([]);
+	const [selectedCheckerId, setSelectedCheckerId] = useState<number>(0);
 	const [title, setTitle] = useState<string>("");
 	const modalRef = useRef<HTMLDivElement | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
 	useEffect(() => {
-		getTipoTareas();
+		getCheckpoint();
+		getChecker();
 		if (modalRef.current) {
 			modalRef.current.addEventListener("hidden.bs.modal", handleModalHidden);
 		}
@@ -42,26 +53,35 @@ const TipoTareas: React.FC = () => {
 		};
 	}, []);
 
-	const getTipoTareas = async () => {
+	const getCheckpoint = async () => {
 		try {
-			const response: AxiosResponse<TipoTareas[]> = await axios.get(`${baseURL}/task_type/`);
-			setTipoTareas(response.data);
+			const response: AxiosResponse<Items[]> = await axios.get(`${baseURL}/checkpoint/`);
+			setCheckpoint(response.data);
 		} catch (error) {
-			showAlert("Error al obtener el Tipo de Tareas", "error");
+			showAlert("Error al obtener los Items", "error");
 		}
 	};
 
-	const openModal = (op: string, TipoTareas?: TipoTareas) => {
-		if (TipoTareas) {
-			setId(TipoTareas.id);
-			setName(TipoTareas.name);
-			setDescription(TipoTareas.description);
+	const getChecker = async () => {
+		try {
+			const response = await axios.get<Checker[]>(`${baseURL}/checker/`);
+			setChecker(response.data);
+		} catch (error) {
+			showAlert("Error al obtener els verificadores", "error");
+		}
+	};
+
+	const openModal = (op: string, checkpoint?: Items) => {
+		if (checkpoint) {
+			setId(checkpoint.id);
+			setName(checkpoint.name);
+			setDescription(checkpoint.description);
 		} else {
 			setId(null);
 			setName("");
 			setDescription("");
 		}
-		setTitle(op === "1" ? "Registrar el Tipo de Tareas" : "Editar el Tipo de Tareas");
+		setTitle(op === "1" ? "Registrar Item" : "Editar Item");
 
 		if (modalRef.current) {
 			const modal = new bootstrap.Modal(modalRef.current);
@@ -78,26 +98,32 @@ const TipoTareas: React.FC = () => {
 
 	const validar = () => {
 		if (name.trim() === "") {
-			showAlert("Escribe el nombre", "warning", "nombre del Tipo de Tareas");
+			showAlert("Escribe el nombre", "warning", "nombre del checkpoint");
 			return;
 		}
 		if (description.trim() === "") {
 			showAlert("Escribe la descripción", "warning", "descripción");
 			return;
 		}
+		if (selectedCheckerId === 0) {
+			showAlert("Selecciona un verificador", "warning");
+			return;
+		}
 
-		const parametros: TipoTareasData = {  
+		const parametros : CheckpointData = { 
 			name: name.trim(), 
-			description: description.trim() 
+			description: description.trim(), 
+			checkerId: selectedCheckerId 
 		};
+
 		const metodo = id ? "PUT" : "POST";
 		enviarSolicitud(metodo, parametros);
 	};
 
 
-const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => {
+const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => {
 		try {
-		  const url = method === "PUT" && id ? `${baseURL}/task_type/${id}` : `${baseURL}/task_type/`;
+		  const url = method === "PUT" && id ? `${baseURL}/checkpoint/${id}` : `${baseURL}/checkpoint/`;
 		  const response = await axios({
 			method,
 			url,
@@ -106,7 +132,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 		  });
 	  
 		  showAlert("Operación realizada con éxito", "success");
-		  getTipoTareas();
+		  getCheckpoint();
 		  if (modalRef.current) {
 			const modal = bootstrap.Modal.getInstance(modalRef.current);
 			modal?.hide();
@@ -120,18 +146,17 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 		}
 }; 
 
-
-	const deleteTipoTareas = async (id: number) => {
+	const deleteCheckpoint = async (id: number) => {
 		try {
-		  await axios.delete(`${baseURL}/task_type/${id}`, {
+		  await axios.delete(`${baseURL}/checkpoint/${id}`, {
 			headers: { "Content-Type": "application/json" },
 		  });
-		  Swal.fire("Tipo de Tareas eliminado correctamente", "", "success");
-		  getTipoTareas();
+		  Swal.fire("Checkpoint eliminado correctamente", "", "success");
+		  getCheckpoint();
 		} catch (error) {
 		  Swal.fire({
 			title: "Error",
-			text: "Error al eliminar el Tipo de Tareas.",
+			text: "Error al eliminar el Item.",
 			icon: "error",
 			confirmButtonText: "OK",
 		  });
@@ -150,17 +175,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 		</Tooltip>
 	);
 
-	const formatDate = (dateString: string) => {
-		return dateString.split("T")[0];
-	};
-
 	return (
 		<div className="App">
 			<div className="container-fluid">
 				<div className="row mt-3">
 					<div className="col-12">
 						<div className="tabla-contenedor">
-							<EncabezadoTabla title="Tipo de Tareas" onClick={() => openModal("1")} />
+							<EncabezadoTabla title="Items" onClick={() => openModal("1")} />
 						</div>
 						<div className="table-responsive">
 							<table className="table table-bordered">
@@ -173,24 +194,23 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 									<tr>
 										<th>N°</th>
 										<th>Nombre</th>
-										<th>Descripción </th>
-										<th>Fecha</th>
+										<th>Descripción</th>
+										<th>Tipo de Verificación</th>
 										<th>Acciones</th>
 									</tr>
 								</thead>
 								<tbody className="table-group-divider">
-									{tipoTareas.map((div, i) => (
-										<tr key={JSON.stringify(div)} className="text-center">
+									{checkpoint.map((check, i) => (
+										<tr key={JSON.stringify(check)} className="text-center">
 											<td>{i + 1}</td>
-											<td>{div.name}</td>
-											<td>{div.description}</td>
-											<td>{div.createDate ? formatDate(div.createDate) : ""}</td>
+											<td>{check.name}</td>
+											<td>{check.description}</td>
+											<td>{check.checker.name}</td>
 											<td className="text-center">
 												<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
 													<button
-														onClick={() => openModal("2", div)}
-														className="btn btn-custom-editar m-2"
-													>
+														onClick={() => openModal("2", check)}
+														className="btn btn-custom-editar m-2">
 														<i className="fa-solid fa-edit"></i>
 													</button>
 												</OverlayTrigger>
@@ -207,7 +227,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 																cancelButtonText: "Cancelar",
 															}).then((result) => {
 																if (result.isConfirmed) {
-																	deleteTipoTareas(div.id);
+																	deleteCheckpoint(check.id);
 																}
 															});
 														}}>
@@ -236,15 +256,16 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 							</div>
 							<div className="modal-body">
 								<input type="hidden" id="id" />
+
 								<div className="input-group mb-3">
 									<span className="input-group-text">
-										<i className="fa-solid fa-list-check"></i>
+									<i className="fa-solid fa-rectangle-list"></i>
 									</span>
 									<input
 										type="text"
 										id="nombre"
 										className="form-control"
-										placeholder="Nombre Tipo de Tareas"
+										placeholder="Nombre del Item"
 										value={name}
 										onChange={(e) => setName(e.target.value)}
 									/>
@@ -262,15 +283,28 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 										onChange={(e) => setDescription(e.target.value)}
 									/>
 								</div>
-								<div className="input-group mb-3"></div>
+								<div className="mb-3">
+									<label htmlFor="Checkpoint" className="form-label">
+                      				Verificador:
+									</label>
+										<select
+										id="checker"
+										className="form-select"
+										value={selectedCheckerId}
+										onChange={(e) => setSelectedCheckerId(Number(e.target.value))}>
+										<option value={0}>Selecciona...</option>
+										{checker.map((chec) => (
+										<option key={JSON.stringify(chec)} value={chec.id}>{chec.name}</option>
+										))}
+										</select>
+								</div>
 							</div>
 							<div className="modal-footer">
 								<button
 									type="button"
 									className="btn btn-secondary"
 									data-bs-dismiss="modal"
-									id="btnCerrar"
-								>
+									id="btnCerrar">
 									Cerrar
 								</button>
 								<button type="button" className="btn btn-primary" onClick={validar}>
@@ -285,4 +319,4 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 	);
 };
 
-export default TipoTareas;
+export default Items;

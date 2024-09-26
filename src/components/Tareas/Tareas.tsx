@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import axios, { AxiosResponse } from "axios";
 import { AxiosError } from "axios";
@@ -11,9 +10,10 @@ import { faDownload, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from "bootstrap";
 import { useDropzone } from "react-dropzone";
-import Select from 'react-select';
-import { Accordion, AccordionItem, AccordionHeader, AccordionBody } from 'react-bootstrap';
-import './Tareas.css';
+import Select from "react-select";
+import { Accordion, AccordionItem, AccordionHeader, AccordionBody } from "react-bootstrap";
+import "./Tareas.css";
+import { versions } from "process";
 
 const MySwal = withReactContent(Swal);
 
@@ -27,9 +27,8 @@ interface Tareas {
 	base64: string;
 	type: string;
 	taskType: TaskType;
-	checkers: Checkers[];
+	checker: Checker;
 }
-
 
 interface TaskType {
 	id: number;
@@ -39,15 +38,15 @@ interface TaskType {
 	updateDate?: string;
 }
 
-interface Checkers {
+interface Checker {
 	id: number;
 	name: string;
 	description: string;
 	createDate: string;
 	updateDate: string;
-  } 
+}
 
-  interface FileData {
+interface FileData {
 	base64: string;
 	type: string;
 }
@@ -55,23 +54,23 @@ interface Checkers {
 function Tareas() {
 	const baseURL = import.meta.env.VITE_API_URL;
 	const [tareas, setTareas] = useState<Tareas[]>([]);
+	const [taskType, setTaskType] = useState<TaskType[]>([]);
+	const [checker, setChecker] = useState<Checker[]>([]);
+	const [isEditMode, setIsEditMode] = useState<boolean>(false);
+	const modalRef = useRef<HTMLDivElement | null>(null);
+
 	const [id, setId] = useState<number>(0);
 	const [name, setName] = useState<string>("");
 	const [description, setDescription] = useState<string>("");
 	const [version, setVersion] = useState<string>("");
 	const [fileExtension, setFileExtension] = useState<string>("");
-	const [file, setFile] = useState<{ base64: string; type: string }[]>([]);
-	const [selectedCheckerIds, setSelectedCheckerIds] = useState<number[]>([]);
-	const [taskType, setTaskType] = useState<TaskType[]>([]);
-	const [checkers, setCheckers] = useState<Checkers[]>([]);
-	const [selectedTaskTypeId, setselectedTaskTypeId] = useState<number>(0);
+	const [file, setFile] = useState<FileData[]>([]);
+	const [selectedTaskTypeId, setSelectedTaskTypeId] = useState<number>(0);
+	const [selectedCheckerId, setSelectedCheckerId] = useState<number | null>(null);
 	const [title, setTitle] = useState<string>("");
 	const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
-	const [uploadedFiles, setUploadedFiles] = useState<{ base64: string; type: string }[]>([]);
-	const [isEditMode, setIsEditMode] = useState<boolean>(false); 
-	const modalRef = useRef<HTMLDivElement | null>(null);
+	const [uploadedFiles, setUploadedFiles] = useState<FileData[]>([]);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-	
 
 	useEffect(() => {
 		getTareas();
@@ -89,16 +88,12 @@ function Tareas() {
 		};
 	}, []);
 
-
-
-
 	const getTareas = async () => {
 		try {
 			const response: AxiosResponse<Tareas[]> = await axios.get(`${baseURL}/task/`);
 			setTareas(response.data);
 		} catch (error) {
 			showAlert("Error al obtener Tareas", "error");
-
 		}
 	};
 	const getTasksType = async () => {
@@ -112,48 +107,42 @@ function Tareas() {
 
 	const getChecker = async () => {
 		try {
-		  const response: AxiosResponse<Checkers[]> = await axios.get(`${baseURL}/checker/`);
-		  setCheckers(response.data);
+			const response: AxiosResponse<Checker[]> = await axios.get(`${baseURL}/checker/`);
+			setChecker(response.data);
 		} catch (error) {
-		  showAlert("Error al obtener las verificaciones", "error");
+			showAlert("Error al obtener las verificaciones", "error");
 		}
-	  };
+	};
 
-	  const validarTamañoArchivo = (file: File): boolean => {
+	const validarTamañoArchivo = (file: File): boolean => {
 		const fileSizeInMB = file.size / (1024 * 1024);
 		if (fileSizeInMB > 2) {
-		  showAlert("El archivo supera los 2 MB, por favor sube uno más pequeño", "warning");
-		  return false;
+			showAlert("El archivo supera los 2 MB, por favor sube uno más pequeño", "warning");
+			return false;
 		}
 		return true;
-	  };
-	  
+	};
 
 	const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
 		try {
-		  const url = method === "PUT" && id ? `${baseURL}/task/${id}` : `${baseURL}/task/`;
-		  const response = await axios({
-			method,
-			url,
-			data,
-			headers: { "Content-Type": "application/json" },
-		  });
-	  
-		  showAlert("Operación realizada con éxito", "success");
-		  getTareas();
-		  if (modalRef.current) {
-			const modal = bootstrap.Modal.getInstance(modalRef.current);
-			modal?.hide();
-		  }
-		} catch (error) {
-		  if (axios.isAxiosError(error) && error.response) {
-			showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
-		  } else {
-			showAlert("Error al realizar la solicitud", "error");
-		  }
-		}
-	  };
+			const url = method === "PUT" && id ? `${baseURL}/task/${id}` : `${baseURL}/task/`;
+			const response = await axios({
+				method,
+				url,
+				data,
+				headers: { "Content-Type": "application/json" },
+			});
 
+			showAlert("Operación realizada con éxito", "success");
+			getTareas();
+			if (modalRef.current) {
+				const modal = bootstrap.Modal.getInstance(modalRef.current);
+				modal?.hide();
+			}
+		} catch (error) {
+			showAlert("Error al realizar la solicitud", "error");
+		}
+	};
 
 	const validar = (): void => {
 		if (name.trim() === "") {
@@ -162,25 +151,30 @@ function Tareas() {
 		}
 
 		if (description.trim() === "") {
-			showAlert("Escribe la descripcion de la tarea", "warning");
+			showAlert("Escribe la descripción de la tarea", "warning");
+			return;
+		}
+
+		if (version.trim() === "") {
+			showAlert("Escribe la versión de la tarea", "warning");
 			return;
 		}
 
 		if (!isEditMode && file.length === 0) {
 			showAlert("Sube un archivo", "warning");
 			return;
-		  }
+		}
 
 		if (selectedTaskTypeId === 0) {
 			showAlert("Selecciona un tipo de tarea", "warning");
 			return;
 		}
-		if (selectedCheckerIds.length === 0) {
-			showAlert("Selecciona al menos un verificador", "warning");
+		if (!selectedCheckerId) {
+			showAlert("Selecciona un verificador", "warning");
 			return;
 		}
 
-		enviarSolicitud("POST", {
+		enviarSolicitud(isEditMode ? "PUT" : "POST", {
 			id,
 			name,
 			description,
@@ -188,67 +182,86 @@ function Tareas() {
 			file: file.length > 0 ? file[0].base64 : null,
 			fileExtension,
 			taskTypeId: selectedTaskTypeId.toString(),
-			checkers,
+			checkerId: selectedCheckerId,
 		});
 	};
 
 	const deleteTarea = async (id: number) => {
+		console.log("Deleting task with id:", id);
 		try {
-				await axios.delete(`${baseURL}/task/${id}`, {
+			await axios.delete(`${baseURL}/task/${id}`, {
 				headers: { "Content-Type": "application/json" },
 			});
 			showAlert("Tarea eliminada correctamente", "success");
-			getTareas();
+			setTareas((prevTareas) => prevTareas.filter((tarea) => tarea.id !== id));
 		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				console.error("Servidor respondiendo:", error.response?.data);
+			} else {
+				console.error("Error borrando tareas:", error);
+			}
 			showAlert("Error al eliminar la tarea", "error");
 		}
 	};
 
-
-	const openModal = (op: string, tarea?: Tareas) =>  {
-		if (op === "1") {
-		  setIsEditMode(false);
-		  setId(0);
-		  setName("");
-		  setDescription("");
-		  setSelectedCheckerIds([]);
-		  setTitle("Registrar Tareas");
+	const openModal = (op: string, tarea?: Tareas) => {
+		if (op === "1" ) {
+		    setIsEditMode(true);
+			setId(0);
+			setName("");
+			setDescription("");
+			setVersion("");
+			setSelectedTaskTypeId(0);
+			setSelectedCheckerId(null);
+			setFile([]);
+			setUploadedImageUrl(null);
+			setTitle("Registrar Tarea");
+			setIsEditMode(false);
 		} else if (op === "2" && tarea) {
-		 setIsEditMode(true);
-		  setId(tarea.id);
-		  setName(tarea.name);
-		  setDescription(tarea.description);
-		  setSelectedCheckerIds(tarea.checkers.map(h => h.id));
-		  setTitle("Editar Tareas");
+			setId(tarea.id);
+			setName(tarea.name);
+			setDescription(tarea.description);
+			setVersion(tarea.version);
+			setSelectedTaskTypeId(tarea.taskType.id);
+			setFile([{ base64: tarea.file, type: tarea.fileExtension }]);
+			setUploadedImageUrl(`data:image/${tarea.fileExtension};base64,${tarea.file}`);
+			setTitle("Editar Verificadores");
+			setIsEditMode(true);
 		}
-	
-		if (modalRef.current) {
-		  const modal = new bootstrap.Modal(modalRef.current);
-		  modal.show();
-		  setIsModalOpen(true);
-		}
-	  };
 
-	  const handleModalHidden = () => {
+		if (modalRef.current) {
+			const modal = new bootstrap.Modal(modalRef.current);
+			modal.show();
+			setIsModalOpen(true);
+		}
+	};
+
+
+	useEffect(() => {
+		if (isModalOpen) {
+			console.log("Modal abierto en modo edición:", isEditMode);
+		}
+	}, [isModalOpen, isEditMode]);
+
+	const handleModalHidden = () => {
 		setIsModalOpen(false);
-		const modals = document.querySelectorAll('.modal-backdrop');
-		modals.forEach(modal => modal.parentNode?.removeChild(modal));
-	  };
+		const modals = document.querySelectorAll(".modal-backdrop");
+		modals.forEach((modal) => modal.parentNode?.removeChild(modal));
+	};
+
+
 
 	const onDrop = useCallback((acceptedFiles: File[]) => {
 		if (acceptedFiles.length > 0) {
 			const file = acceptedFiles[0];
-
 			if (!validarTamañoArchivo(file)) {
-				return; 
-				
-			  }
+				return;
+			}
 
 			const reader = new FileReader();
 			reader.onload = () => {
 				const base64 = reader.result as string;
 				const extension = extractFileExtension(base64);
-
 				setFile([{ base64: removeBase64Prefix(base64), type: extension }]);
 				setFileExtension(extension);
 				setUploadedImageUrl(base64);
@@ -260,7 +273,7 @@ function Tareas() {
 	const eliminarImagen = () => {
 		setFile([]);
 		setUploadedImageUrl(null);
-	  };
+	};
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		onDrop,
@@ -277,61 +290,50 @@ function Tareas() {
 			"application/pdf": "pdf",
 		};
 		const type = base64.split(";")[0].split(":")[1];
-		
 		return extensionMap[type] || "unknown";
-		
 	};
 
-
-		const downloadFile = async (fileUrl: string, fileName: string, fileExtension: string) => {
+	const downloadFile = async (fileUrl: string, fileName: string, fileExtension: string) => {
 		try {
-		  const response = await axios.get(fileUrl, {
-			responseType: "json", 
-		  });
-	  
-		  const base64Data = response.data.file; 
-	  
-		  if (!base64Data) {
-			Swal.fire({
-			  title: "Error",
-			  text: "No se pudo obtener el archivo para descargar.",
-			  icon: "error",
-			  confirmButtonText: "OK",
+			const response = await axios.get(fileUrl, {
+				responseType: "json",
 			});
-			return;
-		  }
-	  
-		  const base64String = base64Data.split(",")[1] || base64Data;
-	  
-		  const byteCharacters = atob(base64String);
-		  const byteNumbers = new Array(byteCharacters.length);
-		  for (let i = 0; i < byteCharacters.length; i++) {
-			byteNumbers[i] = byteCharacters.charCodeAt(i);
-		  }
-		  const byteArray = new Uint8Array(byteNumbers);
 
-		  const blob = new Blob([byteArray], { type: `application/${fileExtension}` });
+			const base64Data = response.data.file;
+			if (!base64Data) {
+				Swal.fire({
+					title: "Error",
+					text: "No se pudo obtener el archivo para descargar.",
+					icon: "error",
+					confirmButtonText: "OK",
+				});
+				return;
+			}
 
-		  const link = document.createElement("a");
-		  link.href = window.URL.createObjectURL(blob);
-		link.setAttribute("download", `${""}.${fileExtension}`);
-		  document.body.appendChild(link);
-		  link.click();
-		  document.body.removeChild(link);
-
-		  window.URL.revokeObjectURL(link.href);
+			const base64String = base64Data.split(",")[1] || base64Data;
+			const byteCharacters = atob(base64String);
+			const byteNumbers = new Array(byteCharacters.length);
+			for (let i = 0; i < byteCharacters.length; i++) {
+				byteNumbers[i] = byteCharacters.charCodeAt(i);
+			}
+			const byteArray = new Uint8Array(byteNumbers);
+			const blob = new Blob([byteArray], { type: `application/${fileExtension}` });
+			const link = document.createElement("a");
+			link.href = window.URL.createObjectURL(blob);
+			link.setAttribute("download", `${""}.${fileExtension}`);
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			window.URL.revokeObjectURL(link.href);
 		} catch (error) {
-		  Swal.fire({
-			title: "Error",
-			text: "Hubo un error al descargar el archivo.",
-			icon: "error",
-			confirmButtonText: "OK",
-		  });
+			Swal.fire({
+				title: "Error",
+				text: "Hubo un error al descargar el archivo.",
+				icon: "error",
+				confirmButtonText: "OK",
+			});
 		}
-	  };
-
-	
-	
+	};
 
 	const removeBase64Prefix = (base64: string): string => {
 		return base64
@@ -339,12 +341,23 @@ function Tareas() {
 			.replace(/^data:application\/\w+;base64,/, "");
 	};
 
-	const opcionesVerificadores = checkers.map(sp => ({
-		value: sp.id,
-		label: sp.description,
-	  }));
-	  
-	
+	const opcionesVerificadores = checker
+		? checker.map((sp) => ({
+				value: sp.id,
+				label: sp.description,
+		  }))
+		: [];
+
+
+		const handleCheckerChange = (selectedOption: { value: number; label: string } | null) => {
+			if (selectedOption) {
+			  setSelectedCheckerId(selectedOption.value);
+			} else {
+			  setSelectedCheckerId(null); 
+			}
+		  };
+		
+		  const selectedOption = opcionesVerificadores.find(option => option.value === selectedCheckerId) || null;
 
 	return (
 		<div className="App">
@@ -355,16 +368,16 @@ function Tareas() {
 							<EncabezadoTabla title="Tareas" onClick={() => openModal("1")} />
 						</div>
 					</div>
-					<div className="table-responsive">
+					<div className="table-responsive tabla-scroll">
 						<table className="table table-bordered">
 							<thead
 								className="text-center"
 								style={{
 									background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
 									color: "#fff",
-								}}
-							>
+								}}>
 								<tr>
+									<th>N°</th>
 									<th>Tipo de Tarea</th>
 									<th>Nombre</th>
 									<th>Descripción</th>
@@ -375,80 +388,83 @@ function Tareas() {
 								</tr>
 							</thead>
 							<tbody className="table-group-divider">
-								{tareas.map((tr) => (
-									<tr key={tr.id}>
-										<td>{tr.taskType.name}</td>
-										<td>{tr.name}</td>
-										<td>{tr.description}</td>
-										<td>{tr.version}</td>
-										<td>
+								{tareas && tareas.length > 0 ? (
+									tareas.map((tr, i) => (
+										<tr key={tr.id}>
+											<td>{i + 1}</td>
+											<td>{tr.taskType?.name || "N/A"}</td>
+											<td>{tr.name}</td>
+											<td>{tr.description}</td>
+											<td>{tr.version}</td>
+											<td>
 											<Accordion>
-												<Accordion.Item eventKey="0">
-													<Accordion.Header>Verificadores</Accordion.Header>
-													<Accordion.Body>
-														<ul>
-															{tr.checkers.map((check) => (
-																<li key={check.id}>{check.description}</li>
-															))}
-														</ul>
-													</Accordion.Body>
-												</Accordion.Item>
-											</Accordion>
-										</td>
-										<td>
-											{" "}
-											<OverlayTrigger
-												overlay={
-													<Tooltip id={`tooltip-download-${tr.id}`}>Descargar Archivo</Tooltip>
-												}
-											>
-												<button
-													onClick={() =>
-														downloadFile(
-															`https://testbackend-433922.uk.r.appspot.com/api/task/${tr.id}/download`,
-															tr.fileExtension,
-															tr.name
-														)
-													}
-													className="btn btn-custom-editar m-2"
-												>
-													<FontAwesomeIcon icon={faDownload} /> Descargar
-												</button>
-											</OverlayTrigger>
-										</td>
-										<td>
-											<OverlayTrigger placement="top" overlay={<Tooltip>Editar</Tooltip>}>
-												<button
-													onClick={() => openModal("2", tr)}
-													className="btn btn-custom-editar m-2"
-												>
-													<i className="fa-solid fa-edit"></i>
-												</button>
-											</OverlayTrigger>
-											<OverlayTrigger placement="top" overlay={<Tooltip>Eliminar</Tooltip>}>
-												<button
-													className="btn btn-custom-danger"
-													onClick={() => {
-														MySwal.fire({
-															title: "¿Estás seguro?",
-															text: "No podrás revertir esto",
-															icon: "warning",
-															showCancelButton: true,
-															confirmButtonText: "Sí, bórralo",
-															cancelButtonText: "Cancelar",
-														}).then((result) => {
-															if (result.isConfirmed) {
-																deleteTarea(tr.id);
-															}
-														});
-													}}
-												>
-													<FontAwesomeIcon icon={faCircleXmark} />
-												</button>
-											</OverlayTrigger>
-										</td>
+													<Accordion.Item eventKey="0">
+														<Accordion.Header>Verificadores</Accordion.Header>
+														<Accordion.Body>
+															<ul>
+																{tr.checker ? tr.checker.description : "Sin Verificador"}
+															</ul>
+														</Accordion.Body>
+													</Accordion.Item>
+												</Accordion>
+											</td>
+											<td>
+												<OverlayTrigger
+													overlay={
+														<Tooltip id={`tooltip-download-${tr.id}`}>Descargar Archivo</Tooltip>
+													}>
+													<button
+														onClick={() =>
+															downloadFile(
+																`https://testbackend-433922.uk.r.appspot.com/api/task/${tr.id}/download`,
+																tr.fileExtension,
+																tr.name
+															)
+														}
+														className="btn btn-custom-editar m-2"
+													>
+														<FontAwesomeIcon icon={faDownload} /> Descargar
+													</button>
+												</OverlayTrigger>
+											</td>
+											<td>
+												<OverlayTrigger placement="top" overlay={<Tooltip>Editar</Tooltip>}>
+													<button
+														className="btn btn-custom-editar m-2"
+														onClick={() => openModal("2", tr)}
+													>
+														<FontAwesomeIcon icon={faDownload} />{" "}
+													</button>
+												</OverlayTrigger>
+												<OverlayTrigger placement="top" overlay={<Tooltip>Eliminar</Tooltip>}>
+													<button
+														className="btn btn-custom-danger"
+														onClick={() => {
+															MySwal.fire({
+																title: "¿Estás seguro?",
+																text: "No podrás revertir esto",
+																icon: "warning",
+																showCancelButton: true,
+																confirmButtonText: "Sí, bórralo",
+																cancelButtonText: "Cancelar",
+															}).then((result) => {
+																if (result.isConfirmed) {
+																	deleteTarea(tr.id);
+																}
+															});
+														}}
+													>
+														<FontAwesomeIcon icon={faCircleXmark} />
+													</button>
+												</OverlayTrigger>
+											</td>
+										</tr>
+									))
+								) : (
+									<tr>
+										<td colSpan={8}>No hay tareas disponibles</td>
 									</tr>
-								))}
+								)}
 							</tbody>
 						</table>
 					</div>
@@ -461,8 +477,7 @@ function Tareas() {
 				tabIndex={-1}
 				aria-labelledby="modalTareaLabel"
 				aria-hidden="true"
-				ref={modalRef}
-			>
+				ref={modalRef}>
 				<div className="modal-dialog modal-lg">
 					<div className="modal-content">
 						<div className="modal-header">
@@ -483,6 +498,7 @@ function Tareas() {
 									placeholder="Escribe la Tarea"
 									value={name}
 									onChange={(e) => setName(e.target.value)}
+									disabled={isEditMode}
 								/>
 							</div>
 							<div className="input-group mb-3">
@@ -496,6 +512,7 @@ function Tareas() {
 									placeholder="Escribe la descripción"
 									value={description}
 									onChange={(e) => setDescription(e.target.value)}
+									disabled={isEditMode}
 								/>
 							</div>
 							<div className="input-group mb-3">
@@ -509,75 +526,65 @@ function Tareas() {
 									placeholder="Escribe la versión"
 									value={version}
 									onChange={(e) => setVersion(e.target.value)}
+									disabled={isEditMode}
 								/>
 							</div>
 							<div className="mb-3">
-								<label htmlFor="tastType" className="form-label">
+								<label htmlFor="taskType" className="form-label">
 									Tipo de Tarea
 								</label>
 								<select
-									id="criticityType"
+									id="taskType"
 									className="form-select"
 									value={selectedTaskTypeId}
-									onChange={(e) => setselectedTaskTypeId(Number(e.target.value))}
-								>
+									onChange={(e) => setSelectedTaskTypeId(Number(e.target.value))}
+									disabled={isEditMode}>
 									<option value={0}>Selecciona...</option>
 									{taskType.map((ts) => (
 										<option key={ts.id} value={ts.id}>
-											{ts.description + " - " + ts.name}
+											{ts.name} - {ts.description}
 										</option>
 									))}
 								</select>
 							</div>
+
 							<div className="form-group mt-3">
 								<label htmlFor="hazzard">Verificadores:</label>
 								<Select
-									isMulti
-									value={opcionesVerificadores.filter((option) =>
-										selectedCheckerIds.includes(option.value)
-									)}
-									onChange={(selectedOptions) => {
-										const selectedIds = selectedOptions.map((option) => option.value);
-										setSelectedCheckerIds(selectedIds);
-									}}
+									id="verificador"
 									options={opcionesVerificadores}
+									value={selectedOption} 
+									onChange={handleCheckerChange}
+									classNamePrefix="select"
+									placeholder="Selecciona un verificador..."
 								/>
 							</div>
 							<div className="modal-body">
 								<div className="container">
 									<div className="col-md-12">
-										<div className={`dropzone ${isEditMode ? "hidden" : ""}`} {...getRootProps()}>
-											<input {...getInputProps()} />
-											{isDragActive ? (
-												<p>Carga los archivos acá ...</p>
-											) : (
-												<p>Puede arrastrar y soltar archivos aquí para añadirlos</p>
-											)}
-											<div>
-												<br />
-												<p className="text-parrafo-dropzone mt-1">
-													Tamaño máximo de archivo: 500kb, número máximo de archivos: 2
-												</p>
+										{!isEditMode && (
+											<div className="dropzone" {...getRootProps()}>
+												<input {...getInputProps()} />
+												{isDragActive ? (
+													<p>Carga los archivos acá ...</p>
+												) : (
+													<p>Puede arrastrar y soltar archivos aquí para añadirlos</p>
+												)}
+												<div>
+													<br />
+													<p className="text-parrafo-dropzone mt-1">
+														Tamaño máximo de archivo: 500kb, número máximo de archivos: 2
+													</p>
+												</div>
 											</div>
-										</div>
-									</div>
-									{uploadedImageUrl && (
-										<div className="uploaded-image-preview">
-										<img src={uploadedImageUrl} alt="Vista previa" />
-										<span className="delete-icon" onClick={eliminarImagen}>
-										  &#10006;
-										</span>
-									  </div>
-									)}
-									<div className="mb-3">
-										{uploadedFiles.length > 0 && (
-											<div>
-												<h6>Archivos subidos:</h6>
-												<ul>
-													{uploadedFiles.map((file, index) => (
-														<li key={index}>{`Archivo ${index + 1}: ${file.type}`}</li>
-													))}
-												</ul>
+										)}
+
+										{uploadedImageUrl && (
+											<div className="uploaded-image-preview">
+												<img src={uploadedImageUrl} alt="Vista previa" />
+												<span className="delete-icon" onClick={eliminarImagen}>
+													&#10006;
+												</span>
 											</div>
 										)}
 									</div>
@@ -589,8 +596,7 @@ function Tareas() {
 								type="button"
 								className="btn btn-secondary"
 								id="btnCerrar"
-								data-bs-dismiss="modal"
-							>
+								data-bs-dismiss="modal">
 								Cerrar
 							</button>
 							<button type="button" className="btn btn-primary" onClick={validar}>
@@ -605,5 +611,6 @@ function Tareas() {
 }
 
 export default Tareas;
+
 
 

@@ -10,22 +10,22 @@ import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-interface Criticidad {
+interface TipoActividad {
   id: number;
   name: string;
   description: string;
   createDate: string;
 }
 
-interface CriticidadData {
+interface TipoActividadData {
   name: string;
   description: string;
 }
 
-const Criticidad: React.FC = () => {
+const Activity: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
-  const [criticity, setCriticityType] = useState<Criticidad[]>([]);
-  const [id, setId] = useState<string>("");
+  const [activity, setActivity] = useState<TipoActividad[]>([]);
+  const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [title, setTitle] = useState<string>("");
@@ -33,7 +33,7 @@ const Criticidad: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getCriticity();
+    getActivityType();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -44,26 +44,27 @@ const Criticidad: React.FC = () => {
     };
   }, []);
 
-  const getCriticity = async () => {
+  const getActivityType = async () => {
     try {
-      const response: AxiosResponse<Criticidad[]> = await axios.get(`${baseURL}/criticity/`);
-      setCriticityType(response.data);
+      const response: AxiosResponse<TipoActividad[]> = await axios.get(`${baseURL}/activity_type/`);
+      setActivity(response.data);
     } catch (error) {
-      showAlert("Error al obtener criticidad", "error");
+      showAlert("Error al obtener el tipo de actividad", "error");
     }
   };
 
-  const openModal = (op: string, criticity?: Criticidad) => {
+  
+  const openModal = (op: string, activity?: TipoActividad) => {
     if (op === "1") {
-      setId("");
+      setId(null);
       setName("");
       setDescription("");
-      setTitle("Registrar Criticidad");
-    } else if (op === "2" && criticity) {
-      setId(criticity.id.toString());
-      setName(criticity.name);
-      setDescription(criticity.description);
-      setTitle("Editar Criticidad");
+      setTitle("Registrar Tipo de Actividad");
+    } else if (op === "2" && activity) {
+      setId(activity.id);
+      setName(activity.name);
+      setDescription(activity.description);
+      setTitle("Editar Tipo de Actividad");
     }
 
     if (modalRef.current) {
@@ -72,7 +73,6 @@ const Criticidad: React.FC = () => {
       setIsModalOpen(true);
     }
   };
-
   const handleModalHidden = () => {
     setIsModalOpen(false);
     const modals = document.querySelectorAll('.modal-backdrop');
@@ -80,8 +80,8 @@ const Criticidad: React.FC = () => {
   };
 
   const validar = () => {
-    if (!/^\d+$/.test(name.trim())) {
-      showAlert("Solo se permiten números en el campo de nivel de criticidad", "warning", "nombre");
+    if (name.trim() === "") {
+      showAlert("Escribe actividades", "warning", "actividades");
       return;
     }
     if (description.trim() === "") {
@@ -89,60 +89,52 @@ const Criticidad: React.FC = () => {
       return;
     }
     
-    const parametros : CriticidadData = {  
+    const parametros : TipoActividadData = {
       name: name.trim(), 
-      description: description.trim() };
+      description: description.trim() 
+    };
 
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: CriticidadData) => {
+
+const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) => {
+	try {
+	  const url = method === "PUT" && id ? `${baseURL}/activity_type/${id}` : `${baseURL}/activity_type/`;
+	  const response = await axios({
+		method,
+		url,
+		data,
+		headers: { "Content-Type": "application/json" },
+	  });
+  
+	  showAlert("Operación realizada con éxito", "success");
+	  getActivityType();
+	  if (modalRef.current) {
+		const modal = bootstrap.Modal.getInstance(modalRef.current);
+		modal?.hide();
+	  }
+	} catch (error) {
+	  if (axios.isAxiosError(error) && error.response) {
+		showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+	  } else {
+		showAlert("Error al realizar la solicitud", "error");
+	  }
+	}
+  }; 
+
+  const deleteActividad = async (id: number) => {
     try {
-      const url = method === "PUT" && id ? `${baseURL}/criticity/${id}` : `${baseURL}/criticity/`;
-      const response = await axios({
-        method,
-        url,
-        data,
+      await axios.delete(`${baseURL}/activity_type/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-
-      showAlert("Operación realizada con éxito", "success");
-
-      if (method === "POST") {
-        setCriticityType((prev) => [...prev, response.data]);
-      } else if (method === "PUT") {
-        setCriticityType((prev) =>
-          prev.map((item) => (item.id === response.data.id ? response.data : item))
-        );
-      }
-
-      if (modalRef.current) {
-        const modal = bootstrap.Modal.getInstance(modalRef.current);
-        modal?.hide();
-      }
-
-      getCriticity();
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
-      } else {
-        showAlert("Error al realizar la solicitud", "error");
-      }
-    }
-  };
-
-  const deleteCriticity = async (id: number) => {
-    try {
-      await axios.delete(`${baseURL}/criticity/${id}`, {
-        headers: { "Content-Type": "application/json" },
-      });
-      Swal.fire("Criticidad eliminada correctamente", "", "success");
-      getCriticity();
+      Swal.fire("Actividades eliminada correctamente", "", "success");
+      getActivityType();
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar Criticidad.",
+        text: "Error al eliminar Actividades.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -150,18 +142,19 @@ const Criticidad: React.FC = () => {
   };
 
   const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-    <Tooltip id="button-tooltip-edit" {...props}>
-      Editar
-    </Tooltip>
-  );
+		<Tooltip id="button-tooltip-edit" {...props}>
+		  Editar
+		</Tooltip>
+	  );
+	  
+	  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-delete" {...props}>
+		  Eliminar
+		</Tooltip>
+	  );
 
-  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-    <Tooltip id="button-tooltip-delete" {...props}>
-      Eliminar
-    </Tooltip>
-  );
 
-  const formatDate = (dateString: string) => {
+    const formatDate = (dateString: string) => {
     return dateString.split('T')[0];
   };
 
@@ -171,56 +164,57 @@ const Criticidad: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Criticidad' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Tipo de Actividad' onClick={() => openModal("1")} />
             </div>
-            <div className="table-responsive">
+            <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
                 <thead className="text-center" 
-                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
+                style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 
+                color: '#fff' }}>
                   <tr>
                     <th>N°</th>
-                    <th>Nivel</th>
-                    <th>Descripción</th>
+                    <th>Nombre</th>
+                    <th>Descripción </th>
                     <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {criticity.map((crit, i) => (
-                    <tr key={crit.id} className="text-center">
+                  {activity.map((act, i) => (
+                    <tr key={act.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{crit.name}</td>
-                      <td>{capitalizeFirstLetter(crit.description)}</td>
-                      <td>{formatDate(crit.createDate)}</td>
+                      <td>{capitalizeFirstLetter(act.name)}</td>
+                      <td>{act.description}</td>
+                      <td>{formatDate(act.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
-                          <button
-                            onClick={() => openModal("2", crit)}
-                            className="btn btn-custom-editar m-2"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalUsers"
-                          >
-                            <i className="fa-solid fa-edit"></i>
-                          </button>
-                        </OverlayTrigger>
-                        <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
-                          <button className="btn btn-custom-danger" onClick={() => {
-                            MySwal.fire({
-                              title: "¿Estás seguro?",
-                              text: "No podrás revertir esto",
-                              icon: "warning",
-                              showCancelButton: true,
-                              confirmButtonText: "Sí, bórralo",
-                              cancelButtonText: "Cancelar",
-                            }).then((result) => {
-                              if (result.isConfirmed) {
-                                deleteCriticity(crit.id);
-                              }
-                            });
-                          }}>
-                            <i className="fa-solid fa-circle-xmark"></i>
-                          </button>
-                        </OverlayTrigger>
+                        <button
+                        onClick={() => openModal("2", act)}
+                        className="btn btn-custom-editar m-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalUsers"
+                      >
+                        <i className="fa-solid fa-edit"></i>
+                      </button>
+                      </OverlayTrigger>
+                      <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+                        <button className="btn btn-custom-danger" onClick={() => {
+                          MySwal.fire({
+                            title: "¿Estás seguro?",
+                            text: "No podrás revertir esto",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonText: "Sí, bórralo",
+                            cancelButtonText: "Cancelar",
+                          }).then((result) => {
+                            if (result.isConfirmed) {
+                              deleteActividad(act.id);
+                            }
+                          });
+                        }}>
+                          <i className="fa-solid fa-circle-xmark"></i>
+                        </button>
+                      </OverlayTrigger>
                       </td>
                     </tr>
                   ))}
@@ -245,13 +239,13 @@ const Criticidad: React.FC = () => {
                 <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-bolt"></i>
+                  <i className="fa-solid fa-people-robbery"></i>
                   </span>
                   <input
                     type="text"
                     id="nombre"
                     className="form-control"
-                    placeholder="Nivel de Criticidad"
+                    placeholder="Nombre del Tipo de Actividad"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -268,6 +262,8 @@ const Criticidad: React.FC = () => {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
+                </div>
+                <div className="input-group mb-3">
                 </div>
               </div>
               <div className="modal-footer">
@@ -292,8 +288,8 @@ const Criticidad: React.FC = () => {
         </div>
       </div>
     </div>
+  
   );
 };
 
-export default Criticidad;
-
+export default Activity;

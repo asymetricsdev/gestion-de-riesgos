@@ -5,35 +5,64 @@ import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+import Select from 'react-select';
 import { capitalizeFirstLetter } from '../functions';
 import * as bootstrap from 'bootstrap';
 
+
 const MySwal = withReactContent(Swal);
 
-interface Criticidad {
+interface Peligro {
   id: number;
   name: string;
   description: string;
   createDate: string;
+  updateDate: string;
+  checker: Checker;
+  risks: Risk[]; 
 }
-
-interface CriticidadData {
+interface Checker {
+  id: number;
   name: string;
   description: string;
+  createDate?: string;
+  updateDate?: string;
 }
 
-const Criticidad: React.FC = () => {
+interface Risk {
+  id: number;
+  name: string;
+  description: string;
+  createDate?: string;
+  updateDate?: string;
+  hazzard: Peligro;
+}
+
+interface PeligroData {
+  name: string;
+  description: string;
+  checkerId: number;
+  riskIds: number[];
+}
+
+const Peligro: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
-  const [criticity, setCriticityType] = useState<Criticidad[]>([]);
-  const [id, setId] = useState<string>("");
+  const [hazzard, setHazzard] = useState<Peligro[]>([]);
+  const [risk, setRisk] = useState<Risk[]>([]);
+  const [checker, setChecker] = useState<Checker[]>([]);
+  const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [selectedRiskIds, setSelectedRiskIds] = useState<number[]>([]);
+  const [selectedCheckerId, setSelectedCheckerId] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getCriticity();
+    getHazzard();
+    getRisk();
+    getChecker();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -44,26 +73,49 @@ const Criticidad: React.FC = () => {
     };
   }, []);
 
-  const getCriticity = async () => {
+  const getHazzard = async () => {
     try {
-      const response: AxiosResponse<Criticidad[]> = await axios.get(`${baseURL}/criticity/`);
-      setCriticityType(response.data);
+      const response: AxiosResponse<Peligro[]> = await axios.get(`${baseURL}/hazzard/`);
+      setHazzard(response.data);
     } catch (error) {
-      showAlert("Error al obtener criticidad", "error");
+      showAlert("Error al obtener los peligros", "error");
+    }
+  };
+  
+
+  const getRisk = async () => {
+    try {
+      const response: AxiosResponse<Risk[]> = await axios.get(`${baseURL}/risk/`);
+      setRisk(response.data);
+    } catch (error) {
+      showAlert("Error al obtener los riesgos", "error");
     }
   };
 
-  const openModal = (op: string, criticity?: Criticidad) => {
+  const getChecker = async () => {
+    try {
+      const response: AxiosResponse<Checker[]> = await axios.get(`${baseURL}/checker/`);
+      setChecker(response.data);
+    } catch (error) {
+      showAlert("Error al obtener los tipos de verificación", "error");
+    }
+  };
+
+  const openModal = (op: string, hazzard?: Peligro) => {
     if (op === "1") {
-      setId("");
+      setId(null);
       setName("");
       setDescription("");
-      setTitle("Registrar Criticidad");
-    } else if (op === "2" && criticity) {
-      setId(criticity.id.toString());
-      setName(criticity.name);
-      setDescription(criticity.description);
-      setTitle("Editar Criticidad");
+      setSelectedRiskIds([]);
+      setSelectedCheckerId(0);
+      setTitle("Registrar Peligro");
+    } else if (op === "2" && hazzard) {
+      setId(hazzard.id);
+      setName(hazzard.name);
+      setDescription(hazzard.description);
+      setSelectedCheckerId(hazzard.checker.id);
+      setSelectedRiskIds(hazzard.risks.map(h => h.id));
+      setTitle("Editar Peligro");
     }
 
     if (modalRef.current) {
@@ -79,50 +131,50 @@ const Criticidad: React.FC = () => {
     modals.forEach(modal => modal.parentNode?.removeChild(modal));
   };
 
-  const validar = () => {
-    if (!/^\d+$/.test(name.trim())) {
-      showAlert("Solo se permiten números en el campo de nivel de criticidad", "warning", "nombre");
-      return;
+  const validar = (): void => {
+    if (name.trim() === "") {
+        showAlert("Escribe el nombre del peligro", "warning");
+        return;
     }
-    if (description.trim() === "") {
-      showAlert("Escribe la descripción", "warning", "descripción");
-      return;
+    if (selectedCheckerId === 0) {
+        showAlert("Selecciona un tipo de verificación", "warning");
+        return;
     }
+    if (selectedRiskIds.length === 0) {
+      showAlert("Selecciona un tipo de riego", "warning");
+      return;
+  }
+
     
-    const parametros : CriticidadData = {  
-      name: name.trim(), 
-      description: description.trim() };
+    const parametros: PeligroData = {
+        name: name.trim(),
+        description: description.trim(),
+        checkerId: selectedCheckerId,
+        riskIds: selectedRiskIds,                      
+    };
 
-    const metodo = id ? "PUT" : "POST";
+
+
+    const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
-  };
+};
 
-  const enviarSolicitud = async (method: "POST" | "PUT", data: CriticidadData) => {
+  const enviarSolicitud = async (method: "POST" | "PUT", data: PeligroData) => {
     try {
-      const url = method === "PUT" && id ? `${baseURL}/criticity/${id}` : `${baseURL}/criticity/`;
+      const url = method === "PUT" && id ? `${baseURL}/hazzard/${id}` : `${baseURL}/hazzard/`;
       const response = await axios({
         method,
         url,
         data,
         headers: { "Content-Type": "application/json" },
       });
-
+  
       showAlert("Operación realizada con éxito", "success");
-
-      if (method === "POST") {
-        setCriticityType((prev) => [...prev, response.data]);
-      } else if (method === "PUT") {
-        setCriticityType((prev) =>
-          prev.map((item) => (item.id === response.data.id ? response.data : item))
-        );
-      }
-
+      getHazzard();
       if (modalRef.current) {
         const modal = bootstrap.Modal.getInstance(modalRef.current);
         modal?.hide();
       }
-
-      getCriticity();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
@@ -132,17 +184,18 @@ const Criticidad: React.FC = () => {
     }
   };
 
-  const deleteCriticity = async (id: number) => {
+  const deleteHazzard = async (id: number) => {
     try {
-      await axios.delete(`${baseURL}/criticity/${id}`, {
+      await axios.delete(`${baseURL}/hazzard/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-      Swal.fire("Criticidad eliminada correctamente", "", "success");
-      getCriticity();
+      Swal.fire("Peligro eliminado correctamente", "", "success");
+      setHazzard((prev) => prev.filter((check) => check.id !== id));
+      getHazzard();
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar Criticidad.",
+        text: "Error al eliminar el peligro.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -165,40 +218,46 @@ const Criticidad: React.FC = () => {
     return dateString.split('T')[0];
   };
 
+
+  const opcionesPeligros = risk.map(risk => ({
+    value: risk.id,
+    label: risk.name,
+  }));
+
   return (
     <div className="App">
       <div className="container-fluid">
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Criticidad' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Peligros' onClick={() => openModal("1")} />
             </div>
-            <div className="table-responsive">
+            <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
-                <thead className="text-center" 
+                <thead className="text-center"
                   style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
                   <tr>
                     <th>N°</th>
-                    <th>Nivel</th>
-                    <th>Descripción</th>
+                    <th>Nombre</th>
+                    <th>Verificación</th>
+                    <th>Riesgos</th> 
                     <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {criticity.map((crit, i) => (
-                    <tr key={crit.id} className="text-center">
+                  {hazzard.map((hazz, i) => (
+                    <tr key={JSON.stringify(hazz)} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{crit.name}</td>
-                      <td>{capitalizeFirstLetter(crit.description)}</td>
-                      <td>{formatDate(crit.createDate)}</td>
+                      <td>{capitalizeFirstLetter(hazz.name)}</td>
+                      <td>{hazz.checker.name}</td>
+                      <td>{hazz.risks.map(h => capitalizeFirstLetter(h.name)).join(', ')}</td>
+                      <td>{formatDate(hazz.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                           <button
-                            onClick={() => openModal("2", crit)}
+                            onClick={() => openModal("2", hazz)}
                             className="btn btn-custom-editar m-2"
-                            data-bs-toggle="modal"
-                            data-bs-target="#modalUsers"
                           >
                             <i className="fa-solid fa-edit"></i>
                           </button>
@@ -214,7 +273,7 @@ const Criticidad: React.FC = () => {
                               cancelButtonText: "Cancelar",
                             }).then((result) => {
                               if (result.isConfirmed) {
-                                deleteCriticity(crit.id);
+                                deleteHazzard(hazz.id);
                               }
                             });
                           }}>
@@ -229,7 +288,7 @@ const Criticidad: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>
+        <div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
           <div className="modal-dialog modal-dialog-top modal-md">
             <div className="modal-content">
               <div className="modal-header">
@@ -242,33 +301,57 @@ const Criticidad: React.FC = () => {
                 ></button>
               </div>
               <div className="modal-body">
-                <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-bolt"></i>
+                    <i className="fa-solid fa-circle-radiation"></i>
                   </span>
                   <input
                     type="text"
-                    id="nombre"
                     className="form-control"
-                    placeholder="Nivel de Criticidad"
+                    placeholder="Nombre del Peligro"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-regular fa-solid fa-file-alt"></i>
+                  <i className="fa-regular fa-solid fa-file-alt"></i>
                   </span>
                   <input
                     type="text"
-                    id="descripcion"
                     className="form-control"
                     placeholder="Descripción"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
+                <div className="mb-3">
+                  <label htmlFor="checker" className="form-label">Verificación:</label>
+                  <select
+                    id="checker"
+                    className="form-select"
+                    value={selectedCheckerId}  
+                    onChange={(e) => setSelectedCheckerId(Number(e.target.value))}
+                  >
+                    <option value={0}>Selecciona...</option>
+                    {checker.map(chec => (
+                      <option key={JSON.stringify(chec)} value={chec.id}>{chec.name}</option>
+                    ))}
+                 </select>
+                </div>
+                <div className="form-group mt-3">
+                    <label htmlFor="risk">Riesgos:</label>
+                    <Select
+                      isMulti
+                      value={opcionesPeligros.filter(option => selectedRiskIds.includes(option.value))}
+                      onChange={(selectedOptions) => {
+                        const selectedIds = selectedOptions.map((option) => option.value);
+                        setSelectedRiskIds(selectedIds);
+                      }}
+                      options={opcionesPeligros}
+                    />
+              </div>
+
               </div>
               <div className="modal-footer">
                 <button
@@ -295,5 +378,4 @@ const Criticidad: React.FC = () => {
   );
 };
 
-export default Criticidad;
-
+export default Peligro;

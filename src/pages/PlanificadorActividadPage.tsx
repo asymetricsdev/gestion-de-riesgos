@@ -1,4 +1,4 @@
-import { ActivitiesTable }from '../components/ActivitiesTable/ActivitiesTable'
+import { PlanificadorActividad }from '../components/PlanificadorActividad/PlanificadorActividad'
 import ActivityPlanner from "../components/ActivityPlanner/ActivityPlanner";
 import InfoCard from '../components/InfoCard/InfoCard';
 
@@ -7,12 +7,10 @@ export default function PlanificadorActividadPage() {
     <div>
        <ActivityPlanner /> 
        <InfoCard name="John Doe" rut="123456789" program="Program A" numberOfPeople={5} />
-       <ActivitiesTable title="Actividades" /> 
+       <PlanificadorActividad title="Actividades" /> 
       
       
     </div>
-  )
-
-    
+  )  
   
 }

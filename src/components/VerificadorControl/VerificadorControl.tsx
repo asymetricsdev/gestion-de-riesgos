@@ -5,33 +5,27 @@ import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import Select from 'react-select';
 import { Accordion, AccordionItem, AccordionHeader, AccordionBody } from 'react-bootstrap';
+import Select from 'react-select';
+import { capitalizeFirstLetter } from '../functions';
 import * as bootstrap from 'bootstrap';
 
 
 const MySwal = withReactContent(Swal);
 
 
-interface Profiles {
+ interface VerificadorControl {
   id: number;
   name: string;
   description: string;
   createDate: string;
   updateDate: string;
-  process: Process;
-  tasks: Tasks[];
-}
+  checkerType: CheckerType;
+  task: Task;
+  checkpoints: Checkpoint[]; 
+} 
 
-interface Tasks {
-  id: number;
-  name: string;
-  description: string;
-  createDate: string;
-  updateDate: string;
-}
-
-interface Process {
+interface CheckerType {
   id: number;
   name: string;
   description: string;
@@ -39,34 +33,51 @@ interface Process {
   updateDate?: string;
 }
 
-
-interface ProfilesData{
+interface Checkpoint {
+  id: number;
   name: string;
   description: string;
-  processId: number;
-  taskIds: number[];
+  createDate?: string;
+  updateDate?: string;
 }
 
-const Profiles: React.FC = () => {
+interface Task {
+  id: number;
+  name: string;
+  description: string;
+  createDate?: string;
+  updateDate?: string;
+}
 
+interface VerificadorControlData{
+  name: string;
+  description: string;
+  checkerTypeId: number;
+  taskId: number | null;
+  checkpointIds: number[] | null;
+}
+
+const VerificadorControl: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
-  const [profiles, setProfiles] = useState<Profiles[]>([]);
-  const [description, setDescription] = useState<string>("");
-  const [process, setProcess] = useState<Process[]>([]);
-  const [tasks, setTasks] = useState<Tasks[]>([]);
+  const [checker, setChecker] = useState<VerificadorControl[]>([]);
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
-  const [selectedActivityTypeId, setSelectedActivityTypeId] = useState<number>(0);
-  const [selectedProcessId, setSelectedProcessId] = useState<number>(0);
-  const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
+  const [description, setDescription] = useState<string>("");
+  const [checkerType, setCheckerType] = useState<CheckerType[]>([]);
+  const [task, setTask] = useState<Task[]>([]);
+  const [checkpoint, setCheckpoint] = useState<Checkpoint[]>([]);
+  const [selectedCheckerTypeId, setSelectedCheckerTypeId] = useState<number>(0);
+  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
+  const [selectedCheckpointIds, setSelectedCheckpointIds] = useState<number[] | null>(null);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    getProfiles();
-    getProcess(); 
-    getTasks();
+    getChecker();
+    getCheckerType();
+    getTask();
+    getCheckpoint();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -77,49 +88,60 @@ const Profiles: React.FC = () => {
     };
   }, []);
 
-  const getProfiles = async () => {
+  const  getChecker = async () => {
     try {
-      const response: AxiosResponse<Profiles[]> = await axios.get(`${baseURL}/profile/`);
-      setProfiles(response.data);
+      const response: AxiosResponse<VerificadorControl[]> = await axios.get(`${baseURL}/checker/`);
+      setChecker(response.data);
     } catch (error) {
-      showAlert("Error al obtener los perfiles", "error");
+      showAlert("Error al obtener los verificadores de control", "error");
     }
   };
   
-  
-  const getProcess = async () => {
+   const getCheckerType = async () => {
     try {
-      const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
-      setProcess(response.data);
+      const response: AxiosResponse<CheckerType[]> = await axios.get(`${baseURL}/checker_type/`);
+      setCheckerType(response.data);
     } catch (error) {
-      showAlert("Error al obtener los procesos", "error");
+      showAlert("Error al obtener al jerarquía de control", "error");
     }
-  }; 
+  };
 
-  const getTasks = async () => {
+  const getTask = async () => {
     try {
-      const response: AxiosResponse<Tasks[]> = await axios.get(`${baseURL}/task/`);
-      setTasks(response.data);
+      const response: AxiosResponse<Checkpoint[]> = await axios.get(`${baseURL}/task/`);
+      setTask(response.data);
     } catch (error) {
       showAlert("Error al obtener las tareas", "error");
     }
   }; 
+  
+  const getCheckpoint = async () => {
+    try {
+      const response: AxiosResponse<Checkpoint[]> = await axios.get(`${baseURL}/checkpoint/`);
+      setCheckpoint(response.data);
+    } catch (error) {
+      showAlert("Error al obtener los items", "error");
+    }
+  }; 
 
-  const openModal = (op: string, profiles?: Profiles) => {
+  
+  const openModal = (op: string, checker?: VerificadorControl) => {
     if (op === "1") {
       setId(null);
       setName("");
       setDescription("");
-      setSelectedTaskIds([]);
-      setSelectedProcessId(0);
-      setTitle("Registrar Perfil");
-    } else if (op === "2" && profiles) {
-      setId(profiles?.id || null);
-      setName(profiles.name);
-      setDescription(profiles.description);
-      setSelectedTaskIds(profiles.tasks.map(h => h.id));
-      setSelectedProcessId(profiles.process.id);
-      setTitle("Editar Perfil");
+      setSelectedCheckerTypeId(0);
+      setSelectedTaskId(0);
+      setSelectedCheckpointIds([]);
+      setTitle("Registrar Verificación de Control");
+    } else if (op === "2" && checker) {
+      setId(checker?.id || null);
+      setName(checker.name);
+      setDescription(checker.description);
+      setSelectedCheckerTypeId(checker.checkerType.id); 
+      setSelectedTaskId(checker.task.id); 
+      setSelectedCheckpointIds(checker.checkpoints.map(h => h.id));
+      setTitle("Editar Verificación de Control");
     }
 
     if (modalRef.current) {
@@ -137,36 +159,41 @@ const Profiles: React.FC = () => {
 
   const validar = (): void => {
     if (name.trim() === "") {
-        showAlert("Escribe el nombre del perfil", "warning");
+        showAlert("Escribe el nombre del verificador", "warning");
         return;
     }
      if (description.trim() === "") {
-        showAlert("Escribe la descripción del perfil", "warning");
+        showAlert("Escribe la descripción del verificador", "warning");
      }
-    
-    if (selectedProcessId === 0) {
-        showAlert("Selecciona un tipo de proceso", "warning");
+     if (selectedCheckerTypeId === 0) {
+        showAlert("Selecciona un tipo de jerarquía", "warning");
         return;
     }
-    if (selectedTaskIds.length === 0) {
-        showAlert("Selecciona al menos una tarea", "warning");
+    /* if (!selectedTaskId) {
+        showAlert("Selecciona una tarea", "warning");
         return;
-    }
+    } */
+     if (!selectedCheckpointIds) {
+        showAlert("Debes seleccionar al menos un checkpoint o dejarlo vacío", "warning");
+        return;
+    } 
+  
 
-    const parametros : ProfilesData = {
-      name: name.trim(),
-      description: description.trim(),
-      processId: selectedProcessId,
-      taskIds: selectedTaskIds,  
+    const parametros : VerificadorControlData = {
+        name: name.trim(),
+        description: description.trim(),
+        checkerTypeId: selectedCheckerTypeId,  
+        taskId: selectedTaskId ? selectedTaskId : null, 
+        checkpointIds: selectedCheckpointIds,
     };
     
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
-};
+  };
 
-const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
+const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlData) => {
   try {
-    const url = method === "PUT" && id ? `${baseURL}/profile/${id}` : `${baseURL}/profile/`;
+    const url = method === "PUT" && id ? `${baseURL}/checker/${id}` : `${baseURL}/checker/`;
     const response = await axios({
       method,
       url,
@@ -174,15 +201,15 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
       headers: { "Content-Type": "application/json" },
     });
 
-    const newActividad = response.data; 
+    const newChecker = response.data; 
 
     showAlert("Operación realizada con éxito", "success");
 
     if (method === "POST") {
-      setProfiles((prev) => [...prev, newActividad]);
+      setChecker((prev) => [...prev, newChecker]);
     } else if (method === "PUT") {
-      setProfiles((prev) =>
-        prev.map((prof) => (prof.id === newActividad.id ? newActividad : prof))
+      setChecker((prev) =>
+        prev.map((check) => (check.id === newChecker.id ? newChecker : check))
       );
     }
 
@@ -192,25 +219,25 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
     }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+      showAlert(`Error: ${error.response.data.message || "La tarea seleccionada ya esta asignada"}`, "error");
     } else {
       showAlert("Error al realizar la solicitud", "error");
     }
   }
 };
 
-
-  const deleteProfiles = async (id: number) => {
+  const deleteChecker = async (id: number) => {
     try {
-      await axios.delete(`${baseURL}/profile/${id}`, {
+      await axios.delete(`${baseURL}/checker/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-      Swal.fire("Perfil eliminado correctamente", "", "success");
-      getProfiles();
+      Swal.fire("Verificador de control eliminado correctamente", "", "success");
+      setChecker((prev) => prev.filter((check) => check.id !== id));
+      getChecker();
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar el Perfil.",
+        text: "Error al eliminar el verificador de control.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -232,7 +259,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
 
   const handleHazzardSelection = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOptions = Array.from(event.target.selectedOptions, option => Number(option.value));
-    setSelectedTaskIds(selectedOptions);
+    setSelectedCheckpointIds(selectedOptions);
   };
   
 
@@ -240,9 +267,9 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
     return dateString.split('T')[0];
   };
 
-  const opcionesTareas = tasks.map(task => ({
-    value: task.id,
-    label: task.description,
+  const opcionesItems = checkpoint.map(checkpoint => ({
+    value: checkpoint.id,
+    label: checkpoint.name,
   }));
 
   return (
@@ -251,48 +278,53 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Perfiles' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Verificadores de Control' onClick={() => openModal("1")} />
             </div>
-            <div className="table-responsive">
+            <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
                 <thead className="text-center"
                   style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Proceso</th>
-                    <th>Tareas</th> 
-                    <th>Fecha</th>
+                    <th>Medidas Preventivas</th>
+                    <th>Tipo de jerarquia</th>
+                    <th>Tareas</th>
+                    <th>Items</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {profiles.map((prof, i) => (
-                    <tr key={JSON.stringify(prof)} className="text-center">
+                {checker && checker.length > 0 && checker.map((check, i) => (
+                   
+                    <tr key={JSON.stringify(check)} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{prof.name}</td>
-                      <td>{prof.description}</td>
-                      <td>{prof.process.name}</td> 
+                      <td>{check.name}</td>
                       <td>
                         <Accordion>
                           <Accordion.Item eventKey="0">
-                            <Accordion.Header>Ver Tareas</Accordion.Header>
+                            <Accordion.Header>Descripción</Accordion.Header>
                             <Accordion.Body>
                               <ul>
-                                {prof.tasks.map((task) => (
-                                  <li key={task.id}>{task.description}</li>
-                                ))}
+                                {check.description
+                                  .split('-') 
+                                  .filter(Boolean) 
+                                  .map((item, index) => (
+                                    <li key={index}>
+                                      {capitalizeFirstLetter(item.trim())}</li>
+                                  ))}
                               </ul>
                             </Accordion.Body>
                           </Accordion.Item>
                         </Accordion>
                       </td>
-                      <td>{formatDate(prof.createDate)}</td>
+                      <td>{check.checkerType.name}</td>
+                      <td>{check.task ? check.task.name : "Sin Tarea"}</td>
+					  <td>{Array.isArray(check.checkpoints) && check.checkpoints.length > 0 ? check.checkpoints.map((h) => h.name).join(", ") : "Sin Items"}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                           <button
-                            onClick={() => openModal("2", prof)}
+                            onClick={() => openModal("2", check)}
                             className="btn btn-custom-editar m-2"
                           >
                             <i className="fa-solid fa-edit"></i>
@@ -309,7 +341,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                               cancelButtonText: "Cancelar",
                             }).then((result) => {
                               if (result.isConfirmed) {
-                                deleteProfiles(prof.id);
+                                deleteChecker(check.id);
                               }
                             });
                           }}>
@@ -339,12 +371,12 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
               <div className="modal-body">
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-id-badge"></i>
+                  <i className="fa-solid fa-list-check"></i>
                   </span>
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Nombre del Perfil"
+                    placeholder="Nombre de la verificación"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -356,36 +388,53 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Descripción del Perfil"
+                    placeholder="Descripción de la verificación"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="process" className="form-label">Proceso:</label>
+                  <label htmlFor="checkerType" className="form-label">Tipo de Jerarquia:</label>
                   <select
-                    id="process"
+                    id="checkerType"
                     className="form-select"
-                    value={selectedProcessId}  
-                    onChange={(e) => setSelectedProcessId(Number(e.target.value))}
+                    value={selectedCheckerTypeId}
+                    onChange={(e) => setSelectedCheckerTypeId(Number(e.target.value))}
                   >
                     <option value={0}>Selecciona...</option>
-                    {process.map(proc => (
-                      <option key={JSON.stringify(proc)} value={proc.id}>{proc.name}</option>
+                    {checkerType.map(actv => (
+                      <option key={JSON.stringify(actv)} value={actv.id}>{actv.description}</option>
                     ))}
-                 </select>
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="task" className="form-label">Tarea:</label>
+                  <select
+                    id="task"
+                    className="form-select"
+                    value={selectedTaskId === null ? 0 : selectedTaskId}
+                    onChange={(e) => setSelectedTaskId(Number(e.target.value))}
+                  >
+                    <option value={0}>Tarea no asignada</option>
+                    {task.map(ts => (
+                      <option key={JSON.stringify(ts)} value={ts.id}>{ts.name}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="form-group mt-3">
-                    <label htmlFor="hazzard">Tareas:</label>
+                    <label htmlFor="checkpoints">Items:</label>
                     <Select
                       isMulti
-                      value={opcionesTareas.filter(option => selectedTaskIds.includes(option.value))}
+                      value={opcionesItems.filter(option => selectedCheckpointIds?.includes(option.value))}
                       onChange={(selectedOptions) => {
-                        const selectedIds = selectedOptions.map((option) => option.value);
-                        setSelectedTaskIds(selectedIds); 
+                        const selectedIds = selectedOptions.length > 0 
+                          ? selectedOptions.map(option => option.value) 
+                          : null; // Cambia a null si no hay selección
+                        setSelectedCheckpointIds(selectedIds); 
                       }}
-                      options={opcionesTareas}
-                    />
+                  options={opcionesItems}
+                  placeholder="Items no asignados..."
+                />
               </div>
               </div>
               <div className="modal-footer">
@@ -413,4 +462,4 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
   );
 };
 
-export default Profiles;
+export default VerificadorControl;
