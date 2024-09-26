@@ -3,11 +3,7 @@ import './Login.css'
 import icon from '../../img/logo-login.png'; 
 
 export default function Login() {
-  /* const cardStyle = {
-    
-    backgroundColor: '#0D6EFD',
-  }; */
-
+  
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 container-lg">
       <div>
