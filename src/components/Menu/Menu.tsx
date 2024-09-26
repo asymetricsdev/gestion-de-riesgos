@@ -60,6 +60,18 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						</NavLink>
 					</OverlayTrigger>
 				)}
+				{isOpen ? (
+					<NavLink to="/login" id="login" className="nav-link text-custom-color d-flex align-items-center">
+						<i className="fa-solid fa-arrow-right-to-bracket"></i>
+						<span>Login</span>
+					</NavLink>
+				) : (
+					<OverlayTrigger placement="right" overlay={renderTooltip("Home")}>
+						<NavLink to="/login" className="nav-link text-white text-custom-color d-flex align-items-center">
+							<i className="fa-solid fa-home"></i>
+						</NavLink>
+					</OverlayTrigger>
+				)}
 
 				{/* Planificación Submenu */}
 				{isOpen ? (

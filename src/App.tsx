@@ -24,6 +24,7 @@ import Colaboradores from './pages/ColaboradoresPage';
 import Items from './pages/ItemsPage';
 import VerificadorControl from './pages/VerificadorControlPage';
 import JerarquiaControl from './pages/JerarquiaControlPage';
+import Login from './pages/LoginPage';
 
 
 export function App() {
@@ -45,6 +46,9 @@ export function App() {
                         <Col xs={isMenuOpen ? 10 : 11} className="main-content">
                                 <Routes>
                                 <Route path="/home" element={<Home />} />
+                                {/*LOGIN*/}
+                                <Route path="/login" element={<Login />} />
+                                
                                 {/*PLANIFICACIÓN*/}
                                 <Route path="/planificacion" element={< PlanificadorActividad/>} />
                                 <Route path="/planificacion/planificador-de-actividad" element={< PlanificadorActividad/>} />
