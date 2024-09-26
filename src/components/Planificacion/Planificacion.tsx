@@ -62,8 +62,8 @@ interface Tasks {
 interface PlanningData {
 	name: string;
 	description: string;
-	startDate: number;
-	endDate: number;
+	startDate: string;
+	endDate: string;
     employeeIds: number[];
     profileId: number;
 }
@@ -77,7 +77,6 @@ const Planning: React.FC = () => {
     const [endDate, setEndDate] = useState<string>("");
 	const [profile, setProfile] = useState<Profile[]>([]);
 	const [process, setProcess] = useState<Process[]>([]);
-	const [tasks, setTasks] = useState<Tasks[]>([]);
     const [employees, setEmployee] = useState<Employees[]>([]);
 	const [id, setId] = useState<number | null>(null);
     const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<number[]>([]);
@@ -144,22 +143,27 @@ const Planning: React.FC = () => {
 			setDescription("");
 			setSelectedEmployeeIds([]);
 			setSelectedProfileId(0);
-			setTitle("Crear Nueva Planificacion");
+			setStartDate("");
+			setEndDate("");
+			setTitle("Crear Nueva Planificación");
 		} else if (op === "2" && planning) {
-			setId(planning?.id || null);
+			setId(planning.id);
 			setName(planning.name);
 			setDescription(planning.description);
-			setSelectedEmployeeIds(planning.tasks.map((h) => h.id));
+			setSelectedEmployeeIds(planning.employees.map((emp) => emp.id));
 			setSelectedProfileId(planning.profile.id);
-			setTitle("Editar Planificacion");
+			setStartDate(planning.startDate);
+			setEndDate(planning.endDate);
+			setTitle("Editar Planificación");
 		}
-
+	
 		if (modalRef.current) {
 			const modal = new bootstrap.Modal(modalRef.current);
 			modal.show();
 			setIsModalOpen(true);
 		}
 	};
+	
 
 	const handleModalHidden = () => {
 		setIsModalOpen(false);
@@ -167,68 +171,74 @@ const Planning: React.FC = () => {
 		modals.forEach((modal) => modal.parentNode?.removeChild(modal));
 	};
 
-    const validar = (): void => {
-        if (name.trim() === "") {
-            showAlert("Escribe Nombre de la Planificación", "warning");
-            return;
-        }
-        if (description.trim() === "") {
-            showAlert("Escribe la descripción del perfil", "warning");
-            return;
-        }
-        if (startDate === "") {
-            showAlert("Selecciona la fecha de inicio", "warning");
-            return;
-        }
-        if (endDate === "") {
-            showAlert("Selecciona la fecha de fin", "warning");
-            return;
-        }
-        if (selectedProfileId === 0) {
-            showAlert("Selecciona un tipo de proceso", "warning");
-            return;
-        }
-        if (selectedEmployeeIds.length === 0) {
-            showAlert("Selecciona al menos un empleado", "warning");
-            return;
-        }
-    
-        const parametros: PlanningData = {
-            name: name.trim(),
-            description: description.trim(),
-            startDate: new Date(startDate).getTime(),
-            endDate: new Date(endDate).getTime(),
-            employeeIds: selectedEmployeeIds,
-            profileId: selectedProfileId,
-        };
-    
-        const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
-        enviarSolicitud(metodo, parametros);
-    };
-    
+	const validar = (): void => {
+		if (name.trim() === "") {
+			showAlert("Escribe Nombre de la Planificación", "warning");
+			return;
+		}
+		if (description.trim() === "") {
+			showAlert("Escribe la descripción del perfil", "warning");
+			return;
+		}
+		if (startDate === "") {
+			showAlert("Selecciona la fecha de inicio", "warning");
+			return;
+		}
+		if (endDate === "") {
+			showAlert("Selecciona la fecha de fin", "warning");
+			return;
+		}
+		if (selectedProfileId === 0) {
+			showAlert("Selecciona un tipo de proceso", "warning");
+			return;
+		}
+		if (selectedEmployeeIds.length === 0) {
+			showAlert("Selecciona al menos un empleado", "warning");
+			return;
+		}
+	
+		const formattedStartDate = new Date(startDate).toISOString().split("T")[0];
+		const formattedEndDate = new Date(endDate).toISOString().split("T")[0];
+	
+		const parametros: PlanningData = {
+			name: name.trim(),
+			description: description.trim(),
+			startDate: formattedStartDate,
+			endDate: formattedEndDate,
+			employeeIds: selectedEmployeeIds,
+			profileId: selectedProfileId,
+		};
+	
+		const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
+		enviarSolicitud(metodo, parametros);
+	};
+	
+	
 
 	const enviarSolicitud = async (method: "POST" | "PUT", data: PlanningData) => {
 		try {
 			const url = method === "PUT" && id ? `${baseURL}/planning/${id}` : `${baseURL}/planning/`;
+			console.log(data)
 			const response = await axios({
 				method,
 				url,
 				data,
 				headers: { "Content-Type": "application/json" },
 			});
-
-			const newActividad = response.data;
-
+	
+			const newPlanning = response.data; 
+			console.log("errorrss" , newPlanning);
 			showAlert("Operación realizada con éxito", "success");
-
+	
 			if (method === "POST") {
-				setPlanning((prev) => [...prev, newActividad]);
+				console.log("errorrss  3" , newPlanning);
+				setPlanning((prev) => [...prev, newPlanning]);
 			} else if (method === "PUT") {
 				setPlanning((prev) =>
-					prev.map((prof) => (prof.id === newActividad.id ? newActividad : prof))
+					prev.map((plan) => (plan.id === newPlanning.id ? newPlanning : plan))
 				);
 			}
-
+	
 			if (modalRef.current) {
 				const modal = bootstrap.Modal.getInstance(modalRef.current);
 				modal?.hide();
@@ -244,23 +254,34 @@ const Planning: React.FC = () => {
 			}
 		}
 	};
+	
 
 	const deletePlanning = async (id: number) => {
 		try {
-			await axios.delete(`${baseURL}/profile/${id}`, {
+			console.log("Intentando eliminar planificación con ID:", id);
+			const response = await axios.delete(`${baseURL}/planning/${id}`, {
 				headers: { "Content-Type": "application/json" },
 			});
-			Swal.fire("Perfil eliminado correctamente", "", "success");
-			getPlanning();
+	
+			if (response.status === 200) {
+				Swal.fire("Planificación eliminada correctamente", "", "success");
+				getPlanning(); 
+			} else {
+				throw new Error("No se pudo eliminar la planificación");
+			}
 		} catch (error) {
 			Swal.fire({
 				title: "Error",
-				text: "Error al eliminar el Perfil.",
+				text: "Error al eliminar la Planificación. Verifica si hay dependencias.",
 				icon: "error",
 				confirmButtonText: "OK",
 			});
+			console.error("Error al eliminar la planificación:", error);
 		}
 	};
+	
+	
+	
 
 	const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>
@@ -311,6 +332,7 @@ const Planning: React.FC = () => {
 									<tr>
 										<th>N°</th>
 										<th>Perfiles</th>
+										<th>Rut</th>
 										<th>Empleados</th>
 										<th>Fecha de Inicio</th>
 										<th>Fecha de Fin</th>
@@ -322,8 +344,8 @@ const Planning: React.FC = () => {
 										<tr key={JSON.stringify(plan)} className="text-center">
 											<td>{i + 1}</td>
 											<td>{plan.profile?.name}</td>
-                                            <td>{plan.employees?.map((emp) => `${emp.rut} - ${emp.name}`).join(", ")}</td>
-											{/* <td>{plan.employees?.map((emp) => emp.name).join(", ")}</td> */}
+											<td>{plan.employees?.map((emp) => emp.rut).join(", ")}</td>
+											<td>{plan.employees?.map((emp) => emp.name).join(", ")}</td>
 											<td>{formatDate(plan.startDate)}</td>
 											<td>{formatDate(plan.createDate)}</td>
 											<td className="text-center">
