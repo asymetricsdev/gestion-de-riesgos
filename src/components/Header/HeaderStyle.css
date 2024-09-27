@@ -65,27 +65,63 @@
 }
 
 .btn-custom-danger {
-    background-color: #E6007D;
-    border-color: #E6007D;
+    background-color: #A17BB6;
+    border-color: #A17BB6;
+    border-radius: 20px;
     color: #fff;
 }
   
 .btn-custom-danger:hover {
-    background-color: #d1006f;
-    border-color: #d1006f;
+    background-color: #c46bf0;
+    border-color: #c46bf0;
     color: #fff;
 }
 
   
 .btn-custom-editar {
-    background-color: #E6007D;
-    border-color: #E6007D;
+    background-color: #A17BB6;
+    border-color: #A17BB6;
+    border-radius: 20px;
     color: #fff;
 }
 
 .btn-custom-editar:hover {
-    background-color: #d1006f;
-    border-color: #d1006f;
+    background-color: #c46bf0;
+    border-color: #c46bf0;
+    color: #fff;
+}
+
+
+.btn-custom-tareas {
+    width: 90px;
+    height: 35px;
+    border-radius: 20px;
+    background-color: #A17BB6;
+    border-color: #A17BB6;
+    color: #fff;
+}
+
+.btn-custom-tareas:hover {
+    background-color: #c46bf0;
+    border-color: #c46bf0;
+    color: #fff;
+}
+
+.btn-custom-descargar{
+    width: 90px;
+    height: 35px;
+    border-radius: 20px;
+    background-color: #A17BB6;
+    border-color: #A17BB6;
+    color: #fff;
+}
+
+.btn-custom-descargar:hover{
+    width: 90px;
+    height: 35px;
+    border-radius: 20px;
+    background-color: #c46bf0;
+    border-color: #c46bf0;
     color: #fff;
 }
 

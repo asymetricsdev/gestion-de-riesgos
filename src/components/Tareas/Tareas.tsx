@@ -421,9 +421,9 @@ function Tareas() {
 																tr.name
 															)
 														}
-														className="btn btn-custom-editar m-2"
+														className="btn btn-custom-descargar m-2"
 													>
-														<FontAwesomeIcon icon={faDownload} /> Descargar
+														<FontAwesomeIcon icon={faDownload} />
 													</button>
 												</OverlayTrigger>
 											</td>
