@@ -199,6 +199,11 @@ const Colaboradores: React.FC = () => {
     }
   };
 
+  const renderTareasTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+    <Tooltip id="button-tooltip-edit" {...props}>
+      Ver Tareas
+    </Tooltip>
+  );
   const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
     <Tooltip id="button-tooltip-edit" {...props}>
       Editar
@@ -258,6 +263,7 @@ const Colaboradores: React.FC = () => {
                     <th>Nombre</th>
                     <th>Apellido</th>
                     <th>Cargo</th>
+                    <th>Ver Tareas</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -269,6 +275,16 @@ const Colaboradores: React.FC = () => {
                       <td>{emp.firstName}</td>
                       <td>{emp.lastName}</td>
                       <td>{emp.position.name}</td> 
+                      <td>
+                        <OverlayTrigger placement="top" overlay={renderTareasTooltip({})}>
+                          <button
+                              // onClick={() => openModal("3", emp)}
+                              className="btn btn-custom-tareas m-2"
+                            >
+                              <i className="fa-solid fa-list-check"></i>
+                            </button>
+                          </OverlayTrigger>
+                        </td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                           <button
