@@ -1,4 +1,4 @@
-import Registro from '../components/Registro/registro';
+import Registro from '../components/Registro/Registro';
 
 export default function RegistroPage() {
   return (
