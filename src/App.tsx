@@ -26,6 +26,7 @@ import Items from './pages/ItemsPage';
 import VerificadorControl from './pages/VerificadorControlPage';
 import JerarquiaControl from './pages/JerarquiaControlPage';
 import Login from './pages/LoginPage';
+import Registro from './pages/RegistroPage';    
 
 
 export function App() {
@@ -49,6 +50,8 @@ export function App() {
                                 <Route path="/home" element={<Home />} />
                                 {/*LOGIN*/}
                                 <Route path="/login" element={<Login />} />
+                                {/*REGISTRO*/}
+                                <Route path="/registro" element={<Registro />} />
                                 
                                 {/*PLANIFICACIÓN*/}
                                 <Route path="/planificacion" element={< PlanificadorActividad/>} />
