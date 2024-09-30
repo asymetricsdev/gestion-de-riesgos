@@ -6,6 +6,7 @@ import { showAlert } from '../functions';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
+import { useNavigate } from 'react-router-dom'; 
 
 
 const MySwal = withReactContent(Swal);
@@ -244,6 +245,13 @@ const Colaboradores: React.FC = () => {
   
     return digitoCalculado === verificador;
   }; 
+
+  const navigate = useNavigate();
+
+  const verTareas = (empId: number) => {
+    navigate(`/tarea-colaborador/${empId}`);
+  };
+
   
   return (
     <div className="App">
@@ -277,14 +285,11 @@ const Colaboradores: React.FC = () => {
                       <td>{emp.position.name}</td> 
                       <td>
                         <OverlayTrigger placement="top" overlay={renderTareasTooltip({})}>
-                          <button
-                              // onClick={() => openModal("3", emp)}
-                              className="btn btn-custom-tareas m-2"
-                            >
-                              <i className="fa-solid fa-list-check"></i>
-                            </button>
-                          </OverlayTrigger>
-                        </td>
+                          <button className="btn btn-custom-tareas m-2" onClick={() => verTareas(emp.id)}>
+                            <i className="fa-solid fa-list-check"></i>
+                          </button>
+                        </OverlayTrigger>
+                      </td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                           <button
