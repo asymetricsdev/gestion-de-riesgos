@@ -40,6 +40,7 @@ const Riesgo: React.FC = () => {
   const [pendingRequests, setPendingRequests] = useState<number>(0);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getRisk();
@@ -105,6 +106,7 @@ const Riesgo: React.FC = () => {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
+    setLoading(true);
     
     const parametros: RiesgoData = {  
       name: name.trim(), 
@@ -306,9 +308,21 @@ const Riesgo: React.FC = () => {
                 >
                   Cerrar
                 </button>
-                <button type="button" className="btn btn-primary" onClick={validar}>
-                  Guardar
-                </button>
+                <button
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
+								</button>
               </div>
             </div>
           </div>

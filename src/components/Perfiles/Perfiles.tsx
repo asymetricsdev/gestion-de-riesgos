@@ -65,6 +65,7 @@ const Profiles: React.FC = () => {
   const [pendingRequests, setPendingRequests] = useState<number>(0);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getProfiles();
@@ -164,6 +165,7 @@ const Profiles: React.FC = () => {
         showAlert("Selecciona al menos una tarea", "warning");
         return;
     }
+    setLoading(true);
 
     const parametros : ProfilesData = {
       name: name.trim(),
@@ -424,12 +426,20 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                   Cerrar
                 </button>
                 <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                >
-                  Guardar
-                </button>
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
+								</button>
               </div>
             </div>
           </div>

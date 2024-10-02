@@ -86,6 +86,8 @@ const Planning: React.FC = () => {
 	const [loading, setLoading] = useState<boolean>(false); 
 	const [pendingRequests, setPendingRequests] = useState<number>(0);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(false);
+
 
 	useEffect(() => {
 		getPlanning();
@@ -210,6 +212,8 @@ const Planning: React.FC = () => {
 			showAlert("Selecciona al menos un empleado", "warning");
 			return;
 		}
+
+		setLoading(true);
 	
 		const formattedStartDate = new Date(startDate).toISOString().split("T")[0];
 		const formattedEndDate = new Date(endDate).toISOString().split("T")[0];
@@ -233,7 +237,6 @@ const Planning: React.FC = () => {
 		setLoading(true);
 		try {
 			const url = method === "PUT" && id ? `${baseURL}/planning/${id}` : `${baseURL}/planning/`;
-			console.log(data)
 			const response = await axios({
 				method,
 				url,
@@ -241,12 +244,10 @@ const Planning: React.FC = () => {
 				headers: { "Content-Type": "application/json" },
 			});
 	
-			const newPlanning = response.data; 
-			console.log("errorrss" , newPlanning);
+			const newPlanning = response.data;
 			showAlert("Operación realizada con éxito", "success");
 	
 			if (method === "POST") {
-				console.log("errorrss  3" , newPlanning);
 				setPlanning((prev) => [...prev, newPlanning]);
 			} else if (method === "PUT") {
 				setPlanning((prev) =>
@@ -271,6 +272,7 @@ const Planning: React.FC = () => {
 			setLoading(false);
 		}
 	};
+	
 	
 
 	const deletePlanning = async (id: number) => {
@@ -324,10 +326,11 @@ const Planning: React.FC = () => {
 		return dateString.split("T")[0];
 	};
 
-    const opcionesEmpleados = employees.map((emp) => ({
-        value: emp.id,
-        label: `${emp.rut} - ${emp.name}`,
-    }));
+	const opcionesEmpleados = employees.map((emp) => ({
+		value: emp.id,
+		label: `${emp.rut} - ${emp.name}`,
+	}));
+	
     
 
 	return (
@@ -357,8 +360,7 @@ const Planning: React.FC = () => {
 									<tr>
 										<th>N°</th>
 										<th>Perfiles</th>
-										<th>Rut</th>
-										<th>Empleados</th>
+										<th className="w-50">Rut-Empleados</th>
 										<th>Fecha de Inicio</th>
 										<th>Fecha de Fin</th>
 										<th>Acciones</th>
@@ -369,8 +371,15 @@ const Planning: React.FC = () => {
 										<tr key={JSON.stringify(plan)} className="text-center">
 											<td>{i + 1}</td>
 											<td>{plan.profile?.name}</td>
-											<td>{plan.employees?.map((emp) => emp.rut).join(", ")}</td>
-											<td>{plan.employees?.map((emp) => emp.name).join(", ")}</td>
+											<td>
+												<ul className="list-unstyled">
+													{plan.employees?.map((emp) => (
+														<li key={emp.id}>
+															{emp.rut} - {emp.name}
+														</li>
+													))}
+												</ul>
+											</td>
 											<td>{formatDate(plan.startDate)}</td>
 											<td>{formatDate(plan.createDate)}</td>
 											<td className="text-center">
@@ -458,20 +467,22 @@ const Planning: React.FC = () => {
 									<label htmlFor="empleados">Empleados:</label>
 									<Select
 										isMulti
-										value={opcionesEmpleados.filter(
-											(option) => selectedEmployeeIds.includes(option.value)
+										value={opcionesEmpleados.filter((option) =>
+											selectedEmployeeIds.includes(option.value)
 										)}
 										onChange={(selectedOptions) => {
-											const selectedIds = selectedOptions.map((option) => Number(option.value)); 
-											setSelectedEmployeeIds(selectedIds as number[]); 
+											const selectedIds = selectedOptions.map((option) => Number(option.value));
+											setSelectedEmployeeIds(selectedIds as number[]);
 										}}
-										options={opcionesEmpleados} 
+										options={opcionesEmpleados}
 									/>
 								</div>
 
 								<div className="input-group mt-3">
 									<span className="input-group-text">
-									<label htmlFor="empleados"><i className="fa-solid fa-calendar-alt"></i> Fecha Inicio:</label>			
+										<label htmlFor="empleados">
+											<i className="fa-solid fa-calendar-alt"></i> Fecha Inicio:
+										</label>
 									</span>
 									<input
 										type="date"
@@ -482,9 +493,11 @@ const Planning: React.FC = () => {
 									/>
 								</div>
 
-								<div className="input-group mt-3" >
+								<div className="input-group mt-3">
 									<span className="input-group-text">
-									<label htmlFor="empleados"><i className="fa-solid fa-calendar-alt mr-1"></i> Fecha Final:</label>
+										<label htmlFor="empleados">
+											<i className="fa-solid fa-calendar-alt mr-1"></i> Fecha Final:
+										</label>
 									</span>
 									<input
 										type="date"
@@ -504,8 +517,20 @@ const Planning: React.FC = () => {
 								>
 									Cerrar
 								</button>
-								<button type="button" className="btn btn-primary" onClick={validar}>
-									Guardar
+								<button
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
 								</button>
 							</div>
 						</div>

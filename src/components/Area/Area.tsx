@@ -67,6 +67,7 @@ const Area: React.FC<AreaProps> = ({ isNewRecord }: AreaProps ) => {
   const [loading, setLoading] = useState<boolean>(false); 
   const [pendingRequests, setPendingRequests] = useState<number>(0);
 
+
   useEffect(() => {
     getDivision();
     getCompanyType();
@@ -178,6 +179,7 @@ const Area: React.FC<AreaProps> = ({ isNewRecord }: AreaProps ) => {
         return;
     }
 
+	setLoading(true);
 
 	const positionIds = id ? [2] : [];
 	const parametros: AreaData = {
@@ -412,8 +414,20 @@ const deleteDivision = async (id: number) => {
 								>
 									Cerrar
 								</button>
-								<button type="button" className="btn btn-primary" onClick={validar}>
-									Guardar
+								<button
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
 								</button>
 							</div>
 						</div>

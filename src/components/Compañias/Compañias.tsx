@@ -34,6 +34,7 @@ const Company: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false); 
   const [pendingRequests, setPendingRequests] = useState<number>(0);
 
+
   useEffect(() => {
     getCompany();
     if (modalRef.current) {
@@ -93,6 +94,7 @@ const Company: React.FC = () => {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
+    setLoading(true);
     
     const parametros: CompañiaData = { 
       name: name.trim(), 
@@ -291,12 +293,20 @@ const Company: React.FC = () => {
                   Cerrar
                 </button>
                 <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                >
-                  Guardar
-                </button>
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
+								</button>
               </div>
             </div>
           </div>

@@ -61,6 +61,7 @@ const Cargo: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false); 
   const [pendingRequests, setPendingRequests] = useState<number>(0);
 
+
   useEffect(() => {
     getPositions();
     getManagerPositions();
@@ -157,6 +158,7 @@ const Cargo: React.FC = () => {
       showAlert("Selecciona al menos una Division", "warning");
       return;
     }
+    setLoading(true);
 
     const parametros: CargoData = {
       name: name.trim(),
@@ -448,8 +450,20 @@ const Cargo: React.FC = () => {
 								<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
 									Cerrar
 								</button>
-								<button type="button" className="btn btn-primary" onClick={validar}>
-									Guardar
+								<button
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
 								</button>
 							</div>
 						</div>

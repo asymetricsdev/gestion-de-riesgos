@@ -33,6 +33,7 @@ const Activity: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false); 
   const [pendingRequests, setPendingRequests] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getActivityType();
@@ -93,6 +94,7 @@ const Activity: React.FC = () => {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
+    setLoading(true);
     
     const parametros : TipoActividadData = {
       name: name.trim(), 
@@ -130,7 +132,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) 
 	  } finally {
       setLoading(false);
     }
-  }; 
+
+  
 
   const deleteActividad = async (id: number) => {
     setLoading(true);
@@ -295,12 +298,20 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) 
                   Cerrar
                 </button>
                 <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                >
-                  Guardar
-                </button>
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
+								</button>
               </div>
             </div>
           </div>

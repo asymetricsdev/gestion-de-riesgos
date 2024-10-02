@@ -55,6 +55,7 @@ const Colaboradores: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false); 
   const [pendingRequests, setPendingRequests] = useState<number>(0);
 
+
   useEffect(() => {
     getEmpleado();
     getPosition();
@@ -152,6 +153,7 @@ const Colaboradores: React.FC = () => {
         showAlert("Escribe el cargo del colaborador", "warning");
         return;
     }
+    setLoading(true);
     
       const parametros: EmpleadoData = {
         rut: rut.trim(),
@@ -421,12 +423,20 @@ const Colaboradores: React.FC = () => {
                   Cerrar
                 </button>
                 <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                >
-                  Guardar
-                </button>
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
+								</button>
               </div>
             </div>
           </div>

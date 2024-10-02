@@ -1,77 +1,342 @@
+// import React, { useEffect, useState, useRef } from "react";
+// import axios, { AxiosResponse } from "axios";
+// import Swal from "sweetalert2";
+// import withReactContent from "sweetalert2-react-content";
+// import { capitalizeFirstLetter, showAlert } from "../functions";
+// import { OverlayTrigger, Tooltip } from "react-bootstrap";
+// import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+// import * as bootstrap from "bootstrap";
+
+// const MySwal = withReactContent(Swal);
+
+// interface Actividades {
+// 	id: number;
+// 	name: string;
+// 	description: string;
+// 	createDate: string;
+// 	updateDate: string;
+// 	activityType: ActivityType;
+// 	process: Process;
+// 	hazzards: HazzardCriticity[];
+// }
+
+// interface HazzardCriticity {
+// 	hazzardId: number;
+// 	criticityId: number;
+// }
+
+// interface Hazzard {
+// 	id: number;
+// 	name: string;
+// }
+
+// interface ActivityType {
+// 	id: number;
+// 	name: string;
+// }
+
+// interface Process {
+// 	id: number;
+// 	name: string;
+// }
+
+// interface Criticity {
+// 	id: number;
+// 	name: string; 
+// 	description: string;
+//   }
+  
+
+// const Actividades: React.FC = () => {
+// 	const baseURL = import.meta.env.VITE_API_URL;
+// 	const [actividades, setActividades] = useState<Actividades[]>([]);
+// 	const [activityType, setActivityType] = useState<ActivityType[]>([]);
+// 	const [process, setProcess] = useState<Process[]>([]);
+// 	const [hazzards, setHazzard] = useState<Hazzard[]>([]);
+// 	const [criticities, setCriticity] = useState<Criticity[]>([]);
+// 	const [id, setId] = useState<number | null>(null);
+// 	const [name, setName] = useState<string>("");
+// 	const [description, setDescription] = useState<string>("");
+// 	const [selectedActivityTypeId, setSelectedActivityTypeId] = useState<number>(0);
+// 	const [selectedProcessId, setSelectedProcessId] = useState<number>(0);
+// 	const [hazzardCriticityPairs, setHazzardCriticityPairs] = useState<{ hazzardId: number; criticityId: number }[]>([]);
+// 	const modalRef = useRef<HTMLDivElement | null>(null);
+// 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+// 	const [title, setTitle] = useState<string>("");
+// 	const [loading, setLoading] = useState<boolean>(false);
+
+
+// 	useEffect(() => {
+// 		getActivity();
+// 		getActivityType();
+// 		getProcess();
+// 		getHazzard();
+// 		getCriticity();
+// 		if (modalRef.current) {
+// 			modalRef.current.addEventListener("hidden.bs.modal", handleModalHidden);
+// 		}
+// 		return () => {
+// 			if (modalRef.current) {
+// 				modalRef.current.removeEventListener("hidden.bs.modal", handleModalHidden);
+// 			}
+// 		};
+// 	}, []);
+
+// 	const getActivity = async () => {
+// 		try {
+// 			const response: AxiosResponse<Actividades[]> = await axios.get(`${baseURL}/activity/`);
+// 			setActividades(response.data || []);
+// 		} catch (error) {
+// 			showAlert("Error al obtener las actividades", "error");
+// 		}
+// 	};
+  
+
+// 	const getActivityType = async () => {
+// 		try {
+// 			const response: AxiosResponse<ActivityType[]> = await axios.get(`${baseURL}/activity_type/`);
+// 			setActivityType(response.data || []);
+// 		} catch (error) {
+// 			showAlert("Error al obtener los tipos de actividad", "error");
+// 		}
+// 	};
+
+// 	const getProcess = async () => {
+// 		try {
+// 			const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
+// 			setProcess(response.data || []);
+// 		} catch (error) {
+// 			showAlert("Error al obtener los procesos", "error");
+// 		}
+// 	};
+
+// 	const getHazzard = async () => {
+// 		try {
+// 			const response: AxiosResponse<Hazzard[]> = await axios.get(`${baseURL}/hazzard/`);
+// 			setHazzard(response.data || []);
+// 		} catch (error) {
+// 			showAlert("Error al obtener los peligros", "error");
+// 		}
+// 	};
+
+// 	const getCriticity = async () => {
+// 		try {
+// 		  const response: AxiosResponse<Criticity[]> = await axios.get(`${baseURL}/criticity/`);
+// 		  console.log(response.data); 
+// 		  setCriticity(response.data || []);
+// 		} catch (error) {
+// 		  showAlert("Error al obtener las criticidades", "error");
+// 		}
+// 	  };
+	  
+
+// 	const handleModalHidden = () => {
+// 		setIsModalOpen(false);
+// 		const modals = document.querySelectorAll(".modal-backdrop");
+// 		modals.forEach((modal) => modal.parentNode?.removeChild(modal));
+// 	};
+
+// 	const openModal = (op: string, actividad?: Actividades) => {
+// 		if (op === "1") {
+// 		  resetForm();
+// 		  setTitle("Registrar Actividad");
+// 		} else if (op === "2" && actividad) {
+// 		  setId(actividad.id);
+// 		  setName(actividad.name);
+// 		  setDescription(actividad.description);
+// 		  setSelectedActivityTypeId(actividad.activityType.id);
+// 		  setSelectedProcessId(actividad.process.id);
+	  
+// 		  if (Array.isArray(actividad.hazzards)) {
+// 			setHazzardCriticityPairs(actividad.hazzards.map(hc => ({
+// 			  hazzardId: hc.hazzardId,
+// 			  criticityId: hc.criticityId
+// 			})));
+// 		  } else {
+
+// 			setHazzardCriticityPairs([]);
+// 		  }
+	  
+// 		  setTitle("Editar Actividad");
+// 		}
+	  
+// 		if (modalRef.current) {
+// 		  const modal = new bootstrap.Modal(modalRef.current);
+// 		  modal.show();
+// 		  setIsModalOpen(true);
+// 		}
+// 	  };
+	  
+
+// 	const resetForm = () => {
+// 		setId(null);
+// 		setName("");
+// 		setDescription("");
+// 		setSelectedActivityTypeId(0);
+// 		setSelectedProcessId(0);
+// 		setHazzardCriticityPairs([]);
+// 	};
+
+// 	const validar = (): void => {
+// 		if (name.trim() === "") {
+// 			showAlert("Escribe el nombre de la actividad", "warning");
+// 			return;
+// 		}
+// 		if (description.trim() === "") {
+// 			showAlert("Escribe la descripción de la actividad", "warning");
+// 			return;
+// 		}
+// 		if (selectedActivityTypeId === 0) {
+// 			showAlert("Selecciona un tipo de actividad", "warning");
+// 			return;
+// 		}
+// 		if (selectedProcessId === 0) {
+// 			showAlert("Selecciona un proceso", "warning");
+// 			return;
+// 		}
+// 		if (hazzardCriticityPairs.length === 0) {
+// 			showAlert("Agrega al menos un par de Peligro y Criticidad", "warning");
+// 			return;
+// 		}
+
+// 		setLoading(true);
+
+// 		const parametros = {
+// 			name: name.trim(),
+// 			description: description.trim(),
+// 			activityTypeId: selectedActivityTypeId,
+// 			processId: selectedProcessId,
+// 			hazzards: hazzardCriticityPairs,
+// 		};
+
+// 		enviarSolicitud(id ? "PUT" : "POST", parametros);
+// 	};
+
+// 	const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+// 		try {
+// 			const url = method === "PUT" && id ? `${baseURL}/activity/${id}` : `${baseURL}/activity/`;
+// 			const response = await axios({
+// 				method,
+// 				url,
+// 				data,
+// 				headers: { "Content-Type": "application/json" },
+// 			});
+
+// 			const newActividad = response.data;
+
+// 			if (method === "POST") {
+// 				setActividades((prev) => [...prev, newActividad]);
+// 			} else if (method === "PUT") {
+// 				setActividades((prev) =>
+// 					prev.map((act) => (act.id === newActividad.id ? newActividad : act))
+// 				);
+// 			}
+
+// 			showAlert("Operación realizada con éxito", "success");
+
+// 			if (modalRef.current) {
+// 				const modal = bootstrap.Modal.getInstance(modalRef.current);
+// 				modal?.hide();
+// 			}
+// 		} catch (error: any) {
+// 			if (axios.isAxiosError(error) && error.response) {
+// 				showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+// 			} else if (error.request) {
+// 				showAlert("Error: El servidor no respondió. Verifica tu conexión o intenta más tarde.", "error");
+// 			} else {
+// 				showAlert(`Error inesperado: ${error.message}`, "error");
+// 			}
+// 		} finally {
+// 			setLoading(false);
+// 		}
+// 	};
+
+// 	const deleteActividad = async (id: number) => {
+// 		try {
+// 			await axios.delete(`${baseURL}/activity/${id}`, {
+// 				headers: { "Content-Type": "application/json" },
+// 			});
+// 			Swal.fire("Actividad eliminada correctamente", "", "success");
+// 			setActividades((prev) => prev.filter((act) => act.id !== id));
+// 			getActivity();
+// 		} catch (error) {
+// 			Swal.fire({
+// 				title: "Error",
+// 				text: "Error al eliminar la actividad.",
+// 				icon: "error",
+// 				confirmButtonText: "OK",
+// 			});
+// 		}
+// 	};
+
+// 	const handleHazzardChange = (index: number, hazzardId: number) => {
+// 		const newPairs = [...hazzardCriticityPairs];
+// 		newPairs[index].hazzardId = hazzardId;
+// 		setHazzardCriticityPairs(newPairs);
+// 	};
+
+// 	const handleCriticityChange = (index: number, criticityId: number) => {
+// 		const newPairs = [...hazzardCriticityPairs];
+// 		newPairs[index].criticityId = criticityId;
+// 		setHazzardCriticityPairs(newPairs);
+// 	};
+
+// 	const addHazzardCriticityPair = () => {
+// 		setHazzardCriticityPairs([...hazzardCriticityPairs, { hazzardId: 0, criticityId: 0 }]);
+// 	};
+
+// 	const removeHazzardCriticityPair = (index: number) => {
+// 		setHazzardCriticityPairs(hazzardCriticityPairs.filter((_, i) => i !== index));
+// 	};
+
 import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from "../functions";
+import {  capitalizeFirstLetter, showAlert } from "../functions";
 import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import Select from "react-select";
-import { capitalizeFirstLetter } from '../functions';
 import * as bootstrap from "bootstrap";
 
 const MySwal = withReactContent(Swal);
 
 interface Actividades {
-	id: number;
-	name: string;
-	description: string;
-	createDate: string;
-	updateDate: string;
-	activityType: ActivityType;
-	process: Process;
-	criticities: Criticity[];
-	hazzards: HazzardCriticity[];
+  id: number;
+  name: string;
+  description: string;
+  createDate: string;
+  updateDate: string;
+  activityType: ActivityType;
+  process: Process;
+  hazzards: HazzardCriticity[];
 }
 
 interface HazzardCriticity {
-	hazzard: Hazzard;
-	criticity: Criticity;
+  hazzardId: number;
+  criticityId: number;
 }
 
 interface Hazzard {
-	id: number;
-	name: string;
-	description: string;
-	createDate: string;
-	updateDate: string;
+  id: number;
+  name: string;
 }
 
 interface ActivityType {
-	id: number;
-	name: string;
-	description: string;
-	createDate?: string;
-	updateDate?: string;
+  id: number;
+  name: string;
 }
 
 interface Process {
-	id: number;
-	name: string;
-	description: string;
-	createDate?: string;
-	updateDate?: string;
+  id: number;
+  name: string;
 }
 
 interface Criticity {
-	id: number;
-	name: string;
-	description: string;
-	createDate: string;
+  id: number;
+  name: string;
+  description: string;
 }
 
-interface ActividadesData {
-	name: string;
-	description: string;
-	activityTypeId: number;
-	processId: number;
-	hazzards: HazzardCriticity[];
-}
-
-
-interface Option {
-	value: number;
-	label: string;
-}
 
 const Actividades: React.FC = () => {
 	const baseURL = import.meta.env.VITE_API_URL;
@@ -91,7 +356,7 @@ const Actividades: React.FC = () => {
 	const modalRef = useRef<HTMLDivElement | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false); 
-  	const [pendingRequests, setPendingRequests] = useState<number>(0);
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
 
 	const [filteredCriticity, setFilteredCriticity] = useState<Option[]>([]);
 
@@ -259,31 +524,7 @@ const Actividades: React.FC = () => {
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadesData) => {
 	setLoading(true);
-    try {
-        const url = method === "PUT" && id ? `${baseURL}/activity/${id}` : `${baseURL}/activity/`;
-        const response = await axios({
-            method,
-            url,
-            data,
-            headers: { "Content-Type": "application/json" },
-        });
 
-        const newActividad = response.data;
-
-        if (method === "POST") {
-            setActividad((prev) => [...prev, newActividad]);
-        } else if (method === "PUT") {
-            setActividad((prev) =>
-                prev.map((act) => (act.id === newActividad.id ? newActividad : act))
-            );
-        }
-
-        showAlert("Operación realizada con éxito", "success");
-
-        if (modalRef.current) {
-            const modal = bootstrap.Modal.getInstance(modalRef.current);
-            modal?.hide();
-        }
 
     } catch (error: any) {
         if (axios.isAxiosError(error) && error.response) {
@@ -301,7 +542,75 @@ const Actividades: React.FC = () => {
 	}
 };
 
+  const handleModalHidden = () => {
+    setIsModalOpen(false);
+    const modals = document.querySelectorAll(".modal-backdrop");
+    modals.forEach((modal) => modal.parentNode?.removeChild(modal));
+  };
 
+  const openModal = (op: string, actividad?: Actividades) => {
+    if (op === "1") {
+      resetForm();
+      setTitle("Registrar Actividad");
+    } else if (op === "2" && actividad) {
+      setId(actividad.id);
+      setName(actividad.name);
+      setDescription(actividad.description);
+      setSelectedActivityTypeId(actividad.activityType.id);
+      setSelectedProcessId(actividad.process.id);
+
+      if (Array.isArray(actividad.hazzards)) {
+        setHazzardCriticityPairs(actividad.hazzards.map(hc => ({
+          hazzardId: hc.hazzardId,
+          criticityId: hc.criticityId
+        })));
+      } else {
+        setHazzardCriticityPairs([]);
+      }
+
+      setTitle("Editar Actividad");
+    }
+
+
+    if (modalRef.current) {
+      const modal = new bootstrap.Modal(modalRef.current);
+      modal.show();
+      setIsModalOpen(true);
+    }
+  };
+
+  const resetForm = () => {
+    setId(null);
+    setName("");
+    setDescription("");
+    setSelectedActivityTypeId(0);
+    setSelectedProcessId(0);
+    setHazzardCriticityPairs([]);
+  };
+
+  const validar = (): void => {
+    if (name.trim() === "") {
+      showAlert("Escribe el nombre de la actividad", "warning");
+      return;
+    }
+    if (description.trim() === "") {
+      showAlert("Escribe la descripción de la actividad", "warning");
+      return;
+    }
+    if (selectedActivityTypeId === 0) {
+      showAlert("Selecciona un tipo de actividad", "warning");
+      return;
+    }
+    if (selectedProcessId === 0) {
+      showAlert("Selecciona un proceso", "warning");
+      return;
+    }
+    if (hazzardCriticityPairs.length === 0) {
+      showAlert("Agrega al menos un par de Peligro y Criticidad", "warning");
+      return;
+    }
+
+    setLoading(true);
 
 	const deleteActividad = async (id: number) => {
 		setLoading(true);
@@ -330,11 +639,88 @@ const Actividades: React.FC = () => {
 		</Tooltip>
 	);
 
-	const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-		<Tooltip id="button-tooltip-delete" {...props}>
-			Eliminar
-		</Tooltip>
-	);
+
+    enviarSolicitud(id ? "PUT" : "POST", parametros);
+  };
+
+  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+    try {
+      const url = method === "PUT" && id ? `${baseURL}/activity/${id}` : `${baseURL}/activity/`;
+      const response = await axios({
+        method,
+        url,
+        data,
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const newActividad = response.data;
+
+      if (method === "POST") {
+        setActividades((prev) => [...prev, newActividad]);
+      } else if (method === "PUT") {
+        setActividades((prev) =>
+          prev.map((act) => (act.id === newActividad.id ? newActividad : act))
+        );
+      }
+
+      showAlert("Operación realizada con éxito", "success");
+
+      if (modalRef.current) {
+        const modal = bootstrap.Modal.getInstance(modalRef.current);
+        modal?.hide();
+      }
+    } catch (error: any) {
+      if (axios.isAxiosError(error) && error.response) {
+        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+      } else if (error.request) {
+        showAlert("Error: El servidor no respondió. Verifica tu conexión o intenta más tarde.", "error");
+      } else {
+        showAlert(`Error inesperado: ${error.message}`, "error");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteActividad = async (id: number) => {
+    try {
+      await axios.delete(`${baseURL}/activity/${id}`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      Swal.fire("Actividad eliminada correctamente", "", "success");
+      setActividades((prev) => prev.filter((act) => act.id !== id));
+      getActivity();
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar la actividad.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  };
+
+  const handleHazzardChange = (index: number, hazzardId: number) => {
+    const newPairs = [...hazzardCriticityPairs];
+    newPairs[index].hazzardId = hazzardId;
+    setHazzardCriticityPairs(newPairs);
+  };
+
+  const handleCriticityChange = (index: number, criticityId: number) => {
+    const newPairs = [...hazzardCriticityPairs];
+    newPairs[index].criticityId = criticityId;
+    setHazzardCriticityPairs(newPairs);
+  };
+
+  const addHazzardCriticityPair = () => {
+    setHazzardCriticityPairs([...hazzardCriticityPairs, { hazzardId: 0, criticityId: 0 }]);
+  };
+
+  const removeHazzardCriticityPair = (index: number) => {
+    const newPairs = [...hazzardCriticityPairs];
+    newPairs.splice(index, 1);
+    setHazzardCriticityPairs(newPairs);
+  };
 
 	return (
 		<div className="App">
@@ -358,8 +744,7 @@ const Actividades: React.FC = () => {
 									style={{
 										background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
 										color: "#fff",
-									}}
-								>
+									}}>
 									<tr>
 										<th>N°</th>
 										<th>Nombre</th>
@@ -371,34 +756,39 @@ const Actividades: React.FC = () => {
 									</tr>
 								</thead>
 								<tbody className="table-group-divider">
-									{actividad.length > 0 ? (
-										actividad.map((act, i) => (
+									{actividades.length > 0 ? (
+										actividades.map((act, i) => (
 											<tr key={act.id} className="text-center">
 												<td>{i + 1}</td>
 												<td>{capitalizeFirstLetter(act.name)}</td>
 												<td>{capitalizeFirstLetter(act.description)}</td>
-												<td>{act.activityType?.description || "Sin tipo de actividad"}</td>
+												<td>{act.activityType?.name || "Sin tipo de actividad"}</td>
 												<td>{act.process?.name || "Sin proceso"}</td>
 												<td>
 													{Array.isArray(act.hazzards) && act.hazzards.length > 0 ? (
-														<>
-															<ul>
-																{act.hazzards.map((h) => (
-																	<li key={h.hazzard.id}>
-																		 {`${capitalizeFirstLetter(h.hazzard.name)} / ${capitalizeFirstLetter(h.criticity.description)}`}
+														<ul>
+															{act.hazzards.map((h, index) => {
+																const hazzard =
+																	hazzards.find((hz) => hz.id === h.hazzardId)?.name ||
+																	"Peligro no encontrado";
+																const criticity = criticities.find((cr) => cr.id === h.criticityId);
+																const criticityText =
+																	criticity && criticity.name && criticity.description
+																		? `${criticity.name} - ${criticity.description}`
+																		: "Información de criticidad no disponible";
+																return (
+																	<li key={`${h.hazzardId}-${h.criticityId}-${index}`}>
+																		{`${hazzard} / ${criticityText}`}
 																	</li>
-																))}
-															</ul>
-														</>
+																);
+															})}
+														</ul>
 													) : (
-														<>
-															<b>Peligros:</b> Sin peligros <br />
-															<b>Criticidades:</b> Sin criticidades
-														</>
+														"No hay peligro y criticidad."
 													)}
 												</td>
 												<td className="text-center">
-													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
+													<OverlayTrigger placement="top" overlay={<Tooltip>Editar</Tooltip>}>
 														<button
 															onClick={() => openModal("2", act)}
 															className="btn btn-custom-editar m-2"
@@ -406,23 +796,10 @@ const Actividades: React.FC = () => {
 															<i className="fa-solid fa-edit"></i>
 														</button>
 													</OverlayTrigger>
-													<OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+													<OverlayTrigger placement="top" overlay={<Tooltip>Eliminar</Tooltip>}>
 														<button
 															className="btn btn-custom-danger"
-															onClick={() => {
-																MySwal.fire({
-																	title: "¿Estás seguro?",
-																	text: "No podrás revertir esto",
-																	icon: "warning",
-																	showCancelButton: true,
-																	confirmButtonText: "Sí, bórralo",
-																	cancelButtonText: "Cancelar",
-																}).then((result) => {
-																	if (result.isConfirmed) {
-																		deleteActividad(act.id);
-																	}
-																});
-															}}
+															onClick={() => deleteActividad(act.id)}
 														>
 															<i className="fa-solid fa-circle-xmark"></i>
 														</button>
@@ -441,6 +818,7 @@ const Actividades: React.FC = () => {
 						)}
 					</div>
 				</div>
+
 				<div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
 					<div className="modal-dialog modal-dialog-top modal-md">
 						<div className="modal-content">
@@ -509,54 +887,109 @@ const Actividades: React.FC = () => {
 										<option value={0}>Selecciona...</option>
 										{activityType.map((actv) => (
 											<option key={actv.id} value={actv.id}>
-												{actv.description}
+												{actv.name}
 											</option>
 										))}
 									</select>
 								</div>
 
-								<div className="form-group mt-3">
-									<label htmlFor="hazzard">Peligros:</label>
-									<Select
-										isMulti
-										value={hazzards
-											.filter((h) => selectedHazzardCriticity.includes(h.id))
-											.map((h) => ({ value: h.id, label: h.name }))}
-										onChange={(selectedOptions) => {
-											handleHazzardSelection(selectedOptions as Option[]);
-										}}
-										options={hazzards.map((h) => ({
-											value: h.id,
-											label: h.name,
-										}))}
-									/>
-								</div>
-								<div className="form-group mt-3">
-									<label htmlFor="criticity">Criticidad:</label>
-									<Select
-										isMulti
-										value={filteredCriticity.filter((option) =>
-											selectedCriticityIds.includes(option.value)
-										)}
-										onChange={(selectedOptions) => {
-											const selectedIds = selectedOptions.map((option) => option.value);
-											setSelectedCriticityIds(selectedIds);
-										}}
-										options={filteredCriticity}
-									/>
-								</div>
+								{hazzardCriticityPairs.length > 0 ? (
+									hazzardCriticityPairs.map((pair, index) => (
+										<div key={index} className="row mb-3">
+											<div className="col">
+												<label htmlFor={`hazzard-${index}`} className="form-label">
+													Peligro:
+												</label>
+												<select
+													id={`hazzard-${index}`}
+													className="form-select"
+													value={pair.hazzardId}
+													onChange={(e) => handleHazzardChange(index, Number(e.target.value))}
+												>
+													<option value={0}>Selecciona...</option>
+													{hazzards.map((h) => (
+														<option key={h.id} value={h.id}>
+															{h.name}
+														</option>
+													))}
+												</select>
+											</div>
+											{/* <div className="col">
+												<label htmlFor={`criticity-${index}`} className="form-label">
+													Criticidad:
+												</label>
+												<select
+													id={`criticity-${index}`}
+													className="form-select"
+													value={pair.criticityId}
+													onChange={(e) => handleCriticityChange(index, Number(e.target.value))}
+												>
+													<option value={0}>Selecciona...</option>
+													{criticities.map((c) => (
+														<option key={c.id} value={c.id}>
+															{c.description}
+														</option>
+													))}
+												</select>
+											</div> */}
+											<div className="col">
+												<label htmlFor={`criticity-${index}`} className="form-label">
+													Criticidad:
+												</label>
+												<select
+													id={`criticity-${index}`}
+													className="form-select"
+													value={pair.criticityId}
+													onChange={(e) => handleCriticityChange(index, Number(e.target.value))}
+												>
+													<option value={0}>Selecciona...</option>
+													{criticities.map((c) => (
+														<option key={c.id} value={c.id}>
+															{`${c.name} - ${c.description}`}{" "}
+														</option>
+													))}
+												</select>
+											</div>
+
+											<div className="col-auto">
+												<button
+													type="button"
+													className="btn btn-danger mt-4"
+													onClick={() => removeHazzardCriticityPair(index)}
+												>
+													Eliminar
+												</button>
+											</div>
+										</div>
+									))
+								) : (
+									<p>Agregar todos los Peligros y sus Criticidades .</p>
+								)}
+
+								<button
+									type="button"
+									className="btn btn-success mt-3"
+									onClick={addHazzardCriticityPair}
+								>
+									Agregar Peligro / Criticidad
+								</button>
 							</div>
 							<div className="modal-footer">
 								<button
 									type="button"
-									className="btn btn-secondary"
-									data-bs-dismiss="modal"
-									id="btnCerrar"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}
 								>
-									Cerrar
-								</button>
-								<button type="button" className="btn btn-primary" onClick={validar}>
-									Guardar
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
 								</button>
 							</div>
 						</div>
@@ -568,3 +1001,7 @@ const Actividades: React.FC = () => {
 };
 
 export default Actividades;
+
+
+
+

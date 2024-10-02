@@ -74,6 +74,7 @@ const VerificadorControl: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false); 
   const [pendingRequests, setPendingRequests] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getChecker();
@@ -191,6 +192,8 @@ const VerificadorControl: React.FC = () => {
         showAlert("Debes seleccionar al menos un checkpoint o dejarlo vacío", "warning");
         return;
     } 
+
+    setLoading(true);
   
 
     const parametros : VerificadorControlData = {
@@ -475,12 +478,20 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                   Cerrar
                 </button>
                 <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                >
-                  Guardar
-                </button>
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
+								</button>
               </div>
             </div>
           </div>

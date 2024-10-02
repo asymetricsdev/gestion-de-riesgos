@@ -34,6 +34,7 @@ const Proceso: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false); 
   const [pendingRequests, setPendingRequests] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getProcess();
@@ -94,6 +95,8 @@ const Proceso: React.FC = () => {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
+
+    setLoading(true);
     
     const parametros : ProcesoData = {
       name: name.trim(), 
@@ -294,12 +297,20 @@ const Proceso: React.FC = () => {
                   Cerrar
                 </button>
                 <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                >
-                  Guardar
-                </button>
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
+								</button>
               </div>
             </div>
           </div>
