@@ -52,6 +52,7 @@ const Colaboradores: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getEmpleado();
@@ -144,6 +145,7 @@ const Colaboradores: React.FC = () => {
         showAlert("Escribe el cargo del colaborador", "warning");
         return;
     }
+    setLoading(true);
     
       const parametros: EmpleadoData = {
         rut: rut.trim(),
@@ -179,6 +181,8 @@ const Colaboradores: React.FC = () => {
       } else {
         showAlert("Error al realizar la solicitud", "error");
       }
+    } finally {
+      setLoading(false);
     }
   }; 
 
@@ -399,12 +403,20 @@ const Colaboradores: React.FC = () => {
                   Cerrar
                 </button>
                 <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                >
-                  Guardar
-                </button>
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
+								</button>
               </div>
             </div>
           </div>

@@ -58,6 +58,7 @@ const Cargo: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getPositions();
@@ -146,6 +147,7 @@ const Cargo: React.FC = () => {
       showAlert("Selecciona al menos una Division", "warning");
       return;
     }
+    setLoading(true);
 
     const parametros: CargoData = {
       name: name.trim(),
@@ -198,6 +200,8 @@ const Cargo: React.FC = () => {
       } else {
         showAlert("Error al realizar la solicitud", "error");
       }
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -423,8 +427,20 @@ const Cargo: React.FC = () => {
 								<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
 									Cerrar
 								</button>
-								<button type="button" className="btn btn-primary" onClick={validar}>
-									Guardar
+								<button
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
 								</button>
 							</div>
 						</div>

@@ -32,6 +32,7 @@ const JerarquiaControl: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getCheckerType();
@@ -90,6 +91,8 @@ const JerarquiaControl: React.FC = () => {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
+
+    setLoading(true);
     
     const parametros: JerarquiaControlData = { 
       name: name.trim(), 
@@ -122,6 +125,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: JerarquiaControlDat
 	  } else {
 		showAlert("Error al realizar la solicitud", "error");
 	  }
+  } finally {
+    setLoading(false);
 	}
   }; 
 
@@ -276,12 +281,20 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: JerarquiaControlDat
                   Cerrar
                 </button>
                 <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                >
-                  Guardar
-                </button>
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
+								</button>
               </div>
             </div>
           </div>
