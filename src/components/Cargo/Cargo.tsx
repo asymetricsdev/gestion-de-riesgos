@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import Select from 'react-select';
 import { Accordion } from 'react-bootstrap';
@@ -58,6 +58,8 @@ const Cargo: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false); 
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
 
   useEffect(() => {
     getPositions();
@@ -74,29 +76,38 @@ const Cargo: React.FC = () => {
   }, []);
 
   const getPositions = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Cargo[]> = await axios.get(`${baseURL}/position/`);
       setPositions(response.data);
     } catch (error) {
       showAlert("Error al obtener los Cargos", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
 
   const getManagerPositions = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<ManagerPosition[]> = await axios.get(`${baseURL}/position/`);
       setManagerPosition(response.data);
     } catch (error) {
       showAlert("Error al obtener las Jefaturas", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
 
   const getSubordinatePositions = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<SubordinatePosition[]> = await axios.get(`${baseURL}/division/`);
       setSubordinatePositions(response.data);
     } catch (error) {
       showAlert("Error al obtener las Tareas", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
 
@@ -114,7 +125,7 @@ const Cargo: React.FC = () => {
       setDescription(position.description);
       setSelectedDivisionIds(position.subordinatePositions.map(sp => sp.id));
       setSelectedManagerId(position.managerPosition?.id || 0);
-      setTitle("Editar Área");
+      setTitle("Editar Cargo");
     }
   
     if (modalRef.current) {
@@ -167,6 +178,7 @@ const Cargo: React.FC = () => {
   };
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: CargoData) => {
+    setLoading(true);
     try {
       const url = method === "PUT" && id ? `${baseURL}/position/${id}` : `${baseURL}/position/`;
       const response = await axios({
@@ -198,11 +210,14 @@ const Cargo: React.FC = () => {
       } else {
         showAlert("Error al realizar la solicitud", "error");
       }
+    } finally {
+      setLoading(false);
     }
   };
   
 
   const deletePosition = async (id: number | null) => {
+    setLoading(true);
     try {
       if (id === null) {
         Swal.fire({
@@ -257,6 +272,8 @@ const Cargo: React.FC = () => {
         icon: "error",
         confirmButtonText: "OK",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -285,6 +302,13 @@ const Cargo: React.FC = () => {
 						<div className="tabla-contenedor">
 							<EncabezadoTabla title="Cargos" onClick={() => openModal("1")} />
 						</div>
+            {pendingRequests > 0 ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+              <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+            ) : (
 						<div className="table-responsive tabla-scroll">
 							<table className="table table-bordered">
 								<thead
@@ -365,6 +389,7 @@ const Cargo: React.FC = () => {
 								</tbody>
 							</table>
 						</div>
+            )}
 					</div>
 				</div>
 

@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
 
@@ -64,6 +64,8 @@ const Area: React.FC<AreaProps> = ({ isNewRecord }: AreaProps ) => {
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false); 
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
 
   useEffect(() => {
     getDivision();
@@ -80,31 +82,40 @@ const Area: React.FC<AreaProps> = ({ isNewRecord }: AreaProps ) => {
   }, []);
 
   const getDivision = async () => {
+	setPendingRequests(prev => prev + 1);
     try {
 	  const response: AxiosResponse<Area[]> = await axios.get(`${baseURL}/division/`);
       setDivision(response.data);
     } catch (error) {
       showAlert("Error al obtener los peligros", "error");
-    }
+    } finally {
+		setPendingRequests(prev => prev - 1);  // Disminuir contador
+	}
   };
   
 
   const getCompanyType = async () => {
+	setPendingRequests(prev => prev + 1);
     try {
 	  const response: AxiosResponse<Company[]> = await axios.get(`${baseURL}/company/`);
       setCompanyType(response.data);
     } catch (error) {
       showAlert("Error al obtener las compañias", "error");
-    }
+    } finally {
+		setPendingRequests(prev => prev - 1);  // Disminuir contador
+	}
   };
 
   const getCity = async () => {
+	setPendingRequests(prev => prev + 1);
     try {
 	  const response: AxiosResponse<City[]> = await axios.get(`${baseURL}/city/`);
       setCity(response.data);
     } catch (error) {
       showAlert("Error al obtener los tipos de verificación", "error");
-    }
+    } finally {
+		setPendingRequests(prev => prev - 1);  // Disminuir contador
+	}
   };
 
   const openModal = (op: string, division?: Area) => {
@@ -183,6 +194,7 @@ const Area: React.FC<AreaProps> = ({ isNewRecord }: AreaProps ) => {
 };
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: AreaData) => {
+	setLoading(true);
 	try {
 	  const url = method === "PUT" && id ? `${baseURL}/division/${id}` : `${baseURL}/division/`;
 	  const response = await axios({
@@ -204,11 +216,14 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: AreaData) => {
 	  } else {
 		showAlert("Error al realizar la solicitud", "error");
 	  }
+	} finally {
+		setLoading(false);
 	}
   }; 
   
 
 const deleteDivision = async (id: number) => {
+	setLoading(true);
     try {
       await axios.delete(`${baseURL}/division/${id}`, {
         headers: { "Content-Type": "application/json" },
@@ -222,7 +237,9 @@ const deleteDivision = async (id: number) => {
         icon: "error",
         confirmButtonText: "OK",
       });
-    }
+    } finally {
+		setLoading(false);
+	}
   };
 
   const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
@@ -251,6 +268,13 @@ const deleteDivision = async (id: number) => {
 						<div className="tabla-contenedor">
 							<EncabezadoTabla title="Áreas" onClick={() => openModal("1")} />
 						</div>
+						{pendingRequests > 0 ? (
+							<div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+							<Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+								<span className="visually-hidden">Loading...</span>
+							</Spinner>
+							</div>
+							) : (
 						<div className="table-responsive">
 							<table className="table table-bordered">
 								<thead
@@ -312,6 +336,7 @@ const deleteDivision = async (id: number) => {
 								</tbody>
 							</table>
 						</div>
+						)}
 					</div>
 				</div>
 				<div

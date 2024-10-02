@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
 
@@ -31,6 +31,8 @@ const Proceso: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState<boolean>(false); 
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -46,11 +48,14 @@ const Proceso: React.FC = () => {
   }, []);
 
   const getProcess = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Proceso[]> = await axios.get(`${baseURL}/process/`);
       setProcess(response.data);
     } catch (error) {
       showAlert("Error al obtener Proceso", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
 
@@ -101,6 +106,7 @@ const Proceso: React.FC = () => {
   };
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: ProcesoData) => {
+    setLoading(true);
     try {
       const url = method === "PUT" && id ? `${baseURL}/process/${id}` : `${baseURL}/process/`;
       const response = await axios({
@@ -122,10 +128,13 @@ const Proceso: React.FC = () => {
       } else {
       showAlert("Error al realizar la solicitud", "error");
       }
+    } finally {
+      setLoading(false);
     }
-    }; 
+  }; 
 
   const deleteProcess = async (id: number) => {
+    setLoading(true);
     try {
       await axios.delete(`${baseURL}/process/${id}`, {
         headers: { "Content-Type": "application/json" },
@@ -139,6 +148,8 @@ const Proceso: React.FC = () => {
         icon: "error",
         confirmButtonText: "OK",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -166,6 +177,13 @@ const Proceso: React.FC = () => {
             <div className="tabla-contenedor">
               <EncabezadoTabla title='Procesos' onClick={() => openModal("1")} />
             </div>
+            {pendingRequests > 0 ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+              <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+            ) : (
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center" 
@@ -220,6 +238,7 @@ const Proceso: React.FC = () => {
                 </tbody>
               </table>
             </div>
+            )}
           </div>
         </div>
         <div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>

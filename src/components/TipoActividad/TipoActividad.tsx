@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import { capitalizeFirstLetter } from '../functions';
 import * as bootstrap from 'bootstrap';
@@ -30,6 +30,8 @@ const Activity: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState<boolean>(false); 
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -45,11 +47,14 @@ const Activity: React.FC = () => {
   }, []);
 
   const getActivityType = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<TipoActividad[]> = await axios.get(`${baseURL}/activity_type/`);
       setActivity(response.data);
     } catch (error) {
       showAlert("Error al obtener el tipo de actividad", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
 
@@ -100,6 +105,7 @@ const Activity: React.FC = () => {
 
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) => {
+  setLoading(true);
 	try {
 	  const url = method === "PUT" && id ? `${baseURL}/activity_type/${id}` : `${baseURL}/activity_type/`;
 	  const response = await axios({
@@ -121,10 +127,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) 
 	  } else {
 		showAlert("Error al realizar la solicitud", "error");
 	  }
-	}
+	  } finally {
+      setLoading(false);
+    }
   }; 
 
   const deleteActividad = async (id: number) => {
+    setLoading(true);
     try {
       await axios.delete(`${baseURL}/activity_type/${id}`, {
         headers: { "Content-Type": "application/json" },
@@ -138,6 +147,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) 
         icon: "error",
         confirmButtonText: "OK",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -166,6 +177,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) 
             <div className="tabla-contenedor">
               <EncabezadoTabla title='Tipo de Actividad' onClick={() => openModal("1")} />
             </div>
+            {pendingRequests > 0 ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+              <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+            ) : (
             <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
                 <thead className="text-center" 
@@ -221,6 +239,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) 
                 </tbody>
               </table>
             </div>
+            )}
           </div>
         </div>
         <div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>

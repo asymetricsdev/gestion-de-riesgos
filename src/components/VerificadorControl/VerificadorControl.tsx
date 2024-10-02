@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import { Accordion, AccordionItem, AccordionHeader, AccordionBody } from 'react-bootstrap';
 import Select from 'react-select';
@@ -71,6 +71,8 @@ const VerificadorControl: React.FC = () => {
   const [selectedCheckpointIds, setSelectedCheckpointIds] = useState<number[] | null>(null);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState<boolean>(false); 
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -89,38 +91,50 @@ const VerificadorControl: React.FC = () => {
   }, []);
 
   const  getChecker = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<VerificadorControl[]> = await axios.get(`${baseURL}/checker/`);
       setChecker(response.data);
     } catch (error) {
       showAlert("Error al obtener los verificadores de control", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  
     }
   };
   
    const getCheckerType = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<CheckerType[]> = await axios.get(`${baseURL}/checker_type/`);
       setCheckerType(response.data);
     } catch (error) {
       showAlert("Error al obtener al jerarquía de control", "error");
+    }finally {
+      setPendingRequests(prev => prev - 1);  
     }
   };
 
   const getTask = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Checkpoint[]> = await axios.get(`${baseURL}/task/`);
       setTask(response.data);
     } catch (error) {
       showAlert("Error al obtener las tareas", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  
     }
   }; 
   
   const getCheckpoint = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Checkpoint[]> = await axios.get(`${baseURL}/checkpoint/`);
       setCheckpoint(response.data);
     } catch (error) {
       showAlert("Error al obtener los items", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  
     }
   }; 
 
@@ -192,6 +206,7 @@ const VerificadorControl: React.FC = () => {
   };
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlData) => {
+  setLoading(true);
   try {
     const url = method === "PUT" && id ? `${baseURL}/checker/${id}` : `${baseURL}/checker/`;
     const response = await axios({
@@ -223,10 +238,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
     } else {
       showAlert("Error al realizar la solicitud", "error");
     }
+  } finally {
+    setLoading(false);
   }
 };
 
   const deleteChecker = async (id: number) => {
+    setLoading(true);
     try {
       await axios.delete(`${baseURL}/checker/${id}`, {
         headers: { "Content-Type": "application/json" },
@@ -241,6 +259,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
         icon: "error",
         confirmButtonText: "OK",
       });
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -280,6 +300,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
             <div className="tabla-contenedor">
               <EncabezadoTabla title='Verificadores de Control' onClick={() => openModal("1")} />
             </div>
+            {pendingRequests > 0 ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+              <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+            ) : (
             <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
                 <thead className="text-center"
@@ -354,6 +381,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                 </tbody>
               </table>
             </div>
+            )}
           </div>
         </div>
         <div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
