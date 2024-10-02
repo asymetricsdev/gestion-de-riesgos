@@ -64,6 +64,7 @@ const Area: React.FC<AreaProps> = ({ isNewRecord }: AreaProps ) => {
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     getDivision();
@@ -167,6 +168,7 @@ const Area: React.FC<AreaProps> = ({ isNewRecord }: AreaProps ) => {
         return;
     }
 
+	setLoading(true);
 
 	const positionIds = id ? [2] : [];
 	const parametros: AreaData = {
@@ -204,6 +206,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: AreaData) => {
 	  } else {
 		showAlert("Error al realizar la solicitud", "error");
 	  }
+	} finally {
+		setLoading(false);
 	}
   }; 
   
@@ -387,8 +391,20 @@ const deleteDivision = async (id: number) => {
 								>
 									Cerrar
 								</button>
-								<button type="button" className="btn btn-primary" onClick={validar}>
-									Guardar
+								<button
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
 								</button>
 							</div>
 						</div>

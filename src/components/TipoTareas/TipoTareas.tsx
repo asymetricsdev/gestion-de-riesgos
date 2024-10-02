@@ -29,6 +29,7 @@ const TipoTareas: React.FC = () => {
 	const [title, setTitle] = useState<string>("");
 	const modalRef = useRef<HTMLDivElement | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(false);
 
 	useEffect(() => {
 		getTipoTareas();
@@ -86,6 +87,8 @@ const TipoTareas: React.FC = () => {
 			return;
 		}
 
+		setLoading(true);
+
 		const parametros: TipoTareasData = {  
 			name: name.trim(), 
 			description: description.trim() 
@@ -117,6 +120,9 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 		  } else {
 			showAlert("Error al realizar la solicitud", "error");
 		  }
+		} finally {
+
+			setLoading(false);
 		}
 }; 
 
@@ -265,16 +271,20 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 								<div className="input-group mb-3"></div>
 							</div>
 							<div className="modal-footer">
-								<button
+							    <button
 									type="button"
-									className="btn btn-secondary"
-									data-bs-dismiss="modal"
-									id="btnCerrar"
-								>
-									Cerrar
-								</button>
-								<button type="button" className="btn btn-primary" onClick={validar}>
-									Guardar
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
 								</button>
 							</div>
 						</div>
