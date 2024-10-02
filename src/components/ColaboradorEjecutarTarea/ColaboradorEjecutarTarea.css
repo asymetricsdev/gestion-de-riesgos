@@ -1,0 +1,18 @@
+.migas-pan-contenedor {
+    margin-top: 3%;
+}
+
+.modulo-titulo-tarea {
+    font-size: 1.5rem;
+    font-weight:bold;
+    text-align: center;
+    margin-top: 7%;
+}
+
+.card-contenedor {
+    width: 100%;
+    margin: 0 auto;
+    margin-top: 2%;
+    box-sizing: border-box;
+    overflow-x: auto;
+}
