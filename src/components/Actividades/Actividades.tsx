@@ -293,8 +293,8 @@ import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { capitalizeFirstLetter, showAlert } from "../functions";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import {  capitalizeFirstLetter, showAlert } from "../functions";
+import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from "bootstrap";
 
@@ -337,85 +337,210 @@ interface Criticity {
   description: string;
 }
 
+
 const Actividades: React.FC = () => {
-  const baseURL = import.meta.env.VITE_API_URL;
-  const [actividades, setActividades] = useState<Actividades[]>([]);
-  const [activityType, setActivityType] = useState<ActivityType[]>([]);
-  const [process, setProcess] = useState<Process[]>([]);
-  const [hazzards, setHazzard] = useState<Hazzard[]>([]);
-  const [criticities, setCriticity] = useState<Criticity[]>([]);
-  const [id, setId] = useState<number | null>(null);
-  const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [selectedActivityTypeId, setSelectedActivityTypeId] = useState<number>(0);
-  const [selectedProcessId, setSelectedProcessId] = useState<number>(0);
-  const [hazzardCriticityPairs, setHazzardCriticityPairs] = useState<{ hazzardId: number; criticityId: number }[]>([]);
-  const modalRef = useRef<HTMLDivElement | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [title, setTitle] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+	const baseURL = import.meta.env.VITE_API_URL;
+	const [actividad, setActividad] = useState<Actividades[]>([]);
+	const [description, setDescription] = useState<string>("");
+	const [activityType, setActivityType] = useState<ActivityType[]>([]);
+	const [process, setProcess] = useState<Process[]>([]);
+	const [hazzards, setHazzard] = useState<Hazzard[]>([]);
+	const [criticity, setCriticity] = useState<Criticity[]>([]);
+	const [id, setId] = useState<number | null>(null);
+	const [name, setName] = useState<string>("");
+	const [selectedActivityTypeId, setSelectedActivityTypeId] = useState<number>(0);
+	const [selectedProcessId, setSelectedProcessId] = useState<number>(0);
+	const [selectedHazzardCriticity, setSelectedHazzardCriticity] = useState<number[]>([]);
+	const [selectedCriticityIds, setSelectedCriticityIds] = useState<number[]>([]);
+	const [title, setTitle] = useState<string>("");
+	const modalRef = useRef<HTMLDivElement | null>(null);
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(false); 
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
 
-  useEffect(() => {
-    getActivity();
-    getActivityType();
-    getProcess();
-    getHazzard();
-    getCriticity();
-    if (modalRef.current) {
-      modalRef.current.addEventListener("hidden.bs.modal", handleModalHidden);
-    }
-    return () => {
-      if (modalRef.current) {
-        modalRef.current.removeEventListener("hidden.bs.modal", handleModalHidden);
-      }
-    };
-  }, []);
+	const [filteredCriticity, setFilteredCriticity] = useState<Option[]>([]);
 
-  const getActivity = async () => {
-    try {
-      const response: AxiosResponse<Actividades[]> = await axios.get(`${baseURL}/activity/`);
-      setActividades(response.data || []);
-    } catch (error) {
-      showAlert("Error al obtener las actividades", "error");
-    }
-  };
+	useEffect(() => {
+		getActivity();
+		getActivityType();
+		getProcess();
+		getHazzard();
+		getCriticity();
+		if (modalRef.current) {
+			modalRef.current.addEventListener("hidden.bs.modal", handleModalHidden);
+		}
+		return () => {
+			if (modalRef.current) {
+				modalRef.current.removeEventListener("hidden.bs.modal", handleModalHidden);
+			}
+		};
+	}, []);
 
-  const getActivityType = async () => {
-    try {
-      const response: AxiosResponse<ActivityType[]> = await axios.get(`${baseURL}/activity_type/`);
-      setActivityType(response.data || []);
-    } catch (error) {
-      showAlert("Error al obtener los tipos de actividad", "error");
-    }
-  };
+	const getActivity = async () => {
+		try {
+			const response: AxiosResponse<Actividades[]> = await axios.get(`${baseURL}/activity/`);
+			setActividad(response.data || []);
+		} catch (error) {
+			showAlert("Error al obtener las actividades", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  // Disminuir contador
+		}
+	};
 
-  const getProcess = async () => {
-    try {
-      const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
-      setProcess(response.data || []);
-    } catch (error) {
-      showAlert("Error al obtener los procesos", "error");
-    }
-  };
+	const getActivityType = async () => {
+		setPendingRequests(prev => prev + 1);
+		try {
+			const response: AxiosResponse<ActivityType[]> = await axios.get(`${baseURL}/activity_type/`);
+			setActivityType(response.data || []);
+		} catch (error) {
+			showAlert("Error al obtener los tipos de actividad", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  // Disminuir contador
+		}
+	};
 
-  const getHazzard = async () => {
-    try {
-      const response: AxiosResponse<Hazzard[]> = await axios.get(`${baseURL}/hazzard/`);
-      setHazzard(response.data || []);
-    } catch (error) {
-      showAlert("Error al obtener los peligros", "error");
-    }
-  };
+	const getProcess = async () => {
+		setPendingRequests(prev => prev + 1);
+		try {
+			const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
+			setProcess(response.data || []);
+		} catch (error) {
+			showAlert("Error al obtener los procesos", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  // Disminuir contador
+		}
+	};
 
-  const getCriticity = async () => {
-    try {
-      const response: AxiosResponse<Criticity[]> = await axios.get(`${baseURL}/criticity/`);
-      console.log(response.data); 
-      setCriticity(response.data || []);
-    } catch (error) {
-      showAlert("Error al obtener las criticidades", "error");
-    }
-  };
+	const getHazzard = async () => {
+		setPendingRequests(prev => prev + 1);
+		try {
+			const response: AxiosResponse<Hazzard[]> = await axios.get(`${baseURL}/hazzard/`);
+			setHazzard(response.data || []);
+		} catch (error) {
+			showAlert("Error al obtener los peligros", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  // Disminuir contador
+		}
+	};
+
+	const getCriticity = async () => {
+		setPendingRequests(prev => prev + 1);
+		try {
+			const response: AxiosResponse<Criticity[]> = await axios.get(`${baseURL}/criticity/`);
+			setCriticity(response.data || []);
+		} catch (error) {
+			showAlert("Error al obtener las criticidades", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  // Disminuir contador
+		}
+	};
+
+	const handleHazzardSelection = (selectedOptions: Option[]) => {
+		const selectedIds = selectedOptions.map((option) => option.value);
+		setSelectedHazzardCriticity(selectedIds);
+
+		const filteredOptions = criticity
+			.filter((criticityItem) => selectedIds.includes(criticityItem.id))
+			.map((criticityItem) => ({
+				value: criticityItem.id,
+				label: criticityItem.description,
+			}));
+		setFilteredCriticity(filteredOptions);
+	};
+
+	const handleModalHidden = () => {
+		setIsModalOpen(false);
+		const modals = document.querySelectorAll(".modal-backdrop");
+		modals.forEach((modal) => modal.parentNode?.removeChild(modal));
+	};
+
+	const openModal = (op: string, actividad?: Actividades) => {
+		if (op === "1") {
+			setId(null);
+			setName("");
+			setDescription("");
+			setSelectedActivityTypeId(0);
+			setSelectedHazzardCriticity([]);
+			setSelectedCriticityIds([]);
+			setSelectedProcessId(0);
+			setTitle("Registrar Actividad");
+		} else if (op === "2" && actividad) {
+			setId(actividad?.id || null);
+			setName(actividad.name);
+			setDescription(actividad.description);
+			setSelectedActivityTypeId(actividad.activityType.id);
+			setSelectedProcessId(actividad.process.id);
+			setSelectedHazzardCriticity(actividad.hazzards.map((h) => h.hazzard.id));
+			setSelectedCriticityIds(actividad.hazzards.map((h) => h.criticity.id));
+			setSelectedProcessId(actividad.process.id);
+			setTitle("Editar Actividad");
+		}
+
+		if (modalRef.current) {
+			const modal = new bootstrap.Modal(modalRef.current);
+			modal.show();
+			setIsModalOpen(true);
+		}
+	};
+
+	const validar = (): void => {
+		if (name.trim() === "") {
+			showAlert("Escribe el nombre de la actividad", "warning");
+			return;
+		}
+		if (description.trim() === "") {
+			showAlert("Escribe la descripción de la actividad", "warning");
+			return;
+		}
+		if (selectedActivityTypeId === 0) {
+			showAlert("Selecciona un tipo de actividad", "warning");
+			return;
+		}
+		if (selectedProcessId === 0) {
+			showAlert("Selecciona un tipo de proceso", "warning");
+			return;
+		}
+		if (setSelectedHazzardCriticity.length === 0) {
+			showAlert("Selecciona al menos un peligro", "warning");
+			return;
+		}
+
+		const setSelectedHazzardCriticitySend = setSelectedHazzardCriticity || [];
+
+		const parametros: ActividadesData = {
+			name: name.trim(),
+			description: description.trim(),
+			activityTypeId: selectedActivityTypeId,
+			processId: selectedProcessId,
+			hazzards: selectedHazzardCriticity.map((hazzardId, index) => ({
+				hazzardId,
+				criticityId: selectedCriticityIds[index],
+			})),
+		};
+    
+
+		enviarSolicitud(id ? "PUT" : "POST", parametros);
+	};
+
+  const enviarSolicitud = async (method: "POST" | "PUT", data: ActividadesData) => {
+	setLoading(true);
+
+
+    } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            console.error("Detalles del error:", error.response);
+            showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+        } else if (error.request) {
+            console.error("No hay respuesta del servidor:", error.request);
+            showAlert("Error: El servidor no respondió. Verifica tu conexión o intenta más tarde.", "error");
+        } else {
+            console.error("Error inesperado:", error.message);
+            showAlert(`Error inesperado: ${error.message}`, "error");
+        }
+    } finally {
+		setLoading(false);
+	}
+};
 
   const handleModalHidden = () => {
     setIsModalOpen(false);
@@ -445,6 +570,7 @@ const Actividades: React.FC = () => {
 
       setTitle("Editar Actividad");
     }
+
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -486,13 +612,33 @@ const Actividades: React.FC = () => {
 
     setLoading(true);
 
-    const parametros = {
-      name: name.trim(),
-      description: description.trim(),
-      activityTypeId: selectedActivityTypeId,
-      processId: selectedProcessId,
-      hazzards: hazzardCriticityPairs,
-    };
+	const deleteActividad = async (id: number) => {
+		setLoading(true);
+		try {
+			await axios.delete(`${baseURL}/activity/${id}`, {
+				headers: { "Content-Type": "application/json" },
+			});
+			Swal.fire("Tarea eliminada correctamente", "", "success");
+			setActividad((prev) => prev.filter((act) => act.id !== id));
+			getActivity();
+		} catch (error) {
+			Swal.fire({
+				title: "Error",
+				text: "Error al eliminar la tarea.",
+				icon: "error",
+				confirmButtonText: "OK",
+			});
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-edit" {...props}>
+			Editar
+		</Tooltip>
+	);
+
 
     enviarSolicitud(id ? "PUT" : "POST", parametros);
   };
@@ -584,6 +730,13 @@ const Actividades: React.FC = () => {
 						<div className="tabla-contenedor">
 							<EncabezadoTabla title="Actividades" onClick={() => openModal("1")} />
 						</div>
+						{pendingRequests > 0 ? (
+								<div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+								<Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+									<span className="visually-hidden">Loading...</span>
+								</Spinner>
+								</div>
+								) : (
 						<div className="table-responsive">
 							<table className="table table-bordered">
 								<thead
@@ -662,6 +815,7 @@ const Actividades: React.FC = () => {
 								</tbody>
 							</table>
 						</div>
+						)}
 					</div>
 				</div>
 

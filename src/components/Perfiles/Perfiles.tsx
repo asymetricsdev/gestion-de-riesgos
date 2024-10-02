@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import Select from 'react-select';
 import { Accordion, AccordionItem, AccordionHeader, AccordionBody } from 'react-bootstrap';
@@ -61,6 +61,9 @@ const Profiles: React.FC = () => {
   const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState<boolean>(false); 
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
+
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -79,30 +82,39 @@ const Profiles: React.FC = () => {
   }, []);
 
   const getProfiles = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Profiles[]> = await axios.get(`${baseURL}/profile/`);
       setProfiles(response.data);
     } catch (error) {
       showAlert("Error al obtener los perfiles", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
   
   
   const getProcess = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
       setProcess(response.data);
     } catch (error) {
       showAlert("Error al obtener los procesos", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   }; 
 
   const getTasks = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Tasks[]> = await axios.get(`${baseURL}/task/`);
       setTasks(response.data);
     } catch (error) {
       showAlert("Error al obtener las tareas", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   }; 
 
@@ -167,6 +179,7 @@ const Profiles: React.FC = () => {
 };
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
+  setLoading(true);
   try {
     const url = method === "PUT" && id ? `${baseURL}/profile/${id}` : `${baseURL}/profile/`;
     const response = await axios({
@@ -199,13 +212,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
       showAlert("Error al realizar la solicitud", "error");
     }
   } finally {
-
     setLoading(false);
   }
 };
 
 
   const deleteProfiles = async (id: number) => {
+    setLoading(true);
     try {
       await axios.delete(`${baseURL}/profile/${id}`, {
         headers: { "Content-Type": "application/json" },
@@ -219,6 +232,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
         icon: "error",
         confirmButtonText: "OK",
       });
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -258,6 +273,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
             <div className="tabla-contenedor">
               <EncabezadoTabla title='Perfiles' onClick={() => openModal("1")} />
             </div>
+            {pendingRequests > 0 ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+              <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+            ) : (
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center"
@@ -327,6 +349,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                 </tbody>
               </table>
             </div>
+            )}
           </div>
         </div>
         <div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>

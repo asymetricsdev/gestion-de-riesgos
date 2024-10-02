@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import { capitalizeFirstLetter } from '../functions';
 import * as bootstrap from 'bootstrap';
@@ -31,7 +31,9 @@ const Criticidad: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false); 
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
+
 
   useEffect(() => {
     getCriticity();
@@ -46,11 +48,14 @@ const Criticidad: React.FC = () => {
   }, []);
 
   const getCriticity = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Criticidad[]> = await axios.get(`${baseURL}/criticity/`);
       setCriticityType(response.data);
     } catch (error) {
       showAlert("Error al obtener criticidad", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
 
@@ -100,6 +105,7 @@ const Criticidad: React.FC = () => {
   };
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: CriticidadData) => {
+    setLoading(true);
     try {
       const url = method === "PUT" && id ? `${baseURL}/criticity/${id}` : `${baseURL}/criticity/`;
       const response = await axios({
@@ -132,11 +138,12 @@ const Criticidad: React.FC = () => {
         showAlert("Error al realizar la solicitud", "error");
       }
     } finally {
-			setLoading(false);
+      setLoading(false);
     }
   };
 
   const deleteCriticity = async (id: number) => {
+    setLoading(true);
     try {
       await axios.delete(`${baseURL}/criticity/${id}`, {
         headers: { "Content-Type": "application/json" },
@@ -150,6 +157,8 @@ const Criticidad: React.FC = () => {
         icon: "error",
         confirmButtonText: "OK",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -177,6 +186,13 @@ const Criticidad: React.FC = () => {
             <div className="tabla-contenedor">
               <EncabezadoTabla title='Criticidad' onClick={() => openModal("1")} />
             </div>
+            {pendingRequests > 0 ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+              <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+            ) : (
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center" 
@@ -231,6 +247,7 @@ const Criticidad: React.FC = () => {
                 </tbody>
               </table>
             </div>
+            )}
           </div>
         </div>
         <div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>

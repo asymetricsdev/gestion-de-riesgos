@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
 import { useNavigate } from 'react-router-dom'; 
@@ -52,7 +52,9 @@ const Colaboradores: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false); 
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
+
 
   useEffect(() => {
     getEmpleado();
@@ -68,21 +70,27 @@ const Colaboradores: React.FC = () => {
   }, []);
 
   const getEmpleado = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Colaboradores[]> = await axios.get(`${baseURL}/employee/`);
       setEmpleado(response.data);
     } catch (error) {
       showAlert("Error al obtener el cargo del colaborador", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
   
   const getPosition = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Position[]> = await axios.get(`${baseURL}/position/`);
 
       setPosition(response.data);
     } catch (error) {
       showAlert("Error al obtener el cargo del colaborador", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
   
@@ -160,6 +168,7 @@ const Colaboradores: React.FC = () => {
 };
 
    const enviarSolicitud = async (method: "POST" | "PUT", data: EmpleadoData) => {
+    setLoading(true);
     try {
       const url = method === "PUT" && id ? `${baseURL}/employee/${id}` : `${baseURL}/employee/`;
       const response = await axios({
@@ -188,6 +197,7 @@ const Colaboradores: React.FC = () => {
 
 
   const deleteEmpleado = async (id: number) => {
+    setLoading(true);
     try {
       await axios.delete(`${baseURL}/employee/${id}`, {
         headers: { "Content-Type": "application/json" },
@@ -201,6 +211,8 @@ const Colaboradores: React.FC = () => {
         icon: "error",
         confirmButtonText: "OK",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -265,6 +277,13 @@ const Colaboradores: React.FC = () => {
             <div className="tabla-contenedor">
               <EncabezadoTabla title='Colaboradores' onClick={() => openModal("1")} />
             </div>
+            {pendingRequests > 0 ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+              <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+            ) : (
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center"
@@ -327,6 +346,7 @@ const Colaboradores: React.FC = () => {
                 </tbody>
               </table>
             </div>
+            )}
           </div>
         </div>
         <div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
