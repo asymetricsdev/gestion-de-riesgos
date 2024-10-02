@@ -205,7 +205,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
 											<td>{i + 1}</td>
 											<td>{check.name}</td>
 											<td>{check.description}</td>
-											<td>{check.checker.name}</td>
+											<td>{check.checker && check.checker.name}</td>
 											<td className="text-center">
 												<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
 													<button
