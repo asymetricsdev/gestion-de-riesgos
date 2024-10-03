@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from "../functions";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import Select from "react-select";
 import { Accordion, AccordionItem, AccordionHeader, AccordionBody } from "react-bootstrap";
@@ -83,6 +83,7 @@ const Planning: React.FC = () => {
 	const [selectedProfileId, setSelectedProfileId] = useState<number>(0);
 	const [title, setTitle] = useState<string>("");
 	const modalRef = useRef<HTMLDivElement | null>(null);
+	const [pendingRequests, setPendingRequests] = useState<number>(0);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
 
@@ -103,38 +104,50 @@ const Planning: React.FC = () => {
 	}, []);
 
 	const getPlanning = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Planning[]> = await axios.get(`${baseURL}/planning/`);
 			setPlanning(response.data);
 		} catch (error) {
 			showAlert("Error al obtener la Planning", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  
 		}
 	};
 
 	const getProfiles = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Profile[]> = await axios.get(`${baseURL}/profile/`);
 			setProfile(response.data);
 		} catch (error) {
 			showAlert("Error al obtener los perfiles", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  
 		}
 	};
 
 	const getProcess = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
 			setProcess(response.data);
 		} catch (error) {
 			showAlert("Error al obtener los procesos", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  
 		}
 	};
 
 	const getEmployees = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Employees[]> = await axios.get(`${baseURL}/employee/`);
 			setEmployee(response.data);
 		} catch (error) {
 			showAlert("Error al obtener los Empleados", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  
 		}
 	};
 
@@ -220,6 +233,7 @@ const Planning: React.FC = () => {
 	
 
 	const enviarSolicitud = async (method: "POST" | "PUT", data: PlanningData) => {
+		setLoading(true);
 		try {
 			const url = method === "PUT" && id ? `${baseURL}/planning/${id}` : `${baseURL}/planning/`;
 			const response = await axios({
@@ -254,7 +268,6 @@ const Planning: React.FC = () => {
 				showAlert("Error al realizar la solicitud", "error");
 			}
 		} finally {
-
 			setLoading(false);
 		}
 	};
@@ -262,6 +275,7 @@ const Planning: React.FC = () => {
 	
 
 	const deletePlanning = async (id: number) => {
+		setLoading(true);
 		try {
 			console.log("Intentando eliminar planificación con ID:", id);
 			const response = await axios.delete(`${baseURL}/planning/${id}`, {
@@ -282,12 +296,12 @@ const Planning: React.FC = () => {
 				confirmButtonText: "OK",
 			});
 			console.error("Error al eliminar la planificación:", error);
+		} finally {
+			setLoading(false);
 		}
 	};
 	
 	
-	
-
 	const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>
 			Editar
@@ -326,6 +340,13 @@ const Planning: React.FC = () => {
 						<div className="tabla-contenedor">
 							<EncabezadoTabla title="Planificación" onClick={() => openModal("1")} />
 						</div>
+						{pendingRequests > 0 ? (
+							<div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+							<Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+								<span className="visually-hidden">Loading...</span>
+							</Spinner>
+							</div>
+							) : (
 						<div className="table-responsive">
 							<table className="table table-bordered">
 								<thead
@@ -383,6 +404,7 @@ const Planning: React.FC = () => {
 								</tbody>
 							</table>
 						</div>
+						)}
 					</div>
 				</div>
 				<div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>

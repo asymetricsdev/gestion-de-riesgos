@@ -5,7 +5,7 @@ import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import { capitalizeFirstLetter } from '../functions';
 import * as bootstrap from 'bootstrap';
@@ -36,6 +36,7 @@ const Riesgo: React.FC = () => {
   const [updateDate, setUpdateDate] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -52,6 +53,7 @@ const Riesgo: React.FC = () => {
   }, []);
 
   const getRisk = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Riesgo[]> = await axios.get(`${baseURL}/risk/`);
       const data = response.data.map(Risk => ({
@@ -61,6 +63,8 @@ const Riesgo: React.FC = () => {
       setRisk(data);
     } catch (error) {
       showAlert("Error al obtener el riesgo", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
 
@@ -112,6 +116,7 @@ const Riesgo: React.FC = () => {
   };
 
   const enviarSolicitud = async (method: "POST" | "PUT", data: RiesgoData) => {
+    setLoading(true);
     try {
       const url = method === "PUT" && id ? `${baseURL}/risk/${id}` : `${baseURL}/risk/`;
       const response = await axios({
@@ -140,6 +145,7 @@ const Riesgo: React.FC = () => {
   }; 
 
   const deleteRisk = async (id: number) => {
+    setLoading(true);
     try {
       await axios.delete(`${baseURL}/risk/${id}`, {
         headers: { "Content-Type": "application/json" },
@@ -153,6 +159,8 @@ const Riesgo: React.FC = () => {
         icon: "error",
         confirmButtonText: "OK",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -176,6 +184,13 @@ const Riesgo: React.FC = () => {
             <div className="tabla-contenedor">
               <EncabezadoTabla title='Riesgos' onClick={() => openModal("1")} />
             </div>
+            {pendingRequests > 0 ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+              <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+            ) : (
             <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
                 <thead className="text-center" 
@@ -230,6 +245,7 @@ const Riesgo: React.FC = () => {
                 </tbody>
               </table>
             </div>
+            )}
           </div>
         </div>
         <div

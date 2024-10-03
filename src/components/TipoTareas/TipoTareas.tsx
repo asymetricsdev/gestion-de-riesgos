@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from "../functions";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from "bootstrap";
 
@@ -28,6 +28,7 @@ const TipoTareas: React.FC = () => {
 	const [description, setDescription] = useState<string>("");
 	const [title, setTitle] = useState<string>("");
 	const modalRef = useRef<HTMLDivElement | null>(null);
+	const [pendingRequests, setPendingRequests] = useState<number>(0);
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
 
@@ -44,11 +45,14 @@ const TipoTareas: React.FC = () => {
 	}, []);
 
 	const getTipoTareas = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<TipoTareas[]> = await axios.get(`${baseURL}/task_type/`);
 			setTipoTareas(response.data);
 		} catch (error) {
 			showAlert("Error al obtener el Tipo de Tareas", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  // Disminuir contador
 		}
 	};
 
@@ -99,6 +103,7 @@ const TipoTareas: React.FC = () => {
 
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => {
+	setLoading(true);
 		try {
 		  const url = method === "PUT" && id ? `${baseURL}/task_type/${id}` : `${baseURL}/task_type/`;
 		  const response = await axios({
@@ -121,13 +126,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 			showAlert("Error al realizar la solicitud", "error");
 		  }
 		} finally {
-
-			setLoading(false);
+      setLoading(false);
 		}
 }; 
 
 
 	const deleteTipoTareas = async (id: number) => {
+		setLoading(true);
 		try {
 		  await axios.delete(`${baseURL}/task_type/${id}`, {
 			headers: { "Content-Type": "application/json" },
@@ -141,8 +146,10 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 			icon: "error",
 			confirmButtonText: "OK",
 		  });
+		} finally {
+			setLoading(false);
 		}
-	  };
+	};
 
 	const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>
@@ -168,6 +175,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 						<div className="tabla-contenedor">
 							<EncabezadoTabla title="Tipo de Tareas" onClick={() => openModal("1")} />
 						</div>
+						{pendingRequests > 0 ? (
+						<div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+						<Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+							<span className="visually-hidden">Loading...</span>
+						</Spinner>
+						</div>
+						) : (
 						<div className="table-responsive">
 							<table className="table table-bordered">
 								<thead
@@ -226,6 +240,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 								</tbody>
 							</table>
 						</div>
+						)}
 					</div>
 				</div>
 				<div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>

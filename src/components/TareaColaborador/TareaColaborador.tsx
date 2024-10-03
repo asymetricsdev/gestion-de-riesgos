@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
 import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip, Breadcrumb } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Breadcrumb, Spinner } from "react-bootstrap";
 import DangerHead from "../DangerHead/DangerHead";
 import Card from 'react-bootstrap/Card';
 import { Link } from 'react-router-dom';
@@ -42,27 +42,39 @@ const TareaColaborador: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [colaboradores, setColaboradores] = useState<Colaboradores | null>(null);
   const { id } = useParams<{ id: string }>();
+  const [loading, setLoading] = useState<boolean>(false); 
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
   
-console.log("Colaborador ID:", id); // Verifica si el ID es correcto
+console.log("Colaborador ID:", id); 
 
+useEffect(() => {
+  getColaboradorTasks();
+  getColaboradorData();
+}, [id]);
 
   const getColaboradorTasks = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Task[]> = await axios.get(`${baseURL}/employee/${id}/task_list`);
-      console.log(response.data); // Añade este log para verificar la estructura de la respuesta
+      console.log(response.data); 
       setTasks(response.data);
     } catch (error) {
       showAlert("Error al obtener las tareas del colaborador", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
   
 
   const getColaboradorData = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Colaboradores> = await axios.get(`${baseURL}/employee/${id}`);
       setColaboradores(response.data);
     } catch (error) {
       showAlert("Error al obtener los datos del colaborador", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  
     }
   };
 
@@ -72,10 +84,6 @@ console.log("Colaborador ID:", id); // Verifica si el ID es correcto
     </Tooltip>
   );
 
-  useEffect(() => {
-    getColaboradorTasks();
-    getColaboradorData();
-  }, [id]);
 
   return (
     
@@ -106,6 +114,13 @@ console.log("Colaborador ID:", id); // Verifica si el ID es correcto
             <div className="tabla-contenedor-matriz">
               <DangerHead title="Tarea Colaborador" />
             </div>
+            {pendingRequests > 0 ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+              <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+            ) : (
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead
@@ -172,6 +187,7 @@ console.log("Colaborador ID:", id); // Verifica si el ID es correcto
                 </tbody>
               </table>
             </div>
+            )}
           </div>
         </div>
       </div>
