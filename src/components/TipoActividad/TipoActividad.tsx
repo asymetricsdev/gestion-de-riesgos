@@ -29,8 +29,7 @@ const Activity: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [title, setTitle] = useState<string>("");
-  const modalRef = useRef<HTMLDivElement | null>(null);
-  const [loading, setLoading] = useState<boolean>(false); 
+  const modalRef = useRef<HTMLDivElement | null>(null); 
   const [pendingRequests, setPendingRequests] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -133,7 +132,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) 
       setLoading(false);
     }
 
-  
+  }
 
   const deleteActividad = async (id: number) => {
     setLoading(true);
@@ -321,5 +320,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) 
   
   );
 };
+
 
 export default Activity;

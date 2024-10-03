@@ -71,7 +71,6 @@ const VerificadorControl: React.FC = () => {
   const [selectedCheckpointIds, setSelectedCheckpointIds] = useState<number[] | null>(null);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
-  const [loading, setLoading] = useState<boolean>(false); 
   const [pendingRequests, setPendingRequests] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);

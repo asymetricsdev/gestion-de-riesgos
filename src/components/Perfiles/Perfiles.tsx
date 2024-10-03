@@ -61,9 +61,7 @@ const Profiles: React.FC = () => {
   const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
-  const [loading, setLoading] = useState<boolean>(false); 
   const [pendingRequests, setPendingRequests] = useState<number>(0);
-
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -89,7 +87,7 @@ const Profiles: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener los perfiles", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1);  
     }
   };
   
@@ -102,7 +100,7 @@ const Profiles: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener los procesos", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1);  
     }
   }; 
 
@@ -114,7 +112,7 @@ const Profiles: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener las tareas", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1); 
     }
   }; 
 
