@@ -1,4 +1,4 @@
-.card-contenedor {
+.card-contenedor-lista-tareas {
     width: 100%; 
     margin: 0 auto;  
     margin-top: 6%; 
@@ -27,3 +27,12 @@ h4 {
 .migas-contenedor {
     margin-top: 2%; 
 }
+
+
+.col-medidas-preventivas {
+    width: 20%; 
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
+  
