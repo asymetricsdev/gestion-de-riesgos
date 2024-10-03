@@ -3,9 +3,10 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from 'bootstrap';
+import { useNavigate } from 'react-router-dom'; 
 
 
 const MySwal = withReactContent(Swal);
@@ -51,6 +52,9 @@ const Colaboradores: React.FC = () => {
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false); 
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
+
 
   useEffect(() => {
     getEmpleado();
@@ -66,21 +70,27 @@ const Colaboradores: React.FC = () => {
   }, []);
 
   const getEmpleado = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Colaboradores[]> = await axios.get(`${baseURL}/employee/`);
       setEmpleado(response.data);
     } catch (error) {
       showAlert("Error al obtener el cargo del colaborador", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
   
   const getPosition = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Position[]> = await axios.get(`${baseURL}/position/`);
 
       setPosition(response.data);
     } catch (error) {
       showAlert("Error al obtener el cargo del colaborador", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  // Disminuir contador
     }
   };
   
@@ -143,6 +153,7 @@ const Colaboradores: React.FC = () => {
         showAlert("Escribe el cargo del colaborador", "warning");
         return;
     }
+    setLoading(true);
     
       const parametros: EmpleadoData = {
         rut: rut.trim(),
@@ -157,6 +168,7 @@ const Colaboradores: React.FC = () => {
 };
 
    const enviarSolicitud = async (method: "POST" | "PUT", data: EmpleadoData) => {
+    setLoading(true);
     try {
       const url = method === "PUT" && id ? `${baseURL}/employee/${id}` : `${baseURL}/employee/`;
       const response = await axios({
@@ -178,11 +190,14 @@ const Colaboradores: React.FC = () => {
       } else {
         showAlert("Error al realizar la solicitud", "error");
       }
+    } finally {
+      setLoading(false);
     }
   }; 
 
 
   const deleteEmpleado = async (id: number) => {
+    setLoading(true);
     try {
       await axios.delete(`${baseURL}/employee/${id}`, {
         headers: { "Content-Type": "application/json" },
@@ -196,9 +211,16 @@ const Colaboradores: React.FC = () => {
         icon: "error",
         confirmButtonText: "OK",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
+  const renderTareasTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+    <Tooltip id="button-tooltip-edit" {...props}>
+      Ver Tareas
+    </Tooltip>
+  );
   const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
     <Tooltip id="button-tooltip-edit" {...props}>
       Editar
@@ -239,6 +261,13 @@ const Colaboradores: React.FC = () => {
   
     return digitoCalculado === verificador;
   }; 
+
+  const navigate = useNavigate();
+
+  const verTareas = (empId: number) => {
+    navigate(`/tarea-colaborador/${empId}`);
+  };
+
   
   return (
     <div className="App">
@@ -248,6 +277,13 @@ const Colaboradores: React.FC = () => {
             <div className="tabla-contenedor">
               <EncabezadoTabla title='Colaboradores' onClick={() => openModal("1")} />
             </div>
+            {pendingRequests > 0 ? (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+              <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+            ) : (
             <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center"
@@ -258,6 +294,7 @@ const Colaboradores: React.FC = () => {
                     <th>Nombre</th>
                     <th>Apellido</th>
                     <th>Cargo</th>
+                    <th>Ver Tareas</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -269,6 +306,13 @@ const Colaboradores: React.FC = () => {
                       <td>{emp.firstName}</td>
                       <td>{emp.lastName}</td>
                       <td>{emp.position.name}</td> 
+                      <td>
+                        <OverlayTrigger placement="top" overlay={renderTareasTooltip({})}>
+                          <button className="btn btn-custom-tareas m-2" onClick={() => verTareas(emp.id)}>
+                            <i className="fa-solid fa-list-check"></i>
+                          </button>
+                        </OverlayTrigger>
+                      </td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                           <button
@@ -302,6 +346,7 @@ const Colaboradores: React.FC = () => {
                 </tbody>
               </table>
             </div>
+            )}
           </div>
         </div>
         <div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
@@ -378,12 +423,20 @@ const Colaboradores: React.FC = () => {
                   Cerrar
                 </button>
                 <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                >
-                  Guardar
-                </button>
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
+								</button>
               </div>
             </div>
           </div>

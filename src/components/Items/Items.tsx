@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from "../functions";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from "bootstrap";
 
@@ -38,6 +38,9 @@ const Items: React.FC = () => {
 	const [selectedCheckerId, setSelectedCheckerId] = useState<number>(0);
 	const [title, setTitle] = useState<string>("");
 	const modalRef = useRef<HTMLDivElement | null>(null);
+	const [loading, setLoading] = useState<boolean>(false);
+	const [pendingRequests, setPendingRequests] = useState<number>(0);
+
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -54,20 +57,26 @@ const Items: React.FC = () => {
 	}, []);
 
 	const getCheckpoint = async () => {
+		setPendingRequests((prev) => prev + 1);
 		try {
 			const response: AxiosResponse<Items[]> = await axios.get(`${baseURL}/checkpoint/`);
 			setCheckpoint(response.data);
 		} catch (error) {
 			showAlert("Error al obtener los Items", "error");
+		} finally {
+			setPendingRequests((prev) => prev - 1); // Disminuir contador
 		}
 	};
 
 	const getChecker = async () => {
+		setPendingRequests((prev) => prev + 1);
 		try {
 			const response = await axios.get<Checker[]>(`${baseURL}/checker/`);
 			setChecker(response.data);
 		} catch (error) {
 			showAlert("Error al obtener els verificadores", "error");
+		} finally {
+			setPendingRequests((prev) => prev - 1); // Disminuir contador
 		}
 	};
 
@@ -110,58 +119,66 @@ const Items: React.FC = () => {
 			return;
 		}
 
-		const parametros : CheckpointData = { 
-			name: name.trim(), 
-			description: description.trim(), 
-			checkerId: selectedCheckerId 
+		const parametros: CheckpointData = {
+			name: name.trim(),
+			description: description.trim(),
+			checkerId: selectedCheckerId,
 		};
 
 		const metodo = id ? "PUT" : "POST";
 		enviarSolicitud(metodo, parametros);
 	};
 
-
-const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => {
+	const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => {
+		setLoading(true);
 		try {
-		  const url = method === "PUT" && id ? `${baseURL}/checkpoint/${id}` : `${baseURL}/checkpoint/`;
-		  const response = await axios({
-			method,
-			url,
-			data,
-			headers: { "Content-Type": "application/json" },
-		  });
-	  
-		  showAlert("Operación realizada con éxito", "success");
-		  getCheckpoint();
-		  if (modalRef.current) {
-			const modal = bootstrap.Modal.getInstance(modalRef.current);
-			modal?.hide();
-		  }
+			const url = method === "PUT" && id ? `${baseURL}/checkpoint/${id}` : `${baseURL}/checkpoint/`;
+			const response = await axios({
+				method,
+				url,
+				data,
+				headers: { "Content-Type": "application/json" },
+			});
+
+			showAlert("Operación realizada con éxito", "success");
+			getCheckpoint();
+			if (modalRef.current) {
+				const modal = bootstrap.Modal.getInstance(modalRef.current);
+				modal?.hide();
+			}
 		} catch (error) {
-		  if (axios.isAxiosError(error) && error.response) {
-			showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
-		  } else {
-			showAlert("Error al realizar la solicitud", "error");
-		  }
+			if (axios.isAxiosError(error) && error.response) {
+				showAlert(
+					`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`,
+					"error"
+				);
+			} else {
+				showAlert("Error al realizar la solicitud", "error");
+			}
+		} finally {
+			setLoading(false);
 		}
-}; 
+	};
 
 	const deleteCheckpoint = async (id: number) => {
+		setLoading(true);
 		try {
-		  await axios.delete(`${baseURL}/checkpoint/${id}`, {
-			headers: { "Content-Type": "application/json" },
-		  });
-		  Swal.fire("Checkpoint eliminado correctamente", "", "success");
-		  getCheckpoint();
+			await axios.delete(`${baseURL}/checkpoint/${id}`, {
+				headers: { "Content-Type": "application/json" },
+			});
+			Swal.fire("Checkpoint eliminado correctamente", "", "success");
+			getCheckpoint();
 		} catch (error) {
-		  Swal.fire({
-			title: "Error",
-			text: "Error al eliminar el Item.",
-			icon: "error",
-			confirmButtonText: "OK",
-		  });
+			Swal.fire({
+				title: "Error",
+				text: "Error al eliminar el Item.",
+				icon: "error",
+				confirmButtonText: "OK",
+			});
+		} finally {
+			setLoading(false);
 		}
-	  };
+	};
 
 	const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>
@@ -183,63 +200,77 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
 						<div className="tabla-contenedor">
 							<EncabezadoTabla title="Items" onClick={() => openModal("1")} />
 						</div>
-						<div className="table-responsive">
-							<table className="table table-bordered">
-								<thead
-									className="text-center"
-									style={{
-										background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
-										color: "#fff",
-									}}>
-									<tr>
-										<th>N°</th>
-										<th>Nombre</th>
-										<th>Descripción</th>
-										<th>Tipo de Verificación</th>
-										<th>Acciones</th>
-									</tr>
-								</thead>
-								<tbody className="table-group-divider">
-									{checkpoint.map((check, i) => (
-										<tr key={JSON.stringify(check)} className="text-center">
-											<td>{i + 1}</td>
-											<td>{check.name}</td>
-											<td>{check.description}</td>
-											<td>{check.checker.name}</td>
-											<td className="text-center">
-												<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
-													<button
-														onClick={() => openModal("2", check)}
-														className="btn btn-custom-editar m-2">
-														<i className="fa-solid fa-edit"></i>
-													</button>
-												</OverlayTrigger>
-												<OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
-													<button
-														className="btn btn-custom-danger"
-														onClick={() => {
-															MySwal.fire({
-																title: "¿Estás seguro?",
-																text: "No podrás revertir esto",
-																icon: "warning",
-																showCancelButton: true,
-																confirmButtonText: "Sí, bórralo",
-																cancelButtonText: "Cancelar",
-															}).then((result) => {
-																if (result.isConfirmed) {
-																	deleteCheckpoint(check.id);
-																}
-															});
-														}}>
-														<i className="fa-solid fa-circle-xmark"></i>
-													</button>
-												</OverlayTrigger>
-											</td>
+						{pendingRequests > 0 ? (
+							<div
+								className="d-flex justify-content-center align-items-center"
+								style={{ height: "100vh", marginTop: "-200px" }}
+							>
+								<Spinner animation="border" role="status" style={{ color: "#A17BB6" }}>
+									<span className="visually-hidden">Loading...</span>
+								</Spinner>
+							</div>
+						) : (
+							<div className="table-responsive">
+								<table className="table table-bordered">
+									<thead
+										className="text-center"
+										style={{
+											background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
+											color: "#fff",
+										}}
+									>
+										<tr>
+											<th>N°</th>
+											<th>Nombre</th>
+											<th>Descripción</th>
+											<th>Tipo de Verificación</th>
+											<th>Acciones</th>
 										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
+									</thead>
+									<tbody className="table-group-divider">
+										{checkpoint.map((check, i) => (
+											<tr key={JSON.stringify(check)} className="text-center">
+												<td>{i + 1}</td>
+												<td>{check.name}</td>
+												<td>{check.description}</td>
+												<td>{check.checker && check.checker.name}</td>
+												<td className="text-center">
+													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
+														<button
+															onClick={() => openModal("2", check)}
+															className="btn btn-custom-editar m-2"
+														>
+															<i className="fa-solid fa-edit"></i>
+														</button>
+													</OverlayTrigger>
+													<OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+														<button
+															className="btn btn-custom-danger"
+															onClick={() => {
+																MySwal.fire({
+																	title: "¿Estás seguro?",
+																	text: "No podrás revertir esto",
+																	icon: "warning",
+																	showCancelButton: true,
+																	confirmButtonText: "Sí, bórralo",
+																	cancelButtonText: "Cancelar",
+																}).then((result) => {
+																	if (result.isConfirmed) {
+																		deleteCheckpoint(check.id);
+																	}
+																});
+															}}
+														>
+															<i className="fa-solid fa-circle-xmark"></i>
+														</button>
+													</OverlayTrigger>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+						)}
 					</div>
 				</div>
 				<div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>
@@ -259,7 +290,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
 
 								<div className="input-group mb-3">
 									<span className="input-group-text">
-									<i className="fa-solid fa-rectangle-list"></i>
+										<i className="fa-solid fa-rectangle-list"></i>
 									</span>
 									<input
 										type="text"
@@ -285,18 +316,21 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
 								</div>
 								<div className="mb-3">
 									<label htmlFor="Checkpoint" className="form-label">
-                      				Verificador:
+										Verificador:
 									</label>
-										<select
+									<select
 										id="checker"
 										className="form-select"
 										value={selectedCheckerId}
-										onChange={(e) => setSelectedCheckerId(Number(e.target.value))}>
+										onChange={(e) => setSelectedCheckerId(Number(e.target.value))}
+									>
 										<option value={0}>Selecciona...</option>
 										{checker.map((chec) => (
-										<option key={JSON.stringify(chec)} value={chec.id}>{chec.name}</option>
+											<option key={JSON.stringify(chec)} value={chec.id}>
+												{chec.name}
+											</option>
 										))}
-										</select>
+									</select>
 								</div>
 							</div>
 							<div className="modal-footer">
@@ -304,7 +338,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => 
 									type="button"
 									className="btn btn-secondary"
 									data-bs-dismiss="modal"
-									id="btnCerrar">
+									id="btnCerrar"
+								>
 									Cerrar
 								</button>
 								<button type="button" className="btn btn-primary" onClick={validar}>

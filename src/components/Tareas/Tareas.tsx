@@ -4,7 +4,7 @@ import { AxiosError } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { showAlert } from "../functions";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
@@ -58,6 +58,8 @@ function Tareas() {
 	const [checker, setChecker] = useState<Checker[]>([]);
 	const [isEditMode, setIsEditMode] = useState<boolean>(false);
 	const modalRef = useRef<HTMLDivElement | null>(null);
+	const [loading, setLoading] = useState<boolean>(false); 
+  	const [pendingRequests, setPendingRequests] = useState<number>(0);
 
 	const [id, setId] = useState<number>(0);
 	const [name, setName] = useState<string>("");
@@ -89,28 +91,37 @@ function Tareas() {
 	}, []);
 
 	const getTareas = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Tareas[]> = await axios.get(`${baseURL}/task/`);
 			setTareas(response.data);
 		} catch (error) {
 			showAlert("Error al obtener Tareas", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  // Disminuir contador
 		}
 	};
 	const getTasksType = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<TaskType[]> = await axios.get(`${baseURL}/task_type/`);
 			setTaskType(response.data);
 		} catch (error) {
 			showAlert("Error al obtener la tarea", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  // Disminuir contador
 		}
 	};
 
 	const getChecker = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Checker[]> = await axios.get(`${baseURL}/checker/`);
 			setChecker(response.data);
 		} catch (error) {
 			showAlert("Error al obtener las verificaciones", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  // Disminuir contador
 		}
 	};
 
@@ -124,6 +135,7 @@ function Tareas() {
 	};
 
 	const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+		setLoading(true);
 		try {
 			const url = method === "PUT" && id ? `${baseURL}/task/${id}` : `${baseURL}/task/`;
 			const response = await axios({
@@ -141,6 +153,8 @@ function Tareas() {
 			}
 		} catch (error) {
 			showAlert("Error al realizar la solicitud", "error");
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -187,6 +201,7 @@ function Tareas() {
 	};
 
 	const deleteTarea = async (id: number) => {
+		setLoading(true);
 		console.log("Deleting task with id:", id);
 		try {
 			await axios.delete(`${baseURL}/task/${id}`, {
@@ -201,6 +216,8 @@ function Tareas() {
 				console.error("Error borrando tareas:", error);
 			}
 			showAlert("Error al eliminar la tarea", "error");
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -368,6 +385,13 @@ function Tareas() {
 							<EncabezadoTabla title="Tareas" onClick={() => openModal("1")} />
 						</div>
 					</div>
+					{pendingRequests > 0 ? (
+					<div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+					<Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+						<span className="visually-hidden">Loading...</span>
+					</Spinner>
+					</div>
+					) : (
 					<div className="table-responsive tabla-scroll">
 						<table className="table table-bordered">
 							<thead
@@ -421,9 +445,9 @@ function Tareas() {
 																tr.name
 															)
 														}
-														className="btn btn-custom-editar m-2"
+														className="btn btn-custom-descargar m-2"
 													>
-														<FontAwesomeIcon icon={faDownload} /> Descargar
+														<FontAwesomeIcon icon={faDownload} />
 													</button>
 												</OverlayTrigger>
 											</td>
@@ -468,6 +492,7 @@ function Tareas() {
 							</tbody>
 						</table>
 					</div>
+					)}
 				</div>
 			</div>
 
