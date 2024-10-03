@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
+import { useNavigate, useParams } from 'react-router-dom';
 import { showAlert } from '../functions';
 import { OverlayTrigger, Tooltip, Breadcrumb, Spinner } from "react-bootstrap";
 import DangerHead from "../DangerHead/DangerHead";
@@ -84,6 +84,14 @@ useEffect(() => {
     </Tooltip>
   );
 
+
+  const navigate = useNavigate();
+
+  const EjecutarTareas = (empId: number, taskId: number) => {
+    console.log(`Navigating to: /colaborador-ejecutar-tarea/${empId}/tarea/${taskId}`);
+    navigate(`/colaborador-ejecutar-tarea/${empId}/tarea/${taskId}`);
+  };
+  
 
   return (
     
@@ -172,7 +180,11 @@ useEffect(() => {
                         </td>
                         <td>
                           <OverlayTrigger placement="top" overlay={renderEjecutarTooltip({})}>
-                            <button className="btn btn-custom-tareas m-2">
+                            {/* Pasamos el colaboradores.id y task.taskId al hacer clic */}
+                            <button
+                              className="btn btn-custom-tareas m-2"
+                              onClick={() => colaboradores?.id && EjecutarTareas(colaboradores.id, task.taskId)}
+                            >
                               <i className="fa-solid fa-share-from-square"></i>
                             </button>
                           </OverlayTrigger>
