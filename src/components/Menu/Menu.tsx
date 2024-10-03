@@ -66,9 +66,9 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 						<span>Login</span>
 					</NavLink>
 				) : (
-					<OverlayTrigger placement="right" overlay={renderTooltip("Home")}>
+					<OverlayTrigger placement="right" overlay={renderTooltip("Login")}>
 						<NavLink to="/login" className="nav-link text-white text-custom-color d-flex align-items-center">
-							<i className="fa-solid fa-home"></i>
+						<i className="fa-solid fa-arrow-right-to-bracket"></i>
 						</NavLink>
 					</OverlayTrigger>
 				)}
