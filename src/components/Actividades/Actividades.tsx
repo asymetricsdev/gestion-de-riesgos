@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { capitalizeFirstLetter, showAlert } from "../functions";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from "bootstrap";
 
@@ -67,6 +67,7 @@ const Actividades: React.FC = () => {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [title, setTitle] = useState<string>("");
 	const [loading, setLoading] = useState<boolean>(false);
+	const [pendingRequests, setPendingRequests] = useState<number>(0);
 
 	useEffect(() => {
 		getActivity();
@@ -85,6 +86,7 @@ const Actividades: React.FC = () => {
 	}, []);
 
 	const getActivity = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Actividades[]> = await axios.get(`${baseURL}/activity/`);
 			let jh = [];
@@ -96,44 +98,59 @@ const Actividades: React.FC = () => {
 			setActividades(response.data || []);
 		} catch (error) {
 			showAlert("Error al obtener las actividades", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  
 		}
 	};
 
 	const getActivityType = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<ActivityType[]> = await axios.get(`${baseURL}/activity_type/`);
 			setActivityType(response.data || []);
 		} catch (error) {
 			showAlert("Error al obtener los tipos de actividad", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  
 		}
 	};
 
 	const getProcess = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
 			setProcess(response.data || []);
 		} catch (error) {
 			showAlert("Error al obtener los procesos", "error");
 		}
+		finally {
+			setPendingRequests(prev => prev - 1);  
+		}
 	};
 
 	const getHazzard = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Hazzard[]> = await axios.get(`${baseURL}/hazzard/`);
 
 			setHazzard(response.data || []);
 		} catch (error) {
 			showAlert("Error al obtener los peligros", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  
 		}
 	};
 
 	const getCriticity = async () => {
+		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Criticity[]> = await axios.get(`${baseURL}/criticity/`);
 
 			setCriticity(response.data || []);
 		} catch (error) {
 			showAlert("Error al obtener las criticidades", "error");
+		} finally {
+			setPendingRequests(prev => prev - 1);  
 		}
 	};
 
@@ -220,6 +237,7 @@ const Actividades: React.FC = () => {
 	};
 
 	const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
+		setLoading(true);
 		try {
 			const url = method === "PUT" && id ? `${baseURL}/activity/${id}` : `${baseURL}/activity/`;
 			const response = await axios({
@@ -265,6 +283,7 @@ const Actividades: React.FC = () => {
 	};
 
 	const deleteActividad = async (id: number) => {
+		setLoading(true);
 		try {
 			await axios.delete(`${baseURL}/activity/${id}`, {
 				headers: { "Content-Type": "application/json" },
@@ -280,6 +299,8 @@ const Actividades: React.FC = () => {
 				icon: "error",
 				confirmButtonText: "OK",
 			});
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -313,6 +334,13 @@ const Actividades: React.FC = () => {
 						<div className="tabla-contenedor">
 							<EncabezadoTabla title="Actividades" onClick={() => openModal("1")} />
 						</div>
+						{pendingRequests > 0 ? (
+						<div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+						<Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+							<span className="visually-hidden">Loading...</span>
+						</Spinner>
+						</div>
+						) : (
 						<div className="table-responsive">
 							<table className="table table-bordered">
 								<thead
@@ -392,6 +420,7 @@ const Actividades: React.FC = () => {
 								</tbody>
 							</table>
 						</div>
+						)}
 					</div>
 				</div>
 
