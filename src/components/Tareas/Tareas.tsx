@@ -6,7 +6,7 @@ import withReactContent from "sweetalert2-react-content";
 import { showAlert } from "../functions";
 import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faDownload, faCircleXmark, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from "bootstrap";
 import { useDropzone } from "react-dropzone";
@@ -457,7 +457,7 @@ function Tareas() {
 														className="btn btn-custom-editar m-2"
 														onClick={() => openModal("2", tr)}
 													>
-														<FontAwesomeIcon icon={faDownload} />{" "}
+														<FontAwesomeIcon icon={faPenToSquare} />
 													</button>
 												</OverlayTrigger>
 												<OverlayTrigger placement="top" overlay={<Tooltip>Eliminar</Tooltip>}>
