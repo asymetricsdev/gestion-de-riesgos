@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { capitalizeFirstLetter, showAlert } from "../functions";
-import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from "bootstrap";
 
@@ -24,7 +24,7 @@ interface Actividades {
 interface HazzardCriticity {
 	hazzardId: number;
 	criticityId: number;
-	
+	description: string;
 }
 
 interface Hazzard {
@@ -67,7 +67,6 @@ const Actividades: React.FC = () => {
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 	const [title, setTitle] = useState<string>("");
 	const [loading, setLoading] = useState<boolean>(false);
-	const [pendingRequests, setPendingRequests] = useState<number>(0);
 
 	useEffect(() => {
 		getActivity();
@@ -86,71 +85,69 @@ const Actividades: React.FC = () => {
 	}, []);
 
 	const getActivity = async () => {
-		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Actividades[]> = await axios.get(`${baseURL}/activity/`);
-			let jh = [];
-			response.data.forEach((actividad) => {
-				jh.push({ hazzardId: 0, criticityId: 0 });
-				console.log("fin...", jh);
-			});
 
-			setActividades(response.data || []);
+			// Verificamos la respuesta que obtenemos del backend
+			console.log("Datos obtenidos del backend:", response.data);
+
+			if (!response.data || response.data.length === 0) {
+				showAlert("No se encontraron actividades", "warning");
+				return;
+			}
+
+			let updatedActivities = response.data.map((actividad) => ({
+				...actividad,
+				hazzards: Array.isArray(actividad.hazzards)
+					? actividad.hazzards.map((hazard) => ({
+							hazzardId: hazard.hazzardId || 0,
+							criticityId: hazard.criticityId || 0,
+							description: hazard.description || "Descripción no disponible",
+					  }))
+					: [],
+			}));
+
+			setActividades(updatedActivities);
 		} catch (error) {
-			showAlert("Error al obtener las actividades", "error");
-		} finally {
-			setPendingRequests(prev => prev - 1);  
+			console.error("Error al obtener las actividades:", error);
 		}
 	};
 
 	const getActivityType = async () => {
-		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<ActivityType[]> = await axios.get(`${baseURL}/activity_type/`);
 			setActivityType(response.data || []);
 		} catch (error) {
 			showAlert("Error al obtener los tipos de actividad", "error");
-		} finally {
-			setPendingRequests(prev => prev - 1);  
 		}
 	};
 
 	const getProcess = async () => {
-		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
 			setProcess(response.data || []);
 		} catch (error) {
 			showAlert("Error al obtener los procesos", "error");
 		}
-		finally {
-			setPendingRequests(prev => prev - 1);  
-		}
 	};
 
 	const getHazzard = async () => {
-		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Hazzard[]> = await axios.get(`${baseURL}/hazzard/`);
 
 			setHazzard(response.data || []);
 		} catch (error) {
 			showAlert("Error al obtener los peligros", "error");
-		} finally {
-			setPendingRequests(prev => prev - 1);  
 		}
 	};
 
 	const getCriticity = async () => {
-		setPendingRequests(prev => prev + 1);
 		try {
 			const response: AxiosResponse<Criticity[]> = await axios.get(`${baseURL}/criticity/`);
 
 			setCriticity(response.data || []);
 		} catch (error) {
 			showAlert("Error al obtener las criticidades", "error");
-		} finally {
-			setPendingRequests(prev => prev - 1);  
 		}
 	};
 
@@ -237,9 +234,10 @@ const Actividades: React.FC = () => {
 	};
 
 	const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
-		setLoading(true);
 		try {
 			const url = method === "PUT" && id ? `${baseURL}/activity/${id}` : `${baseURL}/activity/`;
+			console.log("Datos enviados al backend:", data);
+
 			const response = await axios({
 				method,
 				url,
@@ -249,6 +247,7 @@ const Actividades: React.FC = () => {
 
 			const newActividad = response.data;
 			newActividad.hazzards = hazzardCriticityPairs;
+
 			if (method === "POST") {
 				setActividades((prev) => [...prev, newActividad]);
 			} else if (method === "PUT") {
@@ -264,26 +263,13 @@ const Actividades: React.FC = () => {
 				modal?.hide();
 			}
 		} catch (error: any) {
-			if (axios.isAxiosError(error) && error.response) {
-				showAlert(
-					`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`,
-					"error"
-				);
-			} else if (error.request) {
-				showAlert(
-					"Error: El servidor no respondió. Verifica tu conexión o intenta más tarde.",
-					"error"
-				);
-			} else {
-				showAlert(`Error inesperado: ${error.message}`, "error");
-			}
+			console.error("Error en la solicitud:", error);
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	const deleteActividad = async (id: number) => {
-		setLoading(true);
 		try {
 			await axios.delete(`${baseURL}/activity/${id}`, {
 				headers: { "Content-Type": "application/json" },
@@ -299,8 +285,6 @@ const Actividades: React.FC = () => {
 				icon: "error",
 				confirmButtonText: "OK",
 			});
-		} finally {
-			setLoading(false);
 		}
 	};
 
@@ -334,13 +318,6 @@ const Actividades: React.FC = () => {
 						<div className="tabla-contenedor">
 							<EncabezadoTabla title="Actividades" onClick={() => openModal("1")} />
 						</div>
-						{pendingRequests > 0 ? (
-						<div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
-						<Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
-							<span className="visually-hidden">Loading...</span>
-						</Spinner>
-						</div>
-						) : (
 						<div className="table-responsive">
 							<table className="table table-bordered">
 								<thead
@@ -348,7 +325,8 @@ const Actividades: React.FC = () => {
 									style={{
 										background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
 										color: "#fff",
-									}}>
+									}}
+								>
 									<tr>
 										<th>N°</th>
 										<th>Nombre</th>
@@ -376,10 +354,11 @@ const Actividades: React.FC = () => {
 																	hazzards.find((hz) => hz.id === h.hazzardId)?.name ||
 																	"Peligro no encontrado";
 																const criticity = criticities.find((cr) => cr.id === h.criticityId);
-																const criticityText =
-																	criticity && criticity.name && criticity.description
-																		? `${criticity.name} - ${criticity.description}`
-																		: "Información de criticidad no disponible";
+
+																const criticityText = criticity
+																	? `${criticity.name} - ${criticity.description}`
+																	: "Información de criticidad no disponible";
+
 																return (
 																	<li key={`${h.hazzardId}-${h.criticityId}-${index}`}>
 																		{`${hazzard} / ${criticityText}`}
@@ -420,7 +399,6 @@ const Actividades: React.FC = () => {
 								</tbody>
 							</table>
 						</div>
-						)}
 					</div>
 				</div>
 
@@ -589,7 +567,3 @@ const Actividades: React.FC = () => {
 };
 
 export default Actividades;
-
-
-
-
