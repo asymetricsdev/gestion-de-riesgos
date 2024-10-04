@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { capitalizeFirstLetter, showAlert } from "../functions";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import * as bootstrap from "bootstrap";
 
@@ -104,6 +104,7 @@ const Actividades: React.FC = () => {
   >([]);
   const [title, setTitle] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement | null>(null);
 
@@ -124,6 +125,7 @@ const Actividades: React.FC = () => {
   }, []);
 
   const getActivity = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Actividades[]> = await axios.get(`${baseURL}/activity/`);
       if (!response.data || response.data.length === 0) {
@@ -133,45 +135,59 @@ const Actividades: React.FC = () => {
       console.log("Actividades recibidas:", response.data);
       setActividades(response.data);
     } catch (error) {
-      console.error("Error al obtener las actividades:", error);
+      showAlert("Error al obtener las actividades", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  
     }
   };
   
   
 
   const getActivityType = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<ActivityType[]> = await axios.get(`${baseURL}/activity_type/`);
       setActivityType(response.data || []);
     } catch (error) {
-      showAlert("Error al obtener los tipos de actividad", "error");
+      showAlert("Error al obtener los tipos de tareas", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  
     }
   };
 
   const getProcess = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Process[]> = await axios.get(`${baseURL}/process/`);
       setProcess(response.data || []);
     } catch (error) {
       showAlert("Error al obtener los procesos", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1); 
     }
   };
 
   const getHazzard = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Hazzard[]> = await axios.get(`${baseURL}/hazzard/`);
       setHazzard(response.data || []);
     } catch (error) {
       showAlert("Error al obtener los peligros", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1); 
     }
   };
 
   const getCriticity = async () => {
+    setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Criticity[]> = await axios.get(`${baseURL}/criticity/`);
       setCriticity(response.data || []);
     } catch (error) {
       showAlert("Error al obtener las criticidades", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1); 
     }
   };
 
@@ -329,259 +345,240 @@ const Actividades: React.FC = () => {
   };
 
   return (
-		<div className="App">
-			<div className="container-fluid">
-				<div className="row mt-3">
-					<div className="col-12">
-						<div className="tabla-contenedor">
-							<EncabezadoTabla title="Actividades" onClick={() => openModal("1")} />
-						</div>
-						<div className="table-responsive">
-							<table className="table table-bordered">
-								<thead
-									className="text-center"
-									style={{
-										background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
-										color: "#fff",
-									}}
-								>
-									<tr>
-										<th>N°</th>
-										<th>Nombre</th>
-										<th>Descripción</th>
-										<th>Tipo de Actividad</th>
-										<th>Proceso</th>
-										<th>Peligro / Criticidad</th>
-										<th>Acciones</th>
-									</tr>
-								</thead>
-								<tbody className="table-group-divider">
-									{actividades.length > 0 ? (
-										actividades.map((act, i) => (
-											<tr key={act.id} className="text-center">
-												<td>{i + 1}</td>
-												<td>{capitalizeFirstLetter(act.name)}</td>
-												<td>{capitalizeFirstLetter(act.description)}</td>
-												<td>{act.activityType?.name || "Sin tipo de actividad"}</td>
-												<td>{act.process?.name || "Sin proceso"}</td>
-												<td>
-													{Array.isArray(act.hazzards) && act.hazzards.length > 0 ? (
-														<ul>
-															{act.hazzards.map((hz, index) => {
-																const hazzard = hz.hazzard
-																	? hazzards.find((h) => h.id === hz.hazzard?.id)?.name
-																	: "No disponible";
-																const criticity = hz.criticity
-																	? criticities.find((c) => c.id === hz.criticity?.id)
-																	: null;
-																const criticityText = criticity
-																	? `${criticity.name} - ${criticity.description}`
-																	: "Información de criticidad no disponible";
-
-																return (
-																	<li key={`${hz.hazzard?.id}-${hz.criticity?.id}-${index}`}>
-																		{`${hazzard} / ${criticityText}`}
-																	</li>
-																);
-															})}
-														</ul>
-													) : (
-														"No hay peligro y criticidad."
-													)}
-												</td>
-												<td className="text-center">
-													<OverlayTrigger placement="top" overlay={<Tooltip>Editar</Tooltip>}>
-														<button
-															onClick={() => openModal("2", act)}
-															className="btn btn-custom-editar m-2"
-														>
-															<i className="fa-solid fa-edit"></i>
-														</button>
-													</OverlayTrigger>
-													<OverlayTrigger placement="top" overlay={<Tooltip>Eliminar</Tooltip>}>
-														<button
-															className="btn btn-custom-danger"
-															onClick={() => deleteActividad(act.id)}
-														>
-															<i className="fa-solid fa-circle-xmark"></i>
-														</button>
-													</OverlayTrigger>
-												</td>
-											</tr>
-										))
-									) : (
-										<tr>
-											<td colSpan={7}>No hay actividades disponibles</td>
-										</tr>
-									)}
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-
-				<div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
-					<div className="modal-dialog modal-dialog-top modal-md">
-						<div className="modal-content">
-							<div className="modal-header">
-								<h5 className="modal-title w-100">{title}</h5>
-								<button
-									type="button"
-									className="btn-close"
-									data-bs-dismiss="modal"
-									aria-label="Close"
-								></button>
-							</div>
-							<div className="modal-body">
-								<div className="mb-3">
-									<label htmlFor="process" className="form-label">
-										Proceso:
-									</label>
-									<select
-										id="process"
-										className="form-select"
-										value={selectedProcessId}
-										onChange={(e) => setSelectedProcessId(Number(e.target.value))}
-									>
-										<option value={0}>Selecciona...</option>
-										{process.map((proc) => (
-											<option key={proc.id} value={proc.id}>
-												{proc.name}
-											</option>
-										))}
-									</select>
-								</div>
-								<div className="input-group mb-3">
-									<span className="input-group-text">
-										<i className="fa-solid fa-chart-line"></i>
-									</span>
-									<input
-										type="text"
-										className="form-control"
-										placeholder="Nombre de la actividad"
-										value={name}
-										onChange={(e) => setName(e.target.value)}
-									/>
-								</div>
-								<div className="input-group mb-3">
-									<span className="input-group-text">
-										<i className="fa-regular fa-solid fa-file-alt"></i>
-									</span>
-									<input
-										type="text"
-										className="form-control"
-										placeholder="Descripción de la actividad"
-										value={description}
-										onChange={(e) => setDescription(e.target.value)}
-									/>
-								</div>
-								<div className="mb-3">
-									<label htmlFor="activityType" className="form-label">
-										Tipo de Actividad:
-									</label>
-									<select
-										id="activityType"
-										className="form-select"
-										value={selectedActivityTypeId}
-										onChange={(e) => setSelectedActivityTypeId(Number(e.target.value))}
-									>
-										<option value={0}>Selecciona...</option>
-										{activityType.map((actv) => (
-											<option key={actv.id} value={actv.id}>
-												{actv.name}
-											</option>
-										))}
-									</select>
-								</div>
-
-								{hazzardCriticityPairs.length > 0 ? (
-									hazzardCriticityPairs.map((pair, index) => (
-										<div key={index} className="row mb-3">
-											<div className="col">
-												<label htmlFor={`hazzard-${index}`} className="form-label">
-													Peligro:
-												</label>
-												<select
-													id={`hazzard-${index}`}
-													className="form-select"
-													value={pair.hazzardId}
-													onChange={(e) => handleHazzardChange(index, e.target.value)}
-												>
-													<option value="">Selecciona...</option>
-													{hazzards.map((h) => (
-														<option key={h.id} value={h.id.toString()}>
-															{h.name}
-														</option>
-													))}
-												</select>
-											</div>
-
-											<div className="col">
-												<label htmlFor={`criticity-${index}`} className="form-label">
-													Criticidad:
-												</label>
-												<select
-													id={`criticity-${index}`}
-													className="form-select"
-													value={pair.criticityId}
-													onChange={(e) => handleCriticityChange(index, e.target.value)}
-												>
-													<option value="">Selecciona...</option>
-													{criticities.map((c) => (
-														<option key={c.id} value={c.id.toString()}>
-															{`${c.name} - ${c.description}`}{" "}
-														</option>
-													))}
-												</select>
-											</div>
-
-											<div className="col-auto">
-												<button
-													type="button"
-													className="btn btn-danger mt-4"
-													onClick={() => removeHazzardCriticityPair(index)}
-												>
-													Eliminar
-												</button>
-											</div>
-										</div>
-									))
-								) : (
-									<p>Agregar todos los Peligros y sus Criticidades.</p>
-								)}
-
-								<button
-									type="button"
-									className="btn btn-success mt-3"
-									onClick={addHazzardCriticityPair}
-								>
-									Agregar Peligro / Criticidad
-								</button>
-							</div>
-							<div className="modal-footer">
-								<button
-									type="button"
-									className="btn btn-primary"
-									onClick={validar}
-									disabled={loading}
-								>
-									{loading ? (
-										<span
-											className="spinner-border spinner-border-sm"
-											role="status"
-											aria-hidden="true"
-										></span>
-									) : (
-										"Guardar"
-									)}
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
+    <div className="App">
+      <div className="container-fluid">
+        <div className="row mt-3">
+          <div className="col-12">
+            <div className="tabla-contenedor">
+              <EncabezadoTabla title="Actividades" onClick={() => openModal("1")} />
+            </div>
+            {pendingRequests > 0 ? (
+              <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
+                <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
+                  <span className="visually-hidden">Loading...</span>
+                </Spinner>
+              </div>
+            ) : (
+              <div className="table-responsive">
+                <table className="table table-bordered">
+                  <thead
+                    className="text-center"
+                    style={{
+                      background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
+                      color: "#fff",
+                    }}
+                  >
+                    <tr>
+                      <th>N°</th>
+                      <th>Nombre</th>
+                      <th>Descripción</th>
+                      <th>Tipo de Actividad</th>
+                      <th>Proceso</th>
+                      <th>Peligro / Criticidad</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="table-group-divider">
+                    {actividades.length > 0 ? (
+                      actividades.map((act, i) => (
+                        <tr key={act.id} className="text-center">
+                          <td>{i + 1}</td>
+                          <td>{capitalizeFirstLetter(act.name)}</td>
+                          <td>{capitalizeFirstLetter(act.description)}</td>
+                          <td>{act.activityType?.name || "Sin tipo de actividad"}</td>
+                          <td>{act.process?.name || "Sin proceso"}</td>
+                          <td>
+                            {Array.isArray(act.hazzards) && act.hazzards.length > 0 ? (
+                              <ul>
+                                {act.hazzards.map((hz, index) => {
+                                  const hazzard = hz.hazzard
+                                    ? hazzards.find((h) => h.id === hz.hazzard?.id)?.name
+                                    : "No disponible";
+                                  const criticity = hz.criticity
+                                    ? criticities.find((c) => c.id === hz.criticity?.id)
+                                    : null;
+                                  const criticityText = criticity
+                                    ? `${criticity.name} - ${criticity.description}`
+                                    : "Información de criticidad no disponible";
+  
+                                  return (
+                                    <li key={`${hz.hazzard?.id}-${hz.criticity?.id}-${index}`}>
+                                      {`${hazzard} / ${criticityText}`}
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            ) : (
+                              "No hay peligro y criticidad."
+                            )}
+                          </td>
+                          <td className="text-center">
+                            <OverlayTrigger placement="top" overlay={<Tooltip>Editar</Tooltip>}>
+                              <button
+                                onClick={() => openModal("2", act)}
+                                className="btn btn-custom-editar m-2"
+                              >
+                                <i className="fa-solid fa-edit"></i>
+                              </button>
+                            </OverlayTrigger>
+                            <OverlayTrigger placement="top" overlay={<Tooltip>Eliminar</Tooltip>}>
+                              <button
+                                className="btn btn-custom-danger"
+                                onClick={() => deleteActividad(act.id)}
+                              >
+                                <i className="fa-solid fa-circle-xmark"></i>
+                              </button>
+                            </OverlayTrigger>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7}>No hay actividades disponibles</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+  
+        <div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
+          <div className="modal-dialog modal-dialog-top modal-md">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title w-100">{title}</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-3">
+                  <label htmlFor="process" className="form-label">Proceso:</label>
+                  <select
+                    id="process"
+                    className="form-select"
+                    value={selectedProcessId}
+                    onChange={(e) => setSelectedProcessId(Number(e.target.value))}
+                  >
+                    <option value={0}>Selecciona...</option>
+                    {process.map((proc) => (
+                      <option key={proc.id} value={proc.id}>
+                        {proc.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="input-group mb-3">
+                  <span className="input-group-text"><i className="fa-solid fa-chart-line"></i></span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Nombre de la actividad"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div className="input-group mb-3">
+                  <span className="input-group-text"><i className="fa-regular fa-solid fa-file-alt"></i></span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Descripción de la actividad"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="activityType" className="form-label">Tipo de Actividad:</label>
+                  <select
+                    id="activityType"
+                    className="form-select"
+                    value={selectedActivityTypeId}
+                    onChange={(e) => setSelectedActivityTypeId(Number(e.target.value))}
+                  >
+                    <option value={0}>Selecciona...</option>
+                    {activityType.map((actv) => (
+                      <option key={actv.id} value={actv.id}>
+                        {actv.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+  
+                {hazzardCriticityPairs.length > 0 ? (
+                  hazzardCriticityPairs.map((pair, index) => (
+                    <div key={index} className="row mb-3">
+                      <div className="col">
+                        <label htmlFor={`hazzard-${index}`} className="form-label">Peligro:</label>
+                        <select
+                          id={`hazzard-${index}`}
+                          className="form-select"
+                          value={pair.hazzardId}
+                          onChange={(e) => handleHazzardChange(index, e.target.value)}
+                        >
+                          <option value="">Selecciona...</option>
+                          {hazzards.map((h) => (
+                            <option key={h.id} value={h.id.toString()}>{h.name}</option>
+                          ))}
+                        </select>
+                      </div>
+  
+                      <div className="col">
+                        <label htmlFor={`criticity-${index}`} className="form-label">Criticidad:</label>
+                        <select
+                          id={`criticity-${index}`}
+                          className="form-select"
+                          value={pair.criticityId}
+                          onChange={(e) => handleCriticityChange(index, e.target.value)}
+                        >
+                          <option value="">Selecciona...</option>
+                          {criticities.map((c) => (
+                            <option key={c.id} value={c.id.toString()}>
+                              {`${c.name} - ${c.description}`}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+  
+                      <div className="col-auto">
+                        <button
+                          type="button"
+                          className="btn btn-danger mt-4"
+                          onClick={() => removeHazzardCriticityPair(index)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>Agregar todos los Peligros y sus Criticidades.</p>
+                )}
+  
+                <button type="button" className="btn btn-success mt-3" onClick={addHazzardCriticityPair}>
+                  Agregar Peligro / Criticidad
+                </button>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-primary" onClick={validar} disabled={loading}>
+                  {loading ? (
+                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  ) : (
+                    "Guardar"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Actividades;

@@ -62,7 +62,7 @@ useEffect(() => {
     } catch (error) {
       showAlert("Error al obtener las tareas del colaborador", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1); 
     }
   };
   
