@@ -83,7 +83,7 @@ const Peligro: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener los peligros", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1);
     }
   };
   
@@ -96,7 +96,7 @@ const Peligro: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener los riesgos", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1);
     }
   };
 
@@ -108,7 +108,7 @@ const Peligro: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener los tipos de verificación", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1);
     }
   };
 

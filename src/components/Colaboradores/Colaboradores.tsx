@@ -77,7 +77,7 @@ const Colaboradores: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener el cargo del colaborador", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1);
     }
   };
   
@@ -90,7 +90,7 @@ const Colaboradores: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener el cargo del colaborador", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1); 
     }
   };
   
