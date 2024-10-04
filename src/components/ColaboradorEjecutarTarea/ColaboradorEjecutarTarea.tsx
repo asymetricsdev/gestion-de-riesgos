@@ -68,7 +68,7 @@ interface Colaboradores {
 	name: string;
 	rut: string;
 	position: {
-		name: string;
+	name: string;
 	};
 }
 
@@ -94,7 +94,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 			const response: AxiosResponse<Colaboradores> = await axios.get(
 				`${baseURL}/employee/${empId}`
 			);
-			console.log("Colaborador obtenido:", response.data); // Verifica los datos aquí
+			console.log("Colaborador obtenido:", response.data);
 			setColaboradores(response.data);
 		} catch (error) {
 			showAlert("Error al obtener los datos del colaborador", "error");
@@ -145,9 +145,9 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 			<div className="container-fluid">
 				<div className="row mt-3">
 					<div className="col-12">
-            <div className="modulo-titulo-tarea">
-            <h1>Modulo de Tarea: {tasks?.description}</h1>
-            </div>
+						<div className="modulo-titulo-tarea">
+							<h1>Modulo de Tarea: {tasks?.description}</h1>
+						</div>
 						<div className="card-contenedor">
 							<Card className="card">
 								<Card.Body>
@@ -292,35 +292,34 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 						</table>
 					</div>
 					<div className="d-flex justify-content-end">
-    {(tasks?.checker?.checkpoints ?? []).length > 0 ? (
-    <>
-      <OverlayTrigger placement="top" overlay={renderEjecutarTooltip({})}>
-        <button className="btn btn-custom-tareas m-2">
-          <i className="fa-solid fa-eject"></i>
-        </button>
-      </OverlayTrigger>
-      <OverlayTrigger placement="top" overlay={renderCancelarEjecutarTooltip({})}>
-        <button className="btn btn-custom-tareas m-2">
-          <i className="fa-solid fa-rectangle-xmark"></i>
-        </button>
-      </OverlayTrigger>
-    </>
-  ) : (
-    <>
-      <OverlayTrigger placement="top" overlay={renderEjecutarTooltip({})}>
-        <button className="btn btn-custom-tareas m-2" disabled>
-          <i className="fa-solid fa-eject"></i>
-        </button>
-      </OverlayTrigger>
-      <OverlayTrigger placement="top" overlay={renderCancelarEjecutarTooltip({})}>
-        <button className="btn btn-custom-tareas m-2" disabled>
-          <i className="fa-solid fa-rectangle-xmark"></i>
-        </button>
-      </OverlayTrigger>
-    </>
-  )}
-</div>
-
+						{(tasks?.checker?.checkpoints ?? []).length > 0 ? (
+							<>
+								<OverlayTrigger placement="top" overlay={renderEjecutarTooltip({})}>
+									<button className="btn btn-custom-tareas m-2">
+										<i className="fa-solid fa-eject"></i>
+									</button>
+								</OverlayTrigger>
+								<OverlayTrigger placement="top" overlay={renderCancelarEjecutarTooltip({})}>
+									<button className="btn btn-custom-tareas m-2">
+										<i className="fa-solid fa-rectangle-xmark"></i>
+									</button>
+								</OverlayTrigger>
+							</>
+						) : (
+							<>
+								<OverlayTrigger placement="top" overlay={renderEjecutarTooltip({})}>
+									<button className="btn btn-custom-tareas m-2" disabled>
+										<i className="fa-solid fa-eject"></i>
+									</button>
+								</OverlayTrigger>
+								<OverlayTrigger placement="top" overlay={renderCancelarEjecutarTooltip({})}>
+									<button className="btn btn-custom-tareas m-2" disabled>
+										<i className="fa-solid fa-rectangle-xmark"></i>
+									</button>
+								</OverlayTrigger>
+							</>
+						)}
+					</div>
 				</div>
 			</div>
 		</div>

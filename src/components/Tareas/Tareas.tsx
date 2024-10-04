@@ -98,7 +98,7 @@ function Tareas() {
 		} catch (error) {
 			showAlert("Error al obtener Tareas", "error");
 		} finally {
-			setPendingRequests(prev => prev - 1);  // Disminuir contador
+			setPendingRequests(prev => prev - 1);
 		}
 	};
 	const getTasksType = async () => {
@@ -109,7 +109,7 @@ function Tareas() {
 		} catch (error) {
 			showAlert("Error al obtener la tarea", "error");
 		} finally {
-			setPendingRequests(prev => prev - 1);  // Disminuir contador
+			setPendingRequests(prev => prev - 1);
 		}
 	};
 
@@ -121,7 +121,7 @@ function Tareas() {
 		} catch (error) {
 			showAlert("Error al obtener las verificaciones", "error");
 		} finally {
-			setPendingRequests(prev => prev - 1);  // Disminuir contador
+			setPendingRequests(prev => prev - 1); 
 		}
 	};
 
