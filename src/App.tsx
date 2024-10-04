@@ -26,6 +26,7 @@ import Items from './pages/ItemsPage';
 import VerificadorControl from './pages/VerificadorControlPage';
 import JerarquiaControl from './pages/JerarquiaControlPage';
 import TareaColaborador from './components/TareaColaborador/TareaColaborador';
+import ColaboradorEjecutarTarea from './pages/ColaboradorEjecutarTareaPage';
 import Login from './pages/LoginPage';
 import Registro from './pages/RegistroPage';    
 
@@ -81,6 +82,7 @@ export function App() {
                                 <Route path="/organizacion/procesos" element={<Proceso />} />
                                 {/*TAREA-COLABORADOR*/}
                                 <Route path="/tarea-colaborador/:id" element={<TareaColaborador />} />
+                                <Route path="/colaborador-ejecutar-tarea/:empId/tarea/:taskId" element={<ColaboradorEjecutarTarea />} />
                             </Routes>
                         </Col>
                     </Row>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
+import { useNavigate, useParams } from 'react-router-dom';
 import { showAlert } from '../functions';
 import { OverlayTrigger, Tooltip, Breadcrumb, Spinner } from "react-bootstrap";
 import DangerHead from "../DangerHead/DangerHead";
@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import "./TareaColaborador.css";
 
 interface Planning {
+  planningName: string;
   startDate: string;
   endDate: string;
 }
@@ -85,13 +86,21 @@ useEffect(() => {
   );
 
 
+  const navigate = useNavigate();
+
+  const EjecutarTareas = (empId: number, taskId: number) => {
+    console.log(`Navigating to: /colaborador-ejecutar-tarea/${empId}/tarea/${taskId}`);
+    navigate(`/colaborador-ejecutar-tarea/${empId}/tarea/${taskId}`);
+  };
+  
+
   return (
     
     <div className="App">
       <div className="container-fluid">
         <div className="row mt-3">
           <div className="col-12">
-            <div className="card-contenedor">
+            <div className="card-contenedor-lista-tareas">
               <Card className="card">
                 <Card.Body>
                 <div className="d-flex align-items-center custom-icon-task">
@@ -133,8 +142,7 @@ useEffect(() => {
                   <tr>
                     <th>N°</th>
                     <th>ID</th>
-                    <th>Nombre Tarea</th>
-                    <th>Descripción</th>
+                    <th className="col-medidas-preventivas">Medidas Preventivas</th>
                     <th>Items</th>
                     <th>Planificaciones</th>
                     <th>Ejecutar</th>
@@ -146,13 +154,12 @@ useEffect(() => {
                       <tr key={task.taskId} className="text-center">
                         <td>{index + 1}</td>
                         <td>{task.taskId}</td>
-                        <td>{task.taskName}</td>
-                        <td>{task.taskDescription}</td>
+                        <td>{task.checkerDescription}</td>
                         <td>
                           {task.checkpoints.length > 0 ? (
                             task.checkpoints.map((checkpoint) => (
                               <div key={checkpoint.checkpointId}>
-                                • {checkpoint.checkpointName}
+                                · {checkpoint.checkpointName}
                               </div>
                             ))
                           ) : (
@@ -163,7 +170,9 @@ useEffect(() => {
                           {task.plannings.length > 0 ? (
                             task.plannings.map((planning, i) => (
                               <div key={i}>
-                                • {planning.startDate} - {planning.endDate}
+                                <div style={{ fontWeight: 'bold' }}>· {planning.planningName}</div>
+                                <div>[Inicio: {planning.startDate}</div>
+                                <div>Fin: {planning.endDate}]</div>
                               </div>
                             ))
                           ) : (
@@ -171,11 +180,16 @@ useEffect(() => {
                           )}
                         </td>
                         <td>
-                          <OverlayTrigger placement="top" overlay={renderEjecutarTooltip({})}>
-                            <button className="btn btn-custom-tareas m-2">
-                              <i className="fa-solid fa-share-from-square"></i>
-                            </button>
-                          </OverlayTrigger>
+                        <OverlayTrigger placement="top" overlay={renderEjecutarTooltip({})}>
+                          {/* Deshabilita el botón si no hay ítems (checkpoints) */}
+                          <button
+                            className="btn btn-custom-tareas m-2"
+                            onClick={() => colaboradores?.id && EjecutarTareas(colaboradores.id, task.taskId)}
+                            disabled={task.checkpoints.length === 0}  // Deshabilitar si no hay ítems
+                          >
+                            <i className="fa-solid fa-share-from-square"></i>
+                          </button>
+                        </OverlayTrigger>
                         </td>
                       </tr>
                     ))
