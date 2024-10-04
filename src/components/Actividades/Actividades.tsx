@@ -9,7 +9,6 @@ import * as bootstrap from "bootstrap";
 
 const MySwal = withReactContent(Swal);
 
-// Interfaces based on the provided structure
 interface ActivityType {
   id: number;
   name: string;
@@ -88,11 +87,8 @@ interface Actividades {
   hazzards: HazzardWithCriticity[];
 }
 
-// Main component
 const Actividades: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
-
-  // State hooks for managing data
   const [actividades, setActividades] = useState<Actividades[]>([]);
   const [activityType, setActivityType] = useState<ActivityType[]>([]);
   const [process, setProcess] = useState<Process[]>([]);
@@ -111,7 +107,6 @@ const Actividades: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const modalRef = useRef<HTMLDivElement | null>(null);
 
-  // Effect hook to load initial data
   useEffect(() => {
     getActivity();
     getActivityType();
@@ -128,7 +123,6 @@ const Actividades: React.FC = () => {
     };
   }, []);
 
-  // Fetching functions
   const getActivity = async () => {
     try {
       const response: AxiosResponse<Actividades[]> = await axios.get(`${baseURL}/activity/`);
@@ -181,7 +175,7 @@ const Actividades: React.FC = () => {
     }
   };
 
-  // Modal handling
+
   const handleModalHidden = () => {
     setIsModalOpen(false);
     const modals = document.querySelectorAll(".modal-backdrop");
@@ -193,7 +187,6 @@ const Actividades: React.FC = () => {
       resetForm();
       setTitle("Registrar Actividad");
     } else if (op === "2" && actividad) {
-      // Verifica que 'actividad', 'activityType', y 'process' estén definidos
       if (actividad && actividad.activityType && actividad.process) {
         setId(actividad.id);
         setName(actividad.name);
@@ -225,7 +218,6 @@ const Actividades: React.FC = () => {
     }
   };
   
-  
 
   const resetForm = () => {
     setId(null);
@@ -236,7 +228,7 @@ const Actividades: React.FC = () => {
     setHazzardCriticityPairs([]);
   };
 
-  // Validation function
+
   const validar = (): void => {
     if (!name || !description || !selectedActivityTypeId || !selectedProcessId) {
       showAlert("Completa todos los campos antes de guardar.", "warning");
@@ -260,11 +252,9 @@ const Actividades: React.FC = () => {
   };
   
 
-  // Request handling function
   const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     try {
       const url = method === "PUT" && id ? `${baseURL}/activity/${id}` : `${baseURL}/activity/`;
-
       const response = await axios({
         method,
         url,
@@ -295,7 +285,6 @@ const Actividades: React.FC = () => {
     }
   };
 
-  // Delete function
   const deleteActividad = async (id: number) => {
     try {
       await axios.delete(`${baseURL}/activity/${id}`, {
@@ -314,7 +303,6 @@ const Actividades: React.FC = () => {
     }
   };
 
-  // Functions for managing Hazzard and Criticity pairs
   const handleHazzardChange = (index: number, hazzardId: string) => {
     const newPairs = [...hazzardCriticityPairs];
     newPairs[index].hazzardId = hazzardId;
@@ -401,32 +389,6 @@ const Actividades: React.FC = () => {
 														"No hay peligro y criticidad."
 													)}
 												</td>
-
-												{/* <td>
-													{Array.isArray(act.hazzards) && act.hazzards.length > 0 ? (
-														<ul>
-															{act.hazzards.map((hz, index) => {
-																const hazzard = hz.hazzard
-																	? hazzards.find((h) => h.id === hz.hazzard.id)?.name
-																	: "No disponible";
-																const criticity = hz.criticity
-																	? criticities.find((c) => c.id === hz.criticity.id)
-																	: null;
-																const criticityText = criticity
-																	? `${criticity.name} - ${criticity.description}`
-																	: "Información de criticidad no disponible";
-
-																return (
-																	<li key={`${hz.hazzard?.id}-${hz.criticity?.id}-${index}`}>
-																		{`${hazzard} / ${criticityText}`}
-																	</li>
-																);
-															})}
-														</ul>
-													) : (
-														"No hay peligro y criticidad."
-													)}
-												</td> */}
 												<td className="text-center">
 													<OverlayTrigger placement="top" overlay={<Tooltip>Editar</Tooltip>}>
 														<button
