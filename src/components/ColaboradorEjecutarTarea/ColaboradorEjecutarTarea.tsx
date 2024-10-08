@@ -7,62 +7,62 @@ import { OverlayTrigger, Tooltip, Breadcrumb } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import DangerHead from "../DangerHead/DangerHead";
+import Swal from 'sweetalert2';
 import "./ColaboradorEjecutarTarea.css";
 
-interface TaskType {
-	id: number;
-	name: string;
-	description: string;
-	createDate: string;
-	updateDate: string;
-}
 
-interface CheckerType {
+interface ExecutionCheckpoint {
 	id: number;
-	name: string;
-	description: string;
 	createDate: string;
 	updateDate: string;
+	executedAt: string;
+	status: {
+		id: number;
+		name: string;
+	};
 }
 
 interface Checkpoint {
 	id: number;
 	name: string;
-	description: string;
-	createDate: string;
-	updateDate: string;
-	checker: {
-		id: number;
-		name: string;
-	};
+	executionCheckpoints: ExecutionCheckpoint[];
 }
 
 interface Checker {
 	id: number;
 	name: string;
-	description: string;
-	createDate: string;
-	updateDate: string;
-	checkerType: CheckerType;
-	task: {
-		id: number;
-		name: string;
-	};
 	checkpoints: Checkpoint[];
 }
 
-interface Task {
+interface TaskExecution {
 	id: number;
-	name: string;
-	description: string;
-	createDate: string;
-	updateDate: string;
-	version: string;
-	extension: string;
-	taskType: TaskType;
+	executedAt: string;
+	employee: {
+		id: number;
+		name: string;
+	};
+	task: {
+		id: number;
+		name: string;
+		taskTypeId: number;
+	};
 	checker: Checker;
+	planning: {
+		id: number;
+		name: string;
+	};
+	files: {
+		id: number;
+		fileName: string;
+		mimeType: string;
+		createDate: string;
+	}[];
 }
 
+interface Status {
+	id: number;
+	name: string;
+}
 interface Colaboradores {
 	id: number;
 	name: string;
@@ -72,49 +72,85 @@ interface Colaboradores {
 	};
 }
 
+interface FileData {
+	id: number;
+    createDate : string;
+    updateDate: string;
+    executedAt: string;
+    fileName: string;
+    mimeType: string;
+    content: string;
+	fileExtension: string;
+}
+
 const ColaboradorEjecutarTarea: React.FC = () => {
 	const baseURL = import.meta.env.VITE_API_URL;
 	const { empId, taskId } = useParams<{ empId: string; taskId: string }>();
-	const [tasks, setTasks] = useState<Task | null>(null);
+	const [tasks, setTasks] = useState<TaskExecution[] | null>(null);
+	const [status, setStatus] = useState<Status[]>([]);
+	const [title, setTitle] = useState<string>("");
 	const [colaboradores, setColaboradores] = useState<Colaboradores | null>(null);
 	const { getRootProps, getInputProps, isDragActive } = useDropzone();
 	const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
-	const [file, setFile] = useState<File[]>([]);
 	const [isEditMode, setIsEditMode] = useState(false);
 	const { id } = useParams<{ id: string }>();
+
+	
 
 	useEffect(() => {
 		console.log(`empId: ${empId}`);
 		getColaborador();
-		getTask();
+		getTaskExecutionData();
+		getStatus(2);
 	}, [empId, taskId]);
+
+	
+	const getTaskExecutionData = async () => {
+		try {
+			const response = await axios.get(`${baseURL}/task/${taskId}/executions?employeeId=${empId}`);
+			console.log("Datos de ejecución obtenidos:", response.data);
+			setTasks(response.data);
+			  // Verificamos si hay tareas y establecemos el título
+			  if (response.data && response.data.length > 0) {
+				setTitle(response.data[0].task.name); // Establecer el título usando el nombre de la tarea
+			}
+		} catch (error) {
+			showAlert("Error al obtener los datos de ejecución de la tarea", "error");
+		}
+	};
 
 	const getColaborador = async () => {
 		try {
 			const response: AxiosResponse<Colaboradores> = await axios.get(
 				`${baseURL}/employee/${empId}`
 			);
-			console.log("Colaborador obtenido:", response.data); // Verifica los datos aquí
+			console.log("Colaborador obtenido:", response.data); 
 			setColaboradores(response.data);
 		} catch (error) {
 			showAlert("Error al obtener los datos del colaborador", "error");
 		}
 	};
 
-	const getTask = async () => {
-		try {
-			const response: AxiosResponse<Task> = await axios.get(`${baseURL}/task/${taskId}`);
-			console.log("Tarea Obtenido:", response.data);
-			setTasks(response.data);
-		} catch (error) {
-			showAlert("Error al obtener las tareas del colaborador", "error");
-		}
-	};
 
-	const eliminarImagen = () => {
-		setFile([]);
-		setUploadedImageUrl(null);
-	};
+	  const getStatus = async (taskTypeId: number) => {
+		try {
+		  const response: AxiosResponse<Status[]> = await axios.get(
+			`${baseURL}/status/taskType/${taskTypeId}` // TaskType ID específico para Capacitación
+		  );
+		  setStatus(response.data); // Guardar los estados en el estado de React
+		} catch (error) {
+		  showAlert("Error al obtener los estados", "error");
+		}
+	  };
+	  
+	  useEffect(() => {
+		getColaborador();
+		getTaskExecutionData();
+		getStatus(2); // Aquí envías el ID 2 que corresponde a "Capacitación"
+	  }, [empId, taskId]);
+	  
+
+
 
 	const renderSubirArchivoTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>
@@ -134,20 +170,73 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		</Tooltip>
 	);
 
-  const renderEjecutarTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+	const renderEjecutarTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>
 			Ejecutar
 		</Tooltip>
 	);
+
+	
+	// DESCARGAR ARCHIVO
+	const downloadFile = async (fileUrl: string, fileName: string, mimeType: string) => {
+		try {
+			const response = await axios.get(fileUrl, {
+				responseType: "json",
+			});
+	
+			const base64Data = response.data.content;
+			if (!base64Data) {
+				Swal.fire({
+					title: "Error",
+					text: "No se pudo obtener el archivo para descargar.",
+					icon: "error",
+					confirmButtonText: "OK",
+				});
+				return;
+			}
+	
+			// Decodificamos la cadena Base64 y creamos un Blob para el archivo
+			const byteCharacters = atob(base64Data);
+			const byteNumbers = new Array(byteCharacters.length);
+			for (let i = 0; i < byteCharacters.length; i++) {
+				byteNumbers[i] = byteCharacters.charCodeAt(i);
+			}
+			const byteArray = new Uint8Array(byteNumbers);
+			const blob = new Blob([byteArray], { type: 'image/png' }); 
+	
+			// Creamos un enlace de descarga para el archivo
+			const link = document.createElement("a");
+			link.href = window.URL.createObjectURL(blob);
+			link.setAttribute("download", fileName); 
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+	
+			// Liberamos el objeto URL creado
+			window.URL.revokeObjectURL(link.href);
+		} catch (error) {
+			Swal.fire({
+				title: "Error",
+				text: "Hubo un error al descargar el archivo.",
+				icon: "error",
+				confirmButtonText: "OK",
+			});
+		}
+	};
+
+	const formatDate = (dateString: string) => {
+		return dateString.split('T')[0];
+	  };
+	
 
 	return (
 		<div className="App">
 			<div className="container-fluid">
 				<div className="row mt-3">
 					<div className="col-12">
-            <div className="modulo-titulo-tarea">
-            <h1>Modulo de Tarea: {tasks?.description}</h1>
-            </div>
+						<div className="modulo-titulo-tarea">
+							<h2 className="text-center">Ejecutar Tarea: {title}</h2>
+						</div>
 						<div className="card-contenedor">
 							<Card className="card">
 								<Card.Body>
@@ -174,7 +263,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 											{uploadedImageUrl && (
 												<div className="uploaded-image-preview">
 													<img src={uploadedImageUrl} alt="Vista previa" />
-													<span className="delete-icon" onClick={eliminarImagen}>
+													<span className="delete-icon">
 														&#10006;
 													</span>
 												</div>
@@ -228,21 +317,33 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 								</tr>
 							</thead>
 							<tbody className="table-group-divider">
-								<tr className="text-center">
-									<td>xxxxxx</td>
-									<td>xxxxxxxxxx</td>
-									<td>xxxxxxxxxx</td>
-									<td>xxxxxxxx</td>
-									<td>
-										<div className="">
-											<OverlayTrigger placement="top" overlay={renderDescargarArchivoTooltip({})}>
-												<button className="btn btn-custom-tareas m-2">
-													<i className="fa-solid fa-file-arrow-down"></i>
+								{tasks?.map((task, taskIndex) =>
+									task.files.map((ce, fileIndex) => (
+										<tr key={`${task.id}-${ce.id}`}>
+											<td>{fileIndex + 1}</td>
+											<td>{ce.fileName}</td>
+											<td>{ce.mimeType}</td>
+											<td>{formatDate(ce.createDate)}</td>
+											<td><OverlayTrigger
+												overlay={<Tooltip id={`tooltip-download-${ce.id}`}>Descargar Archivo</Tooltip>}
+												>
+												<button
+													onClick={() =>
+													downloadFile(
+														`https://testbackend-433922.uk.r.appspot.com/api/task/downloadFile?fileId=${ce.id}`,
+														ce.fileName,
+														ce.mimeType
+													)
+												}
+													className="btn btn-custom-descargar m-2"
+												>
+													<i className="fa-solid fa-download"></i>
 												</button>
-											</OverlayTrigger>
-										</div>
-									</td>
-								</tr>
+												</OverlayTrigger>
+											</td>
+										</tr>
+									))
+								)}
 							</tbody>
 						</table>
 					</div>
@@ -263,64 +364,60 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 								<tr>
 									<th>N°</th>
 									<th>Items</th>
-									<th>Descripción</th>
-									<th>Verificadores</th>
-									<th>Última Ejecución</th>
 									<th>Empleado</th>
+									<th>Planificación</th>
+									<th>Verificador</th>
+									<th>Última Ejecución</th>
 									<th>Estado Actual</th>
 									<th>Nuevo Estado</th>
 								</tr>
 							</thead>
-							<tbody className="table-group-divider">
-								{tasks?.checker.checkpoints && tasks.checker.checkpoints.length > 0 ? (
-									<tr className="text-center">
-										<td></td>
-										<td>{tasks.checker.checkpoints[0].name}</td>
-										<td></td>
-										<td>{tasks.checker.name}</td>
-										<td></td>
-										<td>{colaboradores?.name}</td>
-										<td>Estado Actual</td>
-										<td>Nuevo Estado</td>
-									</tr>
-								) : (
-									<tr>
-										<td colSpan={8}>No hay items disponibles para esta tarea.</td>
-									</tr>
-								)}
+							<tbody>
+								{tasks &&
+									tasks.map((task) =>
+										task.checker.checkpoints.map((checkpoint, checkpointIndex) =>
+											checkpoint.executionCheckpoints.map((executionCheckpoint, execIndex) => (
+												<tr key={`${checkpoint.id}-${execIndex}`}>
+													<td>{checkpointIndex + 1}</td>
+													<td>{checkpoint.name}</td>
+													<td>{task.employee.name}</td>
+													<td>{task.planning.name}</td>
+													<td>{task.checker.name}</td>
+													<td>{formatDate(executionCheckpoint.executedAt) || "Sin ejecución"}</td>
+													<td>{executionCheckpoint.status.name}</td>
+													<td>
+														<select className="form-select">
+															{Array.isArray(status) && status.length > 0 ? (
+															status.map((status) => (
+																<option key={status.id} value={status.id}>
+																{status.name} {/* Mostrar el nombre del estado */}
+																</option>
+															))
+															) : (
+															<option value="">Cargando estados...</option>
+															)}
+														</select>
+													</td>
+												</tr>
+											))
+										)
+									)}
 							</tbody>
 						</table>
 					</div>
 					<div className="d-flex justify-content-end">
-    {(tasks?.checker?.checkpoints ?? []).length > 0 ? (
-    <>
-      <OverlayTrigger placement="top" overlay={renderEjecutarTooltip({})}>
-        <button className="btn btn-custom-tareas m-2">
-          <i className="fa-solid fa-eject"></i>
-        </button>
-      </OverlayTrigger>
-      <OverlayTrigger placement="top" overlay={renderCancelarEjecutarTooltip({})}>
-        <button className="btn btn-custom-tareas m-2">
-          <i className="fa-solid fa-rectangle-xmark"></i>
-        </button>
-      </OverlayTrigger>
-    </>
-  ) : (
-    <>
-      <OverlayTrigger placement="top" overlay={renderEjecutarTooltip({})}>
-        <button className="btn btn-custom-tareas m-2" disabled>
-          <i className="fa-solid fa-eject"></i>
-        </button>
-      </OverlayTrigger>
-      <OverlayTrigger placement="top" overlay={renderCancelarEjecutarTooltip({})}>
-        <button className="btn btn-custom-tareas m-2" disabled>
-          <i className="fa-solid fa-rectangle-xmark"></i>
-        </button>
-      </OverlayTrigger>
-    </>
-  )}
-</div>
+						<OverlayTrigger placement="top" overlay={renderEjecutarTooltip({})}>
+							<button className="btn btn-custom-tareas m-2">
+								<i className="fa-solid fa-eject"></i>
+							</button>
+						</OverlayTrigger>
 
+						<OverlayTrigger placement="top" overlay={renderCancelarEjecutarTooltip({})}>
+							<button className="btn btn-custom-tareas m-2">
+								<i className="fa-solid fa-rectangle-xmark"></i>
+							</button>
+						</OverlayTrigger>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -328,3 +425,5 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 };
 
 export default ColaboradorEjecutarTarea;
+
+
