@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
@@ -277,7 +278,6 @@ const Planning: React.FC = () => {
 	const deletePlanning = async (id: number) => {
 		setLoading(true);
 		try {
-			console.log("Intentando eliminar planificación con ID:", id);
 			const response = await axios.delete(`${baseURL}/planning/${id}`, {
 				headers: { "Content-Type": "application/json" },
 			});
@@ -341,69 +341,79 @@ const Planning: React.FC = () => {
 							<EncabezadoTabla title="Planificación" onClick={() => openModal("1")} />
 						</div>
 						{pendingRequests > 0 ? (
-							<div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
-							<Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
-								<span className="visually-hidden">Loading...</span>
-							</Spinner>
+							<div
+								className="d-flex justify-content-center align-items-center"
+								style={{ height: "100vh", marginTop: "-200px" }}
+							>
+								<Spinner animation="border" role="status" style={{ color: "#A17BB6" }}>
+									<span className="visually-hidden">Loading...</span>
+								</Spinner>
 							</div>
-							) : (
-						<div className="table-responsive">
-							<table className="table table-bordered">
-								<thead
-									className="text-center"
-									style={{
-										background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
-										color: "#fff",
-									}}
-								>
-									<tr>
-										<th>N°</th>
-										<th>Perfiles</th>
-										<th className="w-50">Rut-Empleados</th>
-										<th>Fecha de Inicio</th>
-										<th>Fecha de Fin</th>
-										<th>Acciones</th>
-									</tr>
-								</thead>
-								<tbody className="table-group-divider">
-									{planning.map((plan, i) => (
-										<tr key={JSON.stringify(plan)} className="text-center">
-											<td>{i + 1}</td>
-											<td>{plan.profile?.name}</td>
-											<td>
-												<ul className="list-unstyled">
-													{plan.employees?.map((emp) => (
-														<li key={emp.id}>
-															{emp.rut} - {emp.name}
-														</li>
-													))}
-												</ul>
-											</td>
-											<td>{formatDate(plan.startDate)}</td>
-											<td>{formatDate(plan.createDate)}</td>
-											<td className="text-center">
-												<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
-													<button
-														onClick={() => openModal("2", plan)}
-														className="btn btn-custom-editar m-2"
-													>
-														<i className="fa-solid fa-edit"></i>
-													</button>
-												</OverlayTrigger>
-												<OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
-													<button
-														className="btn btn-custom-danger"
-														onClick={() => deletePlanning(plan.id)}
-													>
-														<i className="fa-solid fa-circle-xmark"></i>
-													</button>
-												</OverlayTrigger>
-											</td>
+						) : (
+							<div className="table-responsive">
+								<table className="table table-bordered">
+									<thead
+										className="text-center"
+										style={{
+											background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
+											color: "#fff",
+										}}
+									>
+										<tr>
+											<th>N°</th>
+											<th>Perfiles</th>
+											<th className="w-50">Rut-Empleados</th>
+											<th>Fecha de Inicio</th>
+											<th>Fecha de Fin</th>
+											<th>Acciones</th>
 										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
+									</thead>
+									<tbody className="table-group-divider">
+										{planning.map((plan, i) => (
+											<tr key={JSON.stringify(plan)} className="text-center">
+												<td>{i + 1}</td>
+												<td>{plan.profile?.name}</td>
+												<td className="text-start">
+													<ul className="list-unstyled">
+														{plan.employees?.map((emp) => (
+															<li key={emp.id}>
+																<table className="w-100">
+																	<tbody>
+																		<tr>
+																			<td className="text-start">{emp.rut}</td>
+																			<td className="text-start">{emp.name}</td>
+																		</tr>
+																	</tbody>
+																</table>
+															</li>
+														))}
+													</ul>
+												</td>
+												<td>{formatDate(plan.startDate)}</td>
+												<td>{formatDate(plan.endDate)}</td>
+												<td className="text-center">
+													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
+														<button
+															onClick={() => openModal("2", plan)}
+															className="btn btn-custom-editar m-2"
+														>
+															<i className="fa-solid fa-edit"></i>
+														</button>
+													</OverlayTrigger>
+													<OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+														<button
+															className="btn btn-custom-danger"
+															onClick={() => deletePlanning(plan.id)}
+														>
+															<i className="fa-solid fa-circle-xmark"></i>
+														</button>
+													</OverlayTrigger>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
 						)}
 					</div>
 				</div>
@@ -520,7 +530,8 @@ const Planning: React.FC = () => {
 									type="button"
 									className="btn btn-primary"
 									onClick={validar}
-									disabled={loading}>
+									disabled={loading}
+								>
 									{loading ? (
 										<span
 											className="spinner-border spinner-border-sm"

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import axios, { AxiosResponse } from "axios";
 import { AxiosError } from "axios";
@@ -60,7 +61,6 @@ function Tareas() {
 	const modalRef = useRef<HTMLDivElement | null>(null);
 	const [loading, setLoading] = useState<boolean>(false); 
   	const [pendingRequests, setPendingRequests] = useState<number>(0);
-
 	const [id, setId] = useState<number>(0);
 	const [name, setName] = useState<string>("");
 	const [description, setDescription] = useState<string>("");
@@ -202,7 +202,6 @@ function Tareas() {
 
 	const deleteTarea = async (id: number) => {
 		setLoading(true);
-		console.log("Deleting task with id:", id);
 		try {
 			await axios.delete(`${baseURL}/task/${id}`, {
 				headers: { "Content-Type": "application/json" },
@@ -211,11 +210,11 @@ function Tareas() {
 			setTareas((prevTareas) => prevTareas.filter((tarea) => tarea.id !== id));
 		} catch (error) {
 			if (axios.isAxiosError(error)) {
-				console.error("Servidor respondiendo:", error.response?.data);
+				// console.error("Servidor respondiendo:", error.response?.data);
 			} else {
-				console.error("Error borrando tareas:", error);
 			}
-			showAlert("Error al eliminar la tarea", "error");
+			showAlert("Database error: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement", "error");
+			
 		} finally {
 			setLoading(false);
 		}
@@ -256,7 +255,6 @@ function Tareas() {
 
 	useEffect(() => {
 		if (isModalOpen) {
-			console.log("Modal abierto en modo edición:", isEditMode);
 		}
 	}, [isModalOpen, isEditMode]);
 
@@ -386,112 +384,115 @@ function Tareas() {
 						</div>
 					</div>
 					{pendingRequests > 0 ? (
-					<div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
-					<Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
-						<span className="visually-hidden">Loading...</span>
-					</Spinner>
-					</div>
+						<div
+							className="d-flex justify-content-center align-items-center"
+							style={{ height: "100vh", marginTop: "-200px" }}
+						>
+							<Spinner animation="border" role="status" style={{ color: "#A17BB6" }}>
+								<span className="visually-hidden">Loading...</span>
+							</Spinner>
+						</div>
 					) : (
-					<div className="table-responsive tabla-scroll">
-						<table className="table table-bordered">
-							<thead
-								className="text-center"
-								style={{
-									background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
-									color: "#fff",
-								}}>
-								<tr>
-									<th>N°</th>
-									<th>Tipo de Tarea</th>
-									<th>Nombre</th>
-									<th>Descripción</th>
-									<th>Versión</th>
-									<th>Verificadores</th>
-									<th>Archivo</th>
-									<th>Acciones</th>
-								</tr>
-							</thead>
-							<tbody className="table-group-divider">
-								{tareas && tareas.length > 0 ? (
-									tareas.map((tr, i) => (
-										<tr key={tr.id}>
-											<td>{i + 1}</td>
-											<td>{tr.taskType?.name || "N/A"}</td>
-											<td>{tr.name}</td>
-											<td>{tr.description}</td>
-											<td>{tr.version}</td>
-											<td>
-											<Accordion>
-													<Accordion.Item eventKey="0">
-														<Accordion.Header>Verificadores</Accordion.Header>
-														<Accordion.Body>
-															<ul>
-																{tr.checker ? tr.checker.description : "Sin Verificador"}
-															</ul>
-														</Accordion.Body>
-													</Accordion.Item>
-												</Accordion>
-											</td>
-											<td>
-												<OverlayTrigger
-													overlay={
-														<Tooltip id={`tooltip-download-${tr.id}`}>Descargar Archivo</Tooltip>
-													}>
-													<button
-														onClick={() =>
-															downloadFile(
-																`https://testbackend-433922.uk.r.appspot.com/api/task/${tr.id}/download`,
-																tr.fileExtension,
-																tr.name
-															)
-														}
-														className="btn btn-custom-descargar m-2"
-													>
-														<FontAwesomeIcon icon={faDownload} />
-													</button>
-												</OverlayTrigger>
-											</td>
-											<td>
-												<OverlayTrigger placement="top" overlay={<Tooltip>Editar</Tooltip>}>
-													<button
-														className="btn btn-custom-editar m-2"
-														onClick={() => openModal("2", tr)}
-													>
-														<FontAwesomeIcon icon={faPenToSquare} />
-													</button>
-												</OverlayTrigger>
-												<OverlayTrigger placement="top" overlay={<Tooltip>Eliminar</Tooltip>}>
-													<button
-														className="btn btn-custom-danger"
-														onClick={() => {
-															MySwal.fire({
-																title: "¿Estás seguro?",
-																text: "No podrás revertir esto",
-																icon: "warning",
-																showCancelButton: true,
-																confirmButtonText: "Sí, bórralo",
-																cancelButtonText: "Cancelar",
-															}).then((result) => {
-																if (result.isConfirmed) {
-																	deleteTarea(tr.id);
-																}
-															});
-														}}
-													>
-														<FontAwesomeIcon icon={faCircleXmark} />
-													</button>
-												</OverlayTrigger>
-											</td>
-										</tr>
-									))
-								) : (
+						<div className="table-responsive tabla-scroll">
+							<table className="table table-bordered">
+								<thead
+									className="text-center"
+									style={{
+										background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
+										color: "#fff",
+									}}
+								>
 									<tr>
-										<td colSpan={8}>No hay tareas disponibles</td>
+										<th>N°</th>
+										<th>Tipo de Tarea</th>
+										<th>Nombre</th>
+										<th>Descripción</th>
+										<th>Versión</th>
+										<th>Verificadores</th>
+										<th>Archivo</th>
+										<th>Acciones</th>
 									</tr>
-								)}
-							</tbody>
-						</table>
-					</div>
+								</thead>
+								<tbody className="table-group-divider">
+									{tareas && tareas.length > 0 ? (
+										tareas.map((tr, i) => (
+											<tr key={tr.id}>
+												<td>{i + 1}</td>
+												<td>{tr.taskType?.name || "N/A"}</td>
+												<td>{tr.name}</td>
+												<td>{tr.description}</td>
+												<td>{tr.version}</td>
+												<td>
+													<Accordion>
+														<Accordion.Item eventKey="0">
+															<Accordion.Header>Verificadores</Accordion.Header>
+															<Accordion.Body>
+																<ul>{tr.checker ? tr.checker.description : "Sin Verificador"}</ul>
+															</Accordion.Body>
+														</Accordion.Item>
+													</Accordion>
+												</td>
+												<td>
+													<OverlayTrigger
+														overlay={
+															<Tooltip id={`tooltip-download-${tr.id}`}>Descargar Archivo</Tooltip>
+														}
+													>
+														<button
+															onClick={() =>
+																downloadFile(
+																	`https://testbackend-433922.uk.r.appspot.com/api/task/${tr.id}/download`,
+																	tr.fileExtension,
+																	tr.name
+																)
+															}
+															className="btn btn-custom-descargar m-2"
+														>
+															<FontAwesomeIcon icon={faDownload} />
+														</button>
+													</OverlayTrigger>
+												</td>
+												<td>
+													<OverlayTrigger placement="top" overlay={<Tooltip>Editar</Tooltip>}>
+														<button
+															className="btn btn-custom-editar m-2"
+															onClick={() => openModal("2", tr)}
+														>
+															<FontAwesomeIcon icon={faPenToSquare} />
+														</button>
+													</OverlayTrigger>
+													<OverlayTrigger placement="top" overlay={<Tooltip>Eliminar</Tooltip>}>
+														<button
+															className="btn btn-custom-danger"
+															onClick={() => {
+																MySwal.fire({
+																	title: "¿Estás seguro?",
+																	text: "No podrás revertir esto",
+																	icon: "warning",
+																	showCancelButton: true,
+																	confirmButtonText: "Sí, bórralo",
+																	cancelButtonText: "Cancelar",
+																}).then((result) => {
+																	if (result.isConfirmed) {
+																		deleteTarea(tr.id);
+																	}
+																});
+															}}
+														>
+															<FontAwesomeIcon icon={faCircleXmark} />
+														</button>
+													</OverlayTrigger>
+												</td>
+											</tr>
+										))
+									) : (
+										<tr>
+											<td colSpan={8}>No hay tareas disponibles</td>
+										</tr>
+									)}
+								</tbody>
+							</table>
+						</div>
 					)}
 				</div>
 			</div>
@@ -502,7 +503,8 @@ function Tareas() {
 				tabIndex={-1}
 				aria-labelledby="modalTareaLabel"
 				aria-hidden="true"
-				ref={modalRef}>
+				ref={modalRef}
+			>
 				<div className="modal-dialog modal-lg">
 					<div className="modal-content">
 						<div className="modal-header">
@@ -563,7 +565,8 @@ function Tareas() {
 									className="form-select"
 									value={selectedTaskTypeId}
 									onChange={(e) => setSelectedTaskTypeId(Number(e.target.value))}
-									disabled={isEditMode}>
+									disabled={isEditMode}
+								>
 									<option value={0}>Selecciona...</option>
 									{taskType.map((ts) => (
 										<option key={ts.id} value={ts.id}>
@@ -578,7 +581,7 @@ function Tareas() {
 								<Select
 									id="verificador"
 									options={opcionesVerificadores}
-									value={selectedOption} 
+									value={selectedOption}
 									onChange={handleCheckerChange}
 									classNamePrefix="select"
 									placeholder="Selecciona un verificador..."
@@ -588,7 +591,7 @@ function Tareas() {
 								<div className="container">
 									<div className="col-md-12">
 										{!isEditMode && (
-											<div className="dropzone" {...getRootProps()}>
+											<div className={`dropzone ${isEditMode ? "hidden" : ""}`} {...getRootProps()}>
 												<input {...getInputProps()} />
 												{isDragActive ? (
 													<p>Carga los archivos acá ...</p>
@@ -603,8 +606,7 @@ function Tareas() {
 												</div>
 											</div>
 										)}
-
-										{uploadedImageUrl && (
+										{!isEditMode && uploadedImageUrl && (
 											<div className="uploaded-image-preview">
 												<img src={uploadedImageUrl} alt="Vista previa" />
 												<span className="delete-icon" onClick={eliminarImagen}>
@@ -621,11 +623,24 @@ function Tareas() {
 								type="button"
 								className="btn btn-secondary"
 								id="btnCerrar"
-								data-bs-dismiss="modal">
+								data-bs-dismiss="modal"
+							>
 								Cerrar
 							</button>
-							<button type="button" className="btn btn-primary" onClick={validar}>
-								Guardar
+							<button
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
 							</button>
 						</div>
 					</div>
@@ -636,6 +651,5 @@ function Tareas() {
 }
 
 export default Tareas;
-
 
 
