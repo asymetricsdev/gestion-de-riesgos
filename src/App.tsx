@@ -28,6 +28,7 @@ import JerarquiaControl from './pages/JerarquiaControlPage';
 import TareaColaborador from './components/TareaColaborador/TareaColaborador';
 import ColaboradorEjecutarTarea from './pages/ColaboradorEjecutarTareaPage';
 import Login from './pages/LoginPage';
+import Estados from './pages/EstadosPage';
 import Registro from './pages/RegistroPage';    
 
 
@@ -59,6 +60,7 @@ export function App() {
                                 <Route path="/planificacion/planificador-de-actividad" element={< PlanificadorActividad/>} />
                                 <Route path="/planificacion/actividades" element={<Actividad />} />
                                 <Route path="/planificacion/perfiles" element={<Perfiles />} />
+                                <Route path="/planificacion/estados" element={<Estados />} />
                                 {/*VERIFICACION*/}
                                 <Route path="/verificacion/verificadores-de-control" element={<VerificadorControl />} />
                                 <Route path="/verificacion/items" element={<Items />} />
