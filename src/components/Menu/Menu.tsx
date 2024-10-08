@@ -175,7 +175,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 							to="/planificacion/estados"
 							className="nav-link text-white d-flex align-items-center"
 						>
-							<i className="fa-solid fa-arrow-right-arrow-left"></i>
+							<i className="fa-solid fa-retweet"></i>
 							<span>Estados</span>
 						</NavLink>
 						) : (
@@ -184,7 +184,7 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 									to="/planificacion/estados"
 									className="nav-link text-white d-flex align-items-center"
 								>
-									<i className="fa-solid fa-arrow-right-arrow-left"></i>
+									<i className="fa-solid fa-retweet"></i>
 								</NavLink>
 							</OverlayTrigger>
 						)}

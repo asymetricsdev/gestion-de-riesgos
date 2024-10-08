@@ -219,7 +219,7 @@ const Estados: React.FC = () => {
                 <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-arrow-right-arrow-left"></i>
+                  <i className="fa-solid fa-retweet"></i>
                   </span>
                   <input
                     type="text"
