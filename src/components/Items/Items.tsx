@@ -40,7 +40,6 @@ const Items: React.FC = () => {
 	const modalRef = useRef<HTMLDivElement | null>(null);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [pendingRequests, setPendingRequests] = useState<number>(0);
-
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -64,7 +63,7 @@ const Items: React.FC = () => {
 		} catch (error) {
 			showAlert("Error al obtener los Items", "error");
 		} finally {
-			setPendingRequests((prev) => prev - 1); // Disminuir contador
+			setPendingRequests((prev) => prev - 1);
 		}
 	};
 
@@ -76,7 +75,7 @@ const Items: React.FC = () => {
 		} catch (error) {
 			showAlert("Error al obtener els verificadores", "error");
 		} finally {
-			setPendingRequests((prev) => prev - 1); // Disminuir contador
+			setPendingRequests((prev) => prev - 1);
 		}
 	};
 
@@ -342,9 +341,21 @@ const Items: React.FC = () => {
 								>
 									Cerrar
 								</button>
-								<button type="button" className="btn btn-primary" onClick={validar}>
-									Guardar
-								</button>
+								<button
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
+							</button>
 							</div>
 						</div>
 					</div>

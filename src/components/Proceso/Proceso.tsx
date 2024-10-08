@@ -55,7 +55,7 @@ const Proceso: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener Proceso", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1);
     }
   };
 
