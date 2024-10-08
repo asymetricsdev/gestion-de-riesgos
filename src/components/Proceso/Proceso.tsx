@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
@@ -55,7 +56,7 @@ const Proceso: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener Proceso", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1);
     }
   };
 

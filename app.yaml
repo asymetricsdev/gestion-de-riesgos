@@ -1,0 +1,21 @@
+runtime: nodejs20
+
+handlers:
+  # Ruta para servir el archivo index.html
+  - url: /
+    static_files: dist/index.html
+    upload: dist/index.html
+
+  # Ruta para servir archivos estáticos generados por Vite
+  - url: /assets
+    static_dir: dist/assets
+
+  # Ruta para servir otros archivos estáticos (evitar que sean tratados como redirección a index.html)
+  - url: /(.+\..+)
+    static_files: dist/\1
+    upload: dist/(.+)
+
+  # Redirigir todas las demás rutas (por ejemplo, las rutas gestionadas por React Router) a index.html
+  - url: /.*
+    static_files: dist/index.html
+    upload: dist/index.html

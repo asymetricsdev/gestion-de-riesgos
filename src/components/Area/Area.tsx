@@ -90,7 +90,7 @@ const Area: React.FC<AreaProps> = ({ isNewRecord }: AreaProps ) => {
     } catch (error) {
       showAlert("Error al obtener los peligros", "error");
     } finally {
-		setPendingRequests(prev => prev - 1);  // Disminuir contador
+		setPendingRequests(prev => prev - 1);
 	}
   };
   
@@ -103,7 +103,7 @@ const Area: React.FC<AreaProps> = ({ isNewRecord }: AreaProps ) => {
     } catch (error) {
       showAlert("Error al obtener las compañias", "error");
     } finally {
-		setPendingRequests(prev => prev - 1);  // Disminuir contador
+		setPendingRequests(prev => prev - 1); 
 	}
   };
 
@@ -115,7 +115,7 @@ const Area: React.FC<AreaProps> = ({ isNewRecord }: AreaProps ) => {
     } catch (error) {
       showAlert("Error al obtener los tipos de verificación", "error");
     } finally {
-		setPendingRequests(prev => prev - 1);  // Disminuir contador
+		setPendingRequests(prev => prev - 1); 
 	}
   };
 
