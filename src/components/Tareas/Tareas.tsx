@@ -1,20 +1,17 @@
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import axios, { AxiosResponse } from "axios";
-import { AxiosError } from "axios";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
-import { showAlert } from "../functions";
-import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
+import { faCircleXmark, faDownload, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload, faCircleXmark, faPenToSquare } from "@fortawesome/free-solid-svg-icons";
-import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+import axios, { AxiosResponse } from "axios";
 import * as bootstrap from "bootstrap";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Accordion, OverlayTrigger, Spinner, Tooltip } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import Select from "react-select";
-import { Accordion, AccordionItem, AccordionHeader, AccordionBody } from "react-bootstrap";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
+import { showAlert } from "../functions";
 import "./Tareas.css";
-import { versions } from "process";
 
 const MySwal = withReactContent(Swal);
 
@@ -441,7 +438,7 @@ function Tareas() {
 														<button
 															onClick={() =>
 																downloadFile(
-																	`https://testbackend-433922.uk.r.appspot.com/api/task/${tr.id}/download`,
+																	`${baseURL}/task/${tr.id}/download`,
 																	tr.fileExtension,
 																	tr.name
 																)

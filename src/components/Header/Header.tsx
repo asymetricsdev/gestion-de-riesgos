@@ -1,8 +1,8 @@
-import { Navbar, Nav } from 'react-bootstrap';
+import { faBars, faBell, faInfoCircle, faQuestionCircle, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle, faBell, faQuestionCircle, faUserCircle, faBars } from '@fortawesome/free-solid-svg-icons';
-import logo from '../../img/logo-asy.png'; 
-import './HeaderStyle.css'; 
+import { Nav, Navbar } from 'react-bootstrap';
+import logo from '../../img/logo-asy.png';
+import './HeaderStyle.css';
 
 
 interface HeaderProps {
@@ -37,7 +37,7 @@ interface HeaderProps {
                 <FontAwesomeIcon icon={faUserCircle} />
               </Nav.Link>
               <Nav.Link href="#" className="d-flex align-items-center">
-                Bienvenido Felipe Martínez
+                Version: 08.OCT.2024T23:15
               </Nav.Link>
             </div>
           </Nav>
