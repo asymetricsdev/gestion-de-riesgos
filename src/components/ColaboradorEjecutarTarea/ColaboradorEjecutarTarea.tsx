@@ -7,25 +7,34 @@ import { OverlayTrigger, Tooltip, Breadcrumb } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import DangerHead from "../DangerHead/DangerHead";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import "./ColaboradorEjecutarTarea.css";
 
 
-interface ExecutionCheckpoint {
+interface TaskExecution {
 	id: number;
 	createDate: string;
 	updateDate: string;
+	createdAt: string;
 	executedAt: string;
-	status: {
-		id: number;
-		name: string;
-	};
+	checkpoint: Checkpoint;
+	employee: Colaboradores;
+	task: Task;
+	checker: Checker;
+	planning: Planning;
+	files: FileData[];
+
 }
 
 interface Checkpoint {
 	id: number;
 	name: string;
-	executionCheckpoints: ExecutionCheckpoint[];
+}
+
+interface Task {
+	id: number;
+	name: string;
+	description: string;
 }
 
 interface Checker {
@@ -34,34 +43,15 @@ interface Checker {
 	checkpoints: Checkpoint[];
 }
 
-interface TaskExecution {
-	id: number;
-	executedAt: string;
-	employee: {
-		id: number;
-		name: string;
-	};
-	task: {
-		id: number;
-		name: string;
-		taskTypeId: number;
-	};
-	checker: Checker;
-	planning: {
-		id: number;
-		name: string;
-	};
-	files: {
-		id: number;
-		fileName: string;
-		mimeType: string;
-		createDate: string;
-	}[];
-}
-
 interface Status {
 	id: number;
 	name: string;
+}
+
+interface Planning {
+	id: number;
+	name: string;
+	description: string;
 }
 interface Colaboradores {
 	id: number;
@@ -95,8 +85,6 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 	const [isEditMode, setIsEditMode] = useState(false);
 	const { id } = useParams<{ id: string }>();
 
-	
-
 	useEffect(() => {
 		console.log(`empId: ${empId}`);
 		getColaborador();
@@ -104,14 +92,13 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		getStatus(2);
 	}, [empId, taskId]);
 
-	
 	const getTaskExecutionData = async () => {
 		try {
 			const response = await axios.get(`${baseURL}/task/${taskId}/executions?employeeId=${empId}`);
-			console.log("Datos de ejecución obtenidos:", response.data);
+			console.log("Datos de ejecución obtenidos desde getTaskExecutionData:", response.data);
 			setTasks(response.data);
-			  // Verificamos si hay tareas y establecemos el título
-			  if (response.data && response.data.length > 0) {
+			// Verificamos si hay tareas y establecemos el título
+			if (response.data && response.data.length > 0) {
 				setTitle(response.data[0].task.name); // Establecer el título usando el nombre de la tarea
 			}
 		} catch (error) {
@@ -130,25 +117,16 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		}
 	};
 
-
-	  const getStatus = async (taskTypeId: number) => {
+	const getStatus = async (taskTypeId: number) => {
 		try {
-		  const response: AxiosResponse<Status[]> = await axios.get(
-			`${baseURL}/status/taskType/${taskTypeId}` // TaskType ID específico para Capacitación
-		  );
-		  setStatus(response.data); // Guardar los estados en el estado de React
+			const response: AxiosResponse<Status[]> = await axios.get(
+				`${baseURL}/status/taskType/${taskTypeId}` // TaskType ID específico para Capacitación
+			);
+			setStatus(response.data); // Guardar los estados en el estado de React
 		} catch (error) {
-		  showAlert("Error al obtener los estados", "error");
+			showAlert("Error al obtener los estados", "error");
 		}
-	  };
-	  
-	  useEffect(() => {
-		getColaborador();
-		getTaskExecutionData();
-		getStatus(2); // Aquí envías el ID 2 que corresponde a "Capacitación"
-	  }, [empId, taskId]);
-	  
-
+	};
 
 
 	const renderSubirArchivoTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
@@ -175,14 +153,13 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		</Tooltip>
 	);
 
-	
 	// DESCARGAR ARCHIVO
 	const downloadFile = async (fileUrl: string, fileName: string, mimeType: string) => {
 		try {
 			const response = await axios.get(fileUrl, {
 				responseType: "json",
 			});
-	
+
 			const base64Data = response.data.content;
 			if (!base64Data) {
 				Swal.fire({
@@ -193,7 +170,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 				});
 				return;
 			}
-	
+
 			// Decodificamos la cadena Base64 y creamos un Blob para el archivo
 			const byteCharacters = atob(base64Data);
 			const byteNumbers = new Array(byteCharacters.length);
@@ -201,16 +178,16 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 				byteNumbers[i] = byteCharacters.charCodeAt(i);
 			}
 			const byteArray = new Uint8Array(byteNumbers);
-			const blob = new Blob([byteArray], { type: 'image/png' }); 
-	
+			const blob = new Blob([byteArray], { type: "image/png" });
+
 			// Creamos un enlace de descarga para el archivo
 			const link = document.createElement("a");
 			link.href = window.URL.createObjectURL(blob);
-			link.setAttribute("download", fileName); 
+			link.setAttribute("download", fileName);
 			document.body.appendChild(link);
 			link.click();
 			document.body.removeChild(link);
-	
+
 			// Liberamos el objeto URL creado
 			window.URL.revokeObjectURL(link.href);
 		} catch (error) {
@@ -223,10 +200,11 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		}
 	};
 
-	const formatDate = (dateString: string) => {
-		return dateString.split('T')[0];
-	  };
-	
+	function formatDate(date: string | null | undefined): string {
+		if (!date) return "Sin fecha";
+		const parsedDate = new Date(date);
+		return parsedDate.toLocaleDateString();
+	}
 
 	return (
 		<div className="App">
@@ -262,9 +240,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 											{uploadedImageUrl && (
 												<div className="uploaded-image-preview">
 													<img src={uploadedImageUrl} alt="Vista previa" />
-													<span className="delete-icon">
-														&#10006;
-													</span>
+													<span className="delete-icon">&#10006;</span>
 												</div>
 											)}
 										</div>
@@ -317,27 +293,30 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 							</thead>
 							<tbody className="table-group-divider">
 								{tasks?.map((task, taskIndex) =>
-									task.files.map((ce, fileIndex) => (
+									task?.files?.map((ce, fileIndex) => (
 										<tr key={`${task.id}-${ce.id}`}>
 											<td>{fileIndex + 1}</td>
 											<td>{ce.fileName}</td>
 											<td>{ce.mimeType}</td>
 											<td>{formatDate(ce.createDate)}</td>
-											<td><OverlayTrigger
-												overlay={<Tooltip id={`tooltip-download-${ce.id}`}>Descargar Archivo</Tooltip>}
+											<td>
+												<OverlayTrigger
+													overlay={
+														<Tooltip id={`tooltip-download-${ce.id}`}>Descargar Archivo</Tooltip>
+													}
 												>
-												<button
-													onClick={() =>
-													downloadFile(
-														`https://testbackend-433922.uk.r.appspot.com/api/task/downloadFile?fileId=${ce.id}`,
-														ce.fileName,
-														ce.mimeType
-													)
-												}
-													className="btn btn-custom-descargar m-2"
-												>
-													<i className="fa-solid fa-download"></i>
-												</button>
+													<button
+														onClick={() =>
+															downloadFile(
+																`https://testbackend-433922.uk.r.appspot.com/api/task/downloadFile?fileId=${ce.id}`,
+																ce.fileName,
+																ce.mimeType
+															)
+														}
+														className="btn btn-custom-descargar m-2"
+													>
+														<i className="fa-solid fa-download"></i>
+													</button>
 												</OverlayTrigger>
 											</td>
 										</tr>
@@ -372,36 +351,41 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 								</tr>
 							</thead>
 							<tbody>
-								{tasks &&
-									tasks.map((task) =>
-										task.checker.checkpoints.map((checkpoint, checkpointIndex) =>
-											checkpoint.executionCheckpoints.map((executionCheckpoint, execIndex) => (
-												<tr key={`${checkpoint.id}-${execIndex}`}>
-													<td>{checkpointIndex + 1}</td>
-													<td>{checkpoint.name}</td>
-													<td>{task.employee.name}</td>
-													<td>{task.planning.name}</td>
-													<td>{task.checker.name}</td>
-													<td>{formatDate(executionCheckpoint.executedAt) || "Sin ejecución"}</td>
-													<td>{executionCheckpoint.status.name}</td>
-													<td>
-														<select className="form-select">
-															{Array.isArray(status) && status.length > 0 ? (
-															status.map((status) => (
-																<option key={status.id} value={status.id}>
-																{status.name} {/* Mostrar el nombre del estado */}
+								{tasks && tasks.length > 0 ? (
+									tasks.map((task, taskIndex) => (
+									task?.checker?.checkpoints?.map((checkpoint, checkpointIndex) => (
+										<tr key={`${task.id}-${checkpoint.id}`}>
+										<td>{`${taskIndex + 1}.${checkpointIndex + 1}`}</td> 
+										<td>{checkpoint?.name || "Sin nombre"}</td> 
+										<td>{task?.employee?.name || "Sin empleado"}</td> 
+										<td>{task?.planning?.name || "Sin planificación"}</td> 
+										<td>{task?.checker?.name || "Sin verificador"}</td> 
+										<td>{task?.executedAt ? formatDate(task.executedAt) : "Sin ejecución"}</td> 
+										{/* <td>{task?.status?.name || "Sin estado"}</td> */} 
+
+										<td><select className="form-select">
+												{Array.isArray(status) && status.length > 0 ? (
+													status.map((status) => (
+														<option key={status.id} value={status.id}>
+															{status.name} 
 																</option>
-															))
-															) : (
-															<option value="">Cargando estados...</option>
-															)}
-														</select>
-													</td>
-												</tr>
-											))
-										)
-									)}
-							</tbody>
+														))
+														) : (
+														<option value="">Cargando estados...</option>
+														)}
+												</select>
+</td>
+										</tr>
+									))
+									))
+								) : (
+									<tr>
+									<td colSpan={8} className="text-center">
+										No hay ítems para ejecutar.
+									</td>
+									</tr>
+								)}
+    						</tbody>
 						</table>
 					</div>
 					<div className="d-flex justify-content-end">
@@ -423,5 +407,3 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 };
 
 export default ColaboradorEjecutarTarea;
-
-
