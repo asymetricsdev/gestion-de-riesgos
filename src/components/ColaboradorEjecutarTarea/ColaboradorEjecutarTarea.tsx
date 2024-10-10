@@ -274,7 +274,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 					<div className="tabla-contenedor-matriz">
 						<DangerHead title="Historial de Archivos" />
 					</div>
-					<div className="table-responsive">
+					<div className="table-responsive tabla-scroll">
 						<table className="table table-bordered">
 							<thead
 								className="text-center"
