@@ -221,15 +221,16 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
       await axios.delete(`${baseURL}/profile/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-      Swal.fire("Perfil eliminado correctamente", "", "success");
+      showAlert("Perfil eliminado correctamente", "success");
       getProfiles();
     } catch (error) {
-      Swal.fire({
-        title: "Error",
-        text: "Error al eliminar el Perfil.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
+      if (axios.isAxiosError(error)) {
+			} else {
+			}
+			showAlert(
+				"Database error: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement",
+				"error"
+			);
     } finally {
       setLoading(false);
     }
