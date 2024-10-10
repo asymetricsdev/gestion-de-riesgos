@@ -60,7 +60,6 @@ export function App() {
                                 <Route path="/planificacion/planificador-de-actividad" element={< PlanificadorActividad/>} />
                                 <Route path="/planificacion/actividades" element={<Actividad />} />
                                 <Route path="/planificacion/perfiles" element={<Perfiles />} />
-                                <Route path="/planificacion/estados" element={<Estados />} />
                                 {/*VERIFICACION*/}
                                 <Route path="/verificacion/verificadores-de-control" element={<VerificadorControl />} />
                                 <Route path="/verificacion/items" element={<Items />} />
@@ -73,6 +72,7 @@ export function App() {
                                 <Route path="/matriz-de-peligro/configuracion/jerarquia-de-control" element={<JerarquiaControl />} />
                                 <Route path="/matriz-de-peligro/configuracion/peligro" element={<Peligro />} />
                                 <Route path="/matriz-de-peligro/configuracion/riesgos" element={<Riesgo />} />
+                                <Route path="/matriz-de-peligro/configuracion/estados" element={<Estados />} />
                                 {/*TIPOS DE ACTIVIDAD */}
                                 <Route path="/tipo-de-actividad/tipo-de-actividad" element={<TipoActividad />} />
                                 {/*ORGANIZACION */}
