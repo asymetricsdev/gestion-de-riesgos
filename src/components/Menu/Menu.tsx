@@ -1,4 +1,4 @@
-           // MENU EXISTENTE //
+// MENU EXISTENTE //
 import React, { useState } from "react";
 import { Nav, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
@@ -329,7 +329,6 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isAuthenticated }
                 )}
               </div>
             )}
-
             {/* Organización Submenu */}
             {isOpen ? (
               <div className="nav-link text-white text-custom-color fw-bold d-flex align-items-center" onClick={toggleOrgSubmenu}>
@@ -424,7 +423,6 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isAuthenticated }
           </>
         )}
       </Nav>
-
       <button onClick={toggleSidebar} className="btn-sidebar">
         <OverlayTrigger placement="right" overlay={isOpen ? renderTooltip("Cerrar") : renderTooltip("Abrir")}>
           <i className={`fa-solid ${isOpen ? "fa-chevron-left" : "fa-chevron-right"}`}></i>

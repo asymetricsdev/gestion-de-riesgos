@@ -9,22 +9,11 @@ import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-interface Compañia {
-  id: number;
-  name: string;
-  description: string;
-  createDate: string;
-}
 
-interface CompañiaData {
-  name: string;
-  description: string;
-}
-
-const Company: React.FC = () => {
+const Estados: React.FC = () => {
 
   const baseURL = import.meta.env.VITE_API_URL;
-  const [company, setProcess] = useState<Compañia[]>([]);
+//   const [estados, setEstados] = useState<Estados[]>([]);
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -34,43 +23,18 @@ const Company: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false); 
   const [pendingRequests, setPendingRequests] = useState<number>(0);
 
-
-  useEffect(() => {
-    getCompany();
-    if (modalRef.current) {
-      modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
-    }
-    return () => {
-      if (modalRef.current) {
-        modalRef.current.removeEventListener('hidden.bs.modal', handleModalHidden);
-      }
-    };
-  }, []);
-
-  const getCompany = async () => {
-    setPendingRequests(prev => prev + 1);
-    try {
-      const response: AxiosResponse<Compañia[]> = await axios.get(`${baseURL}/company/`);
-      setProcess(response.data);
-    } catch (error) {
-      showAlert("Error al obtener Compañia", "error");
-    } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
-    }
-  };
-
   
-  const openModal = (op: string, company?: Compañia) => {
-    if (company) {
-      setId(company.id);
-      setName(company.name);
-      setDescription(company.description);
+  const openModal = (op: string, estados?: any) => {
+    if (estados) {
+      setId(estados.id);
+      setName(estados.name);
+      setDescription(estados.description);
     } else {
       setId(null);
       setName("");
       setDescription("");
     }
-    setTitle(op === "1" ? "Registrar Compañia" : "Editar Compañia");
+    setTitle(op === "1" ? "Registrar Estado" : "Editar Estado");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
@@ -85,7 +49,7 @@ const Company: React.FC = () => {
     modals.forEach(modal => modal.parentNode?.removeChild(modal));
   };
 
-  const validar = () => {
+  /* const validar = () => {
     if (name.trim() === "") {
       showAlert("Escribe el nombre", "warning", "nombre del Compañia");
       return;
@@ -103,8 +67,8 @@ const Company: React.FC = () => {
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
-
-  const enviarSolicitud = async (method: "POST" | "PUT", data: CompañiaData) => {
+ */
+  const enviarSolicitud = async (method: "POST" | "PUT", data: any) => {
     setLoading(true);
     try {
       const url = method === "PUT" && id ? `${baseURL}/company/${id}` : `${baseURL}/company/`;
@@ -116,7 +80,7 @@ const Company: React.FC = () => {
       });
     
       showAlert("Operación realizada con éxito", "success");
-      getCompany();
+    //   getCompany();
       if (modalRef.current) {
       const modal = bootstrap.Modal.getInstance(modalRef.current);
       modal?.hide();
@@ -139,7 +103,7 @@ const Company: React.FC = () => {
         headers: { "Content-Type": "application/json" },
       });
       Swal.fire("Compañia eliminado correctamente", "", "success");
-      getCompany();
+    //   getCompany();
     } catch (error) {
       Swal.fire({
         title: "Error",
@@ -174,7 +138,7 @@ const Company: React.FC = () => {
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Compañías' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Estados' onClick={() => openModal("1")} />
             </div>
             {pendingRequests > 0 ? (
             <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
@@ -192,21 +156,20 @@ const Company: React.FC = () => {
                     <th>N°</th>
                     <th>Nombre</th>
                     <th>Descripción </th>
-                    <th>Fecha</th>
+                    <th>Tipo de Tarea</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {company.map((comp, i) => (
-                    <tr key={comp.id} className="text-center">
-                      <td>{i + 1}</td>
-                      <td>{comp.name}</td>
-                      <td>{comp.description}</td>
-                      <td>{formatDate(comp.createDate)}</td>
+                  <tr className="text-center">
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button
-                        onClick={() => openModal("2", comp)}
+                        onClick={() => openModal("2", /*comp*/)}
                         className="btn btn-custom-editar m-2"
                         data-bs-toggle="modal"
                         data-bs-target="#modalUsers">
@@ -224,7 +187,7 @@ const Company: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteCompany(comp.id);
+                            //   deleteCompany(comp.id);
                             }
                           });
                         }}>
@@ -233,7 +196,7 @@ const Company: React.FC = () => {
                       </OverlayTrigger>
                       </td>
                     </tr>
-                  ))}
+                
                 </tbody>
               </table>
             </div>
@@ -256,13 +219,13 @@ const Company: React.FC = () => {
                 <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-building"></i>
+                  <i className="fa-solid fa-retweet"></i>
                   </span>
                   <input
                     type="text"
                     id="nombre"
                     className="form-control"
-                    placeholder="Nombre del Compañia"
+                    placeholder="Nombre del Estado"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -293,20 +256,21 @@ const Company: React.FC = () => {
                   Cerrar
                 </button>
                 <button
-									type="button"
-									className="btn btn-primary"
-									onClick={validar}
-									disabled={loading}>
-									{loading ? (
-										<span
-											className="spinner-border spinner-border-sm"
-											role="status"
-											aria-hidden="true"
-										></span>
-									) : (
-										"Guardar"
-									)}
-								</button>
+                type="button"
+                className="btn btn-primary"
+                // onClick={validar}
+                disabled={loading}>
+                {loading ? (
+                    <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                    ></span>
+                ) : (
+                    "Guardar"
+                )}
+            </button>
+									
               </div>
             </div>
           </div>
@@ -317,5 +281,5 @@ const Company: React.FC = () => {
   );
 };
 
-export default Company;
+export default Estados;
 

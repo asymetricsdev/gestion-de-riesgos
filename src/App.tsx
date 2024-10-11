@@ -6,6 +6,32 @@ import { AppRoutes } from './Routes/Routes';
 import LoginPage from './Pages/LoginPage';
 import { Container, Row, Col } from 'react-bootstrap';
 import './AppStyle.css';
+import Home from './pages/HomePage';
+import MatrizPeligro from './pages/MatrizPeligroPage';
+import PlanificadorActividad from './pages/PlanificadorActividadPage';
+import Planificacion from './pages/PlanificacionPage';
+import Perfiles from  './pages/PerfilesPage';
+import Compañia from './pages/CompañiaPage';
+import TipoActividad from './pages/TipoActividadesPage';
+import Criticidad from './pages/CriticidadPage';
+import Area from './pages/AreaPage';
+import Peligro from './pages/PeligroPage';
+import Riesgo from './pages/RiesgoPage';
+import Ciudad from './pages/CiudadPage';
+import Cargo from './pages/CargoPage';
+import Proceso from './pages/ProcesoPage';
+import Actividad from './pages/ActividadPage';
+import Tareas from './pages/TareasPage';
+import TipoTareas from './pages/TipoTareasPage';
+import Colaboradores from './pages/ColaboradoresPage';
+import Items from './pages/ItemsPage';
+import VerificadorControl from './pages/VerificadorControlPage';
+import JerarquiaControl from './pages/JerarquiaControlPage';
+import TareaColaborador from './components/TareaColaborador/TareaColaborador';
+import ColaboradorEjecutarTarea from './pages/ColaboradorEjecutarTareaPage';
+import Login from './pages/LoginPage';
+import Estados from './pages/EstadosPage';
+import Registro from './pages/RegistroPage';    
 
 export function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); 
@@ -40,7 +66,7 @@ export function App() {
     return <LoginPage onLogin={handleLogin} />;
   }
 
-
+  
   return (
     <BrowserRouter>
       <Header toggleMenu={toggleMenu} handleLogout={handleLogout} />
@@ -56,6 +82,7 @@ export function App() {
       </Container>
     </BrowserRouter>
   );
+
 }
 
 export default App;

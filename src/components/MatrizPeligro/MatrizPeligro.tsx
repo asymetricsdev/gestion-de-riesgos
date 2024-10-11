@@ -74,7 +74,7 @@ const MatrizPeligro: React.FC = () => {
     <div className="container-fluid">
       <div className="row mt-3">
         <div className="col-12">
-          <div className="tabla-contenedor-matriz">
+          <div className="tabla-contenedor">
             <DangerHead title="Matriz de Peligro" />
           </div>
           <div className="table-responsive-xl tabla-scroll">
