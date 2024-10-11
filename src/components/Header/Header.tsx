@@ -7,9 +7,11 @@ import './HeaderStyle.css';
 
 interface HeaderProps {
     toggleMenu: () => void;
+    handleLogout: () => void;
   }
 
   export default function Header({ toggleMenu }: HeaderProps){
+
   
   return (
     <>
@@ -46,19 +48,10 @@ interface HeaderProps {
       <button 
         className="navbar-toggler always-visible custom-button" 
         type="button" 
-        onClick={toggleMenu}
-      >
+        onClick={toggleMenu}>
         <FontAwesomeIcon icon={faBars} />
       </button>
       
     </>
   );
-}
-
-
-       
-
-
-
-  
-
+};

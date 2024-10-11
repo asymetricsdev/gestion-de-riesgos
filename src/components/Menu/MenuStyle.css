@@ -23,6 +23,7 @@
 
 .sidebar.open {
     width: 250px;
+    
 }
 
 .sidebar .nav-link {
@@ -64,7 +65,7 @@
 
 .sidebar .nav-link.active {
     background-color: #009FE3;
-    color: whitesmoke;
+    color: #ffffff !important;
     border-radius: 3px;
     padding: 8px;
 }
