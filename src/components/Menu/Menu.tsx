@@ -246,6 +246,18 @@ const Menu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isAuthenticated }
                       </OverlayTrigger>
                     )}
                     {isOpen ? (
+                      <NavLink to="/matriz-de-peligro/configuracion/estados" className="nav-link text-white d-flex align-items-center">
+                        <i className="fa-solid fa-retweet"></i>
+                        <span>Estados</span>
+                      </NavLink>
+                    ) : (
+                      <OverlayTrigger placement="right" overlay={renderTooltip("Estados")}>
+                        <NavLink to="/matriz-de-peligro/configuracion/estados" className="nav-link text-white d-flex align-items-center">
+                        <i className="fa-solid fa-retweet"></i>
+                        </NavLink>
+                      </OverlayTrigger>
+                    )}
+                    {isOpen ? (
                       <NavLink to="/matriz-de-peligro/configuracion/criticidad-de-peligro" className="nav-link text-white d-flex align-items-center">
                         <i className="fa-solid fa-bolt"></i>
                         <span>Criticidad</span>
