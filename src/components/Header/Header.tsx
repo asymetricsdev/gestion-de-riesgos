@@ -3,19 +3,17 @@ import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import logo from '../../img/logo-asy.png'; 
 import './HeaderStyle.css'; 
 
-
 interface HeaderProps {
     toggleMenu: () => void;
+    handleLogout: () => void;
   }
 
   export default function Header({ toggleMenu }: HeaderProps){
-
     const renderLogOutTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
       <Tooltip id="button-tooltip-edit" {...props}>
         Cerrar sesión
       </Tooltip>
     );
-  
   
   return (
     <>
@@ -50,7 +48,6 @@ interface HeaderProps {
               <i className="fa-solid fa-arrow-right-from-bracket"></i>
               </Nav.Link>
               </OverlayTrigger>
-             
             </div>
           </Nav>
         </Navbar.Collapse>
@@ -58,19 +55,9 @@ interface HeaderProps {
       <button 
         className="navbar-toggler always-visible custom-button" 
         type="button" 
-        onClick={toggleMenu}
-      >
+        onClick={toggleMenu}>
         <i className="fa-solid fa-bars"></i>
       </button>
-      
     </>
   );
-}
-
-
-       
-
-
-
-  
-
+};

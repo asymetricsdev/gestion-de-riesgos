@@ -3,9 +3,9 @@
     transition: width 0.3s;
 }
 
-.sidebar.open {
+/* .sidebar.open {
     width: 250px;
-}
+} */
 
 .main-content {
     padding: 20px;
@@ -16,3 +16,22 @@
 .main-content.with-sidebar {
     margin-left: 250px;
 }
+
+/* CSS PROVISORIOS */
+/* 
+.sidebar.open {
+    width: 250px;
+    display: none;
+}
+
+.p-0{
+    display: none;
+}
+
+.custom-button{
+    display: none;
+}
+
+.header-container{
+    display: none;
+} */
