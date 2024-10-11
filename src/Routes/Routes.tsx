@@ -22,7 +22,7 @@ import Colaboradores from '../Pages/ColaboradoresPage';
 import Items from '../Pages/ItemsPage';
 import VerificadorControl from '../Pages/VerificadorControlPage';
 import JerarquiaControl from '../Pages/JerarquiaControlPage';
-import TareaColaborador from '../components/TareaColaborador/TareaColaborador';
+import TareaColaborador from '../Pages/TareaColaboradorPage';
 import ColaboradorEjecutarTarea from '../Pages/ColaboradorEjecutarTareaPage';
 import LoginPage from '../Pages/LoginPage';
 
