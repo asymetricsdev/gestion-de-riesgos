@@ -24,6 +24,7 @@ import VerificadorControl from '../Pages/VerificadorControlPage';
 import JerarquiaControl from '../Pages/JerarquiaControlPage';
 import TareaColaborador from '../Pages/TareaColaboradorPage';
 import ColaboradorEjecutarTarea from '../Pages/ColaboradorEjecutarTareaPage';
+import Estados from '../Pages/EstadosPage';
 import LoginPage from '../Pages/LoginPage';
 
 type RoutesProps = {
@@ -106,6 +107,10 @@ export const AppRoutes = ({ isAuthenticated, onLogin }: { isAuthenticated: boole
       <Route
         path="/matriz-de-peligro/configuracion/riesgos"
         element={<PrivateRoute isAuthenticated={isAuthenticated} component={<Riesgo />} />}
+      />
+       <Route
+        path="/matriz-de-peligro/configuracion/estados"
+        element={<PrivateRoute isAuthenticated={isAuthenticated} component={<Estados />} />}
       />
 
       {/* Tipos de Actividad */}
