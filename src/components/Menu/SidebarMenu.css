@@ -1,0 +1,143 @@
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  min-height: 100vh;
+  height: 100%;
+  background-color: #3C4043;
+  transition: width 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding-top: 1rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 15px;
+  scrollbar-width: thin;
+}
+
+.sidebar.open {
+  width: 250px;
+}
+
+.sidebar .nav-link {
+  padding: 10px 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  transition: background-color 0.3s, color 0.3s;
+  text-decoration: none;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #181818;
+  color: #fff;
+}
+
+.sidebar .nav-link.active {
+  background-color: #009FE3;
+  color: #ffffff !important;
+  font-weight: bold;
+  border-radius: 3px;
+  padding: 8px;
+}
+
+
+.sidebar .nav-link i {
+  margin-right: 10px;
+}
+
+.sidebar .nav-link span {
+  display: none;
+}
+
+.sidebar.open .nav-link span {
+  display: inline;
+}
+
+
+.submenu {
+  display: none;
+  flex-direction: column;
+  padding-left: 20px;
+}
+
+.submenu-open {
+  display: block;
+}
+
+.submenu .nav-link {
+  padding-left: 10px;
+}
+
+.submenu-item .nav-link {
+  color: white;
+  padding: 8px 20px;
+}
+
+.submenu-item .nav-link:hover {
+  background-color: #6c757d;
+}
+
+
+.btn-sidebar {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.fa-chevron-left, .fa-chevron-right {
+  font-size: 1.2rem;
+}
+
+.btn-sidebar:focus {
+  outline: none;
+}
+
+.sidebar.open .btn-sidebar {
+  justify-content: flex-end;
+}
+
+
+.main-content {
+  flex-grow: 1;
+  padding: 10px;
+}
+
+
+.text-custom-color {
+  color: #4285F4 !important;
+}
+
+
+.sidebar .menu {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.menu-item {
+  position: relative;
+}
+
+
+.btn-sidebar:focus {
+    
+  outline: none;
+}
+
+.sidebar.open .btn-sidebar {
+  justify-content: flex-end;
+}
+
+.nav-link span {
+  margin-left: -5px;
+}
