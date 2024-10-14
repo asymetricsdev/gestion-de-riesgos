@@ -25,6 +25,7 @@ import JerarquiaControl from '../Pages/JerarquiaControlPage';
 import TareaColaborador from '../Pages/TareaColaboradorPage';
 import ColaboradorEjecutarTarea from '../Pages/ColaboradorEjecutarTareaPage';
 import Estados from '../Pages/EstadosPage';
+import Roles from '../Pages/RolesPage';
 import LoginPage from '../Pages/LoginPage';
 
 type RoutesProps = {
@@ -143,6 +144,10 @@ export const AppRoutes = ({ isAuthenticated, onLogin }: { isAuthenticated: boole
       <Route
         path="/organizacion/procesos"
         element={<PrivateRoute isAuthenticated={isAuthenticated} component={<Proceso />} />}
+      />
+       <Route
+        path="/organizacion/roles"
+        element={<PrivateRoute isAuthenticated={isAuthenticated} component={<Roles />} />}
       />
 
       {/* Tarea Colaborador */}
