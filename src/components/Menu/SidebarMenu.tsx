@@ -5,7 +5,7 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import menuData from '../../Json/menuData.json';
 import './SidebarMenu.css';
 
-// Define los tipos
+
 interface Submenu {
   menu: string;
   id_menu: number;
@@ -94,8 +94,3 @@ const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isLoggedIn
 };
 
 export default SidebarMenu;
-
-
-
-
-
