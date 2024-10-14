@@ -11,7 +11,7 @@
       "submenu": []
     },
     {
-      "menu": "Planificacion",
+      "menu": "Planificación",
       "id_menu": 2,
       "url": "",
       "icono": "fa-solid fa-business-time",
@@ -19,7 +19,7 @@
       "indicador": "Visible",
       "submenu": [
         {
-          "menu": "Planificacion",
+          "menu": "Planificación",
           "id_menu": 1,
           "url": "/planificacion/planificacion",
           "icono": "fa-solid fa-calendar-week",
@@ -57,7 +57,7 @@
       ]
     },
     {
-      "menu": "Verificacion",
+      "menu": "Verificación",
       "id_menu": 3,
       "url": "",
       "icono": "fa-solid fa-circle-check",
