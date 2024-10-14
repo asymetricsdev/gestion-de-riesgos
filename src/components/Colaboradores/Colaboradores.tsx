@@ -2,431 +2,447 @@ import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
+import { showAlert } from "../functions";
+import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import * as bootstrap from 'bootstrap';
-import { useNavigate } from 'react-router-dom'; 
-
+import * as bootstrap from "bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const MySwal = withReactContent(Swal);
 interface Colaboradores {
-  id: number;
-  name: string;
-  description: string;
-  rut: string;
-  firstName: string;
-  lastName: string;
-  createDate?: string;
-  updateDate?: string;
-  position: Position;
+	id: number;
+	name: string;
+	description: string;
+	rut: string;
+	firstName: string;
+	lastName: string;
+	createDate?: string;
+	updateDate?: string;
+	position: Position;
 }
 
 interface Position {
-  id: number;
-  name: string;
-  description: string;
-  createDate?: string;
-  updateDate?: string;
+	id: number;
+	name: string;
+	description: string;
+	createDate?: string;
+	updateDate?: string;
 }
 
 interface EmpleadoData {
-  rut: string;
-  firstName: string;
-  lastName: string;
-  positionId: number;
+	rut: string;
+	firstName: string;
+	lastName: string;
+	positionId: number;
 }
 
-
 const Colaboradores: React.FC = () => {
-  const baseURL = import.meta.env.VITE_API_URL;
-  const [empleado, setEmpleado] = useState<Colaboradores[]>([]);
-  const [id, setId] = useState<number | null>(null);
-  const [name, setName] = useState<string>("");
-  const [description, setDescription] = useState<string>(""); 
-  const [rut, setRut] = useState<string>("");
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [position, setPosition] = useState<Position[]>([]);
-  const [selectedPositionId, setSelectedPositionId] = useState<number>(0);
-  const [title, setTitle] = useState<string>("");
-  const modalRef = useRef<HTMLDivElement | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false); 
-  const [pendingRequests, setPendingRequests] = useState<number>(0);
+	const baseURL = import.meta.env.VITE_API_URL;
+	const [empleado, setEmpleado] = useState<Colaboradores[]>([]);
+	const [id, setId] = useState<number | null>(null);
+	const [name, setName] = useState<string>("");
+	const [description, setDescription] = useState<string>("");
+	const [rut, setRut] = useState<string>("");
+	const [firstName, setFirstName] = useState<string>("");
+	const [lastName, setLastName] = useState<string>("");
+	const [position, setPosition] = useState<Position[]>([]);
+	const [selectedPositionId, setSelectedPositionId] = useState<number>(0);
+	const [title, setTitle] = useState<string>("");
+	const modalRef = useRef<HTMLDivElement | null>(null);
+	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(false);
+	const [pendingRequests, setPendingRequests] = useState<number>(0);
 
+	useEffect(() => {
+		getEmpleado();
+		getPosition();
+		if (modalRef.current) {
+			modalRef.current.addEventListener("hidden.bs.modal", handleModalHidden);
+		}
+		return () => {
+			if (modalRef.current) {
+				modalRef.current.removeEventListener("hidden.bs.modal", handleModalHidden);
+			}
+		};
+	}, []);
 
-  useEffect(() => {
-    getEmpleado();
-    getPosition();
-    if (modalRef.current) {
-      modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
-    }
-    return () => {
-      if (modalRef.current) {
-        modalRef.current.removeEventListener('hidden.bs.modal', handleModalHidden);
-      }
-    };
-  }, []);
+	const getEmpleado = async () => {
+		setPendingRequests((prev) => prev + 1);
+		try {
+			const response: AxiosResponse<Colaboradores[]> = await axios.get(`${baseURL}/employee/`);
+			setEmpleado(response.data);
+		} catch (error) {
+			showAlert("Error al obtener el cargo del colaborador", "error");
+		} finally {
+			setPendingRequests((prev) => prev - 1);
+		}
+	};
 
-  const getEmpleado = async () => {
-    setPendingRequests(prev => prev + 1);
-    try {
-      const response: AxiosResponse<Colaboradores[]> = await axios.get(`${baseURL}/employee/`);
-      setEmpleado(response.data);
-    } catch (error) {
-      showAlert("Error al obtener el cargo del colaborador", "error");
-    } finally {
-      setPendingRequests(prev => prev - 1);
-    }
-  };
-  
-  const getPosition = async () => {
-    setPendingRequests(prev => prev + 1);
-    try {
-      const response: AxiosResponse<Position[]> = await axios.get(`${baseURL}/position/`);
+	const getPosition = async () => {
+		setPendingRequests((prev) => prev + 1);
+		try {
+			const response: AxiosResponse<Position[]> = await axios.get(`${baseURL}/position/`);
 
-      setPosition(response.data);
-    } catch (error) {
-      showAlert("Error al obtener el cargo del colaborador", "error");
-    } finally {
-      setPendingRequests(prev => prev - 1); 
-    }
-  };
-  
-  const openModal = (op: string, empleado?: Colaboradores) => {
-    if (op === "1") {
-      setId(null);
-      setName("");
-      setDescription(""); 
-      setRut("");
-      setFirstName("");
-      setLastName("");
-      setSelectedPositionId(0);
-      setTitle("Registrar Colaborador");
-    } else if (op === "2" && empleado) {
-      setId(empleado.id);
-      setName(empleado.name);
-      setDescription(empleado.description); 
-      setRut(empleado.rut);
-      setFirstName(empleado.firstName);
-      setLastName(empleado.lastName);
-      setSelectedPositionId(empleado.position.id);
-      setTitle("Editar colaborador");
-    }
+			setPosition(response.data);
+		} catch (error) {
+			showAlert("Error al obtener el cargo del colaborador", "error");
+		} finally {
+			setPendingRequests((prev) => prev - 1);
+		}
+	};
 
-    if (modalRef.current) {
-      const modal = new bootstrap.Modal(modalRef.current);
-      modal.show();
-      setIsModalOpen(true);
-    }
-  };
+	const openModal = (op: string, empleado?: Colaboradores) => {
+		if (op === "1") {
+			setId(null);
+			setName("");
+			setDescription("");
+			setRut("");
+			setFirstName("");
+			setLastName("");
+			setSelectedPositionId(0);
+			setTitle("Registrar Colaborador");
+		} else if (op === "2" && empleado) {
+			setId(empleado.id);
+			setName(empleado.name);
+			setDescription(empleado.description);
+			setRut(empleado.rut);
+			setFirstName(empleado.firstName);
+			setLastName(empleado.lastName);
+			setSelectedPositionId(empleado.position.id);
+			setTitle("Editar colaborador");
+		}
 
-  const handleModalHidden = () => {
-    setIsModalOpen(false);
-    const modals = document.querySelectorAll('.modal-backdrop');
-    modals.forEach(modal => modal.parentNode?.removeChild(modal));
-  };
+		if (modalRef.current) {
+			const modal = new bootstrap.Modal(modalRef.current);
+			modal.show();
+			setIsModalOpen(true);
+		}
+	};
 
-  const validar = (): void => {
-    if (firstName.trim() === "") {
-        showAlert("Escribe el nombre del colaborador", "warning");
-        return;
-    }
+	const handleModalHidden = () => {
+		setIsModalOpen(false);
+		const modals = document.querySelectorAll(".modal-backdrop");
+		modals.forEach((modal) => modal.parentNode?.removeChild(modal));
+	};
 
-    if (lastName.trim() === "") {
-        showAlert("Escribe el apellido del colaborador", "warning");
-        return;
-    }
+	const validar = (): void => {
+		if (firstName.trim() === "") {
+			showAlert("Escribe el nombre del colaborador", "warning");
+			return;
+		}
 
-    if (rut.trim() === "") {
-        showAlert("Escribe el rut del colaborador", "warning");
-        return;
-    }
+		if (lastName.trim() === "") {
+			showAlert("Escribe el apellido del colaborador", "warning");
+			return;
+		}
 
-     if (!validarRut(rut.trim())) {
-    showAlert("El RUT ingresado no es válido", "warning");
-    return;
-    } 
+		if (rut.trim() === "") {
+			showAlert("Escribe el rut del colaborador", "warning");
+			return;
+		}
 
-    if (selectedPositionId === 0) {
-        showAlert("Escribe el cargo del colaborador", "warning");
-        return;
-    }
-    setLoading(true);
-    
-      const parametros: EmpleadoData = {
-        rut: rut.trim(),
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        positionId:  selectedPositionId               
-    };  
+		if (!validarRut(rut.trim())) {
+			showAlert("El RUT ingresado no es válido", "warning");
+			return;
+		}
 
+		if (selectedPositionId === 0) {
+			showAlert("Escribe el cargo del colaborador", "warning");
+			return;
+		}
+		setLoading(true);
 
-    const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
-    enviarSolicitud(metodo, parametros); 
-};
+		const parametros: EmpleadoData = {
+			rut: rut.trim(),
+			firstName: firstName.trim(),
+			lastName: lastName.trim(),
+			positionId: selectedPositionId,
+		};
 
-   const enviarSolicitud = async (method: "POST" | "PUT", data: EmpleadoData) => {
-    setLoading(true);
-    try {
-      const url = method === "PUT" && id ? `${baseURL}/employee/${id}` : `${baseURL}/employee/`;
-      const response = await axios({
-        method,
-        url,
-        data,
-        headers: { "Content-Type": "application/json" },
-      });
-  
-      showAlert("Operación realizada con éxito", "success");
-      getEmpleado();
-      if (modalRef.current) {
-        const modal = bootstrap.Modal.getInstance(modalRef.current);
-        modal?.hide();
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
-      } else {
-        showAlert("Error al realizar la solicitud", "error");
-      }
-    } finally {
-      setLoading(false);
-    }
-  }; 
+		const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
+		enviarSolicitud(metodo, parametros);
+	};
 
+	const enviarSolicitud = async (method: "POST" | "PUT", data: EmpleadoData) => {
+		setLoading(true);
+		try {
+			const url = method === "PUT" && id ? `${baseURL}/employee/${id}` : `${baseURL}/employee/`;
+			const response = await axios({
+				method,
+				url,
+				data,
+				headers: { "Content-Type": "application/json" },
+			});
 
-  const deleteEmpleado = async (id: number) => {
-    setLoading(true);
-    try {
-      await axios.delete(`${baseURL}/employee/${id}`, {
-        headers: { "Content-Type": "application/json" },
-      });
-      Swal.fire("Colaborador eliminado correctamente", "", "success");
-      getEmpleado();
-    } catch (error) {
-      Swal.fire({
-        title: "Error",
-        text: "Error al eliminar el Colaborador.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+			showAlert("Operación realizada con éxito", "success");
+			getEmpleado();
+			if (modalRef.current) {
+				const modal = bootstrap.Modal.getInstance(modalRef.current);
+				modal?.hide();
+			}
+		} catch (error) {
+			if (axios.isAxiosError(error) && error.response) {
+				showAlert(
+					`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`,
+					"error"
+				);
+			} else {
+				showAlert("Error al realizar la solicitud", "error");
+			}
+		} finally {
+			setLoading(false);
+		}
+	};
 
-  const renderTareasTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-    <Tooltip id="button-tooltip-edit" {...props}>
-      Ver Tareas
-    </Tooltip>
-  );
-  const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-    <Tooltip id="button-tooltip-edit" {...props}>
-      Editar
-    </Tooltip>
-  );
+	const deleteEmpleado = async (id: number) => {
+		setLoading(true);
+		try {
+			await axios.delete(`${baseURL}/employee/${id}`, {
+				headers: { "Content-Type": "application/json" },
+			});
+			showAlert("Colaborador eliminada correctamente", "success");
+			getEmpleado();
+		} catch (error) {
+			if (axios.isAxiosError(error)) {
+			} else {
+			}
+			showAlert(
+				"Database error: could not execute statement; SQL [n/a]; constraint [null]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement",
+				"error"
+			);
+		} finally {
+			setLoading(false);
+		}
+	};
 
-  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-    <Tooltip id="button-tooltip-delete" {...props}>
-      Eliminar
-    </Tooltip>
-  );
+	const renderTareasTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-edit" {...props}>
+			Ver Tareas
+		</Tooltip>
+	);
+	const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-edit" {...props}>
+			Editar
+		</Tooltip>
+	);
 
-  const formatDate = (dateString: string) => {
-    return dateString.split('T')[0];
-  };
+	const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+		<Tooltip id="button-tooltip-delete" {...props}>
+			Eliminar
+		</Tooltip>
+	);
 
+	const formatDate = (dateString: string) => {
+		return dateString.split("T")[0];
+	};
 
-  const validarRut = (rut: string): boolean => {
-    const rutSinFormato = rut.replace(/\./g, "").replace(/-/g, "");
-  
-    const rutNumero = rutSinFormato.slice(0, -1);
-    const verificador = rutSinFormato.slice(-1).toUpperCase();
-  
-    if (rutNumero.length < 7 || rutNumero.length > 8) {
-      return false;
-    }
-  
-    let suma = 0;
-    let multiplicador = 2;
-  
-    for (let i = rutNumero.length - 1; i >= 0; i--) {
-      suma += Number(rutNumero.charAt(i)) * multiplicador;
-      multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
-    }
-  
-    const residuo = suma % 11;
-    const digitoCalculado = residuo === 0 ? "0" : residuo === 1 ? "K" : String(11 - residuo);
-  
-    return digitoCalculado === verificador;
-  }; 
+	const validarRut = (rut: string): boolean => {
+		const rutSinFormato = rut.replace(/\./g, "").replace(/-/g, "");
 
-  const navigate = useNavigate();
+		const rutNumero = rutSinFormato.slice(0, -1);
+		const verificador = rutSinFormato.slice(-1).toUpperCase();
 
-  const verTareas = (empId: number) => {
-    navigate(`/tarea-colaborador/${empId}`);
-  };
+		if (rutNumero.length < 7 || rutNumero.length > 8) {
+			return false;
+		}
 
-  
-  return (
-    <div className="App">
-      <div className="container-fluid">
-        <div className="row mt-3">
-          <div className="col-12">
-            <div className="tabla-contenedor">
-              <EncabezadoTabla title='Colaboradores' onClick={() => openModal("1")} />
-            </div>
-            {pendingRequests > 0 ? (
-            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
-              <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
-                <span className="visually-hidden">Loading...</span>
-              </Spinner>
-            </div>
-            ) : (
-            <div className="table-responsive">
-              <table className="table table-bordered">
-                <thead className="text-center"
-                  style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
-                  <tr>
-                    <th>N°</th>
-                    <th>Rut</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Cargo</th>
-                    <th>Ver Tareas</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="table-group-divider">
-                  {empleado.map((emp, i) => (
-                    <tr key={JSON.stringify(emp)} className="text-center">
-                      <td>{i + 1}</td>
-                      <td>{emp.rut}</td>
-                      <td>{emp.firstName}</td>
-                      <td>{emp.lastName}</td>
-                      <td>{emp.position.name}</td> 
-                      <td>
-                        <OverlayTrigger placement="top" overlay={renderTareasTooltip({})}>
-                          <button className="btn btn-custom-tareas m-2" onClick={() => verTareas(emp.id)}>
-                            <i className="fa-solid fa-list-check"></i>
-                          </button>
-                        </OverlayTrigger>
-                      </td>
-                      <td className="text-center">
-                        <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
-                          <button
-                            onClick={() => openModal("2", emp)}
-                            className="btn btn-custom-editar m-2"
-                          >
-                            <i className="fa-solid fa-edit"></i>
-                          </button>
-                        </OverlayTrigger>
-                        <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
-                          <button className="btn btn-custom-danger" onClick={() => {
-                            MySwal.fire({
-                              title: "¿Estás seguro?",
-                              text: "No podrás revertir esto",
-                              icon: "warning",
-                              showCancelButton: true,
-                              confirmButtonText: "Sí, bórralo",
-                              cancelButtonText: "Cancelar",
-                            }).then((result) => {
-                              if (result.isConfirmed) {
-                                deleteEmpleado(emp.id);
-                              }
-                            });
-                          }}>
-                            <i className="fa-solid fa-circle-xmark"></i>
-                          </button>
-                        </OverlayTrigger>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            )}
-          </div>
-        </div>
-        <div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
-          <div className="modal-dialog modal-dialog-top modal-md">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title w-100">{title}</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                  <i className="fa-solid fa-id-card-clip"></i>
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Nombre"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                  />
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                  <i className="fa-solid fa-id-card-clip"></i>
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Apellidos"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                  <i className="fa-solid fa-id-card-clip"></i>
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Rut ej. 12345678-9"
-                    value={rut}
-                    onChange={(e) => setRut(e.target.value)}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="position" className="form-label">Cargo:</label>
-                  <select
-                    id="position"
-                    className="form-select"
-                    value={selectedPositionId}
-                    onChange={(e) => setSelectedPositionId(Number(e.target.value))}
-                  >
-                    <option value={0}>Selecciona...</option>
-                    {position.map(pos => (
-                      <option key={JSON.stringify(pos)} value={pos.id}>{pos.name}</option>
-                    ))}
-                  </select>
-                </div> 
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                  id="btnCerrar"
-                >
-                  Cerrar
-                </button>
-                <button
+		let suma = 0;
+		let multiplicador = 2;
+
+		for (let i = rutNumero.length - 1; i >= 0; i--) {
+			suma += Number(rutNumero.charAt(i)) * multiplicador;
+			multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+		}
+
+		const residuo = suma % 11;
+		const digitoCalculado = residuo === 0 ? "0" : residuo === 1 ? "K" : String(11 - residuo);
+
+		return digitoCalculado === verificador;
+	};
+
+	const navigate = useNavigate();
+
+	const verTareas = (empId: number) => {
+		navigate(`/tarea-colaborador/${empId}`);
+	};
+
+	return (
+		<div className="App">
+			<div className="container-fluid">
+				<div className="row mt-3">
+					<div className="col-12">
+						<div className="tabla-contenedor">
+							<EncabezadoTabla title="Colaboradores" onClick={() => openModal("1")} />
+						</div>
+						{pendingRequests > 0 ? (
+							<div
+								className="d-flex justify-content-center align-items-center"
+								style={{ height: "100vh", marginTop: "-200px" }}
+							>
+								<Spinner animation="border" role="status" style={{ color: "#A17BB6" }}>
+									<span className="visually-hidden">Loading...</span>
+								</Spinner>
+							</div>
+						) : (
+							<div className="table-responsive tabla-scroll">
+								<table className="table table-bordered">
+									<thead
+										className="text-center"
+										style={{
+											background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
+											color: "#fff",
+										}}
+									>
+										<tr>
+											<th>N°</th>
+											<th>Rut</th>
+											<th>Nombre</th>
+											<th>Apellido</th>
+											<th>Cargo</th>
+											<th>Ver Tareas</th>
+											<th>Acciones</th>
+										</tr>
+									</thead>
+									<tbody className="table-group-divider">
+										{empleado.map((emp, i) => (
+											<tr key={JSON.stringify(emp)} className="text-center">
+												<td>{i + 1}</td>
+												<td>{emp.rut}</td>
+												<td>{emp.firstName}</td>
+												<td>{emp.lastName}</td>
+												<td>{emp.position.name}</td>
+												<td>
+													<OverlayTrigger placement="top" overlay={renderTareasTooltip({})}>
+														<button
+															className="btn btn-custom-tareas m-2"
+															onClick={() => verTareas(emp.id)}
+														>
+															<i className="fa-solid fa-list-check"></i>
+														</button>
+													</OverlayTrigger>
+												</td>
+												<td className="text-center">
+													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
+														<button
+															onClick={() => openModal("2", emp)}
+															className="btn btn-custom-editar m-2"
+														>
+															<i className="fa-solid fa-edit"></i>
+														</button>
+													</OverlayTrigger>
+													<OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+														<button
+															className="btn btn-custom-danger"
+															onClick={() => {
+																MySwal.fire({
+																	title: "¿Estás seguro?",
+																	text: "No podrás revertir esto",
+																	icon: "warning",
+																	showCancelButton: true,
+																	confirmButtonText: "Sí, bórralo",
+																	cancelButtonText: "Cancelar",
+																}).then((result) => {
+																	if (result.isConfirmed) {
+																		deleteEmpleado(emp.id);
+																	}
+																});
+															}}
+														>
+															<i className="fa-solid fa-circle-xmark"></i>
+														</button>
+													</OverlayTrigger>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+						)}
+					</div>
+				</div>
+				<div className="modal fade" id="modalHazzard" tabIndex={-1} ref={modalRef}>
+					<div className="modal-dialog modal-dialog-top modal-md">
+						<div className="modal-content">
+							<div className="modal-header">
+								<h5 className="modal-title w-100">{title}</h5>
+								<button
+									type="button"
+									className="btn-close"
+									data-bs-dismiss="modal"
+									aria-label="Close"
+								></button>
+							</div>
+							<div className="modal-body">
+								<div className="input-group mb-3">
+									<span className="input-group-text">
+										<i className="fa-solid fa-id-card-clip"></i>
+									</span>
+									<input
+										type="text"
+										className="form-control"
+										placeholder="Nombre"
+										value={firstName}
+										onChange={(e) => setFirstName(e.target.value)}
+									/>
+								</div>
+								<div className="input-group mb-3">
+									<span className="input-group-text">
+										<i className="fa-solid fa-id-card-clip"></i>
+									</span>
+									<input
+										type="text"
+										className="form-control"
+										placeholder="Apellidos"
+										value={lastName}
+										onChange={(e) => setLastName(e.target.value)}
+									/>
+								</div>
+								<div className="input-group mb-3">
+									<span className="input-group-text">
+										<i className="fa-solid fa-id-card-clip"></i>
+									</span>
+									<input
+										type="text"
+										className="form-control"
+										placeholder="Rut ej. 12345678-9"
+										value={rut}
+										onChange={(e) => setRut(e.target.value)}
+									/>
+								</div>
+								<div className="mb-3">
+									<label htmlFor="position" className="form-label">
+										Cargo:
+									</label>
+									<select
+										id="position"
+										className="form-select"
+										value={selectedPositionId}
+										onChange={(e) => setSelectedPositionId(Number(e.target.value))}
+									>
+										<option value={0}>Selecciona...</option>
+										{position.map((pos) => (
+											<option key={JSON.stringify(pos)} value={pos.id}>
+												{pos.name}
+											</option>
+										))}
+									</select>
+								</div>
+							</div>
+							<div className="modal-footer">
+								<button
+									type="button"
+									className="btn btn-secondary"
+									data-bs-dismiss="modal"
+									id="btnCerrar"
+								>
+									Cerrar
+								</button>
+								<button
 									type="button"
 									className="btn btn-primary"
 									onClick={validar}
-									disabled={loading}>
+									disabled={loading}
+								>
 									{loading ? (
 										<span
 											className="spinner-border spinner-border-sm"
@@ -437,13 +453,13 @@ const Colaboradores: React.FC = () => {
 										"Guardar"
 									)}
 								</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default Colaboradores;

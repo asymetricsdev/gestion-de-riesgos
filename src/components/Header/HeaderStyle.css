@@ -16,16 +16,22 @@
 
 .custom-icon .fa-circle-info,
 .custom-icon .fa-bell,
-.custom-icon .fa-circle-question {
-    color: #E6007D;
+.custom-icon .fa-circle-question,
+.custom-icon .fa-arrow-right-from-bracket{
+    color: #ce0875;
     margin: 0 0.1rem;
     transition: color 0.3s ease;
 }
 
 .custom-icon:hover .fa-circle-info,
 .custom-icon:hover .fa-bell,
-.custom-icon:hover .fa-circle-question {
-    color: #ce0875; 
+.custom-icon:hover .fa-circle-question,
+.custom-icon .fa-arrow-right-from-bracket{
+    color: #E6007D; 
+}
+
+.custom-icon .fa-arrow-right-from-bracket {
+   font-size: 25px;
 }
 
 .nav-link {

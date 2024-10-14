@@ -350,7 +350,7 @@ const Planning: React.FC = () => {
 								</Spinner>
 							</div>
 						) : (
-							<div className="table-responsive">
+							<div className="table-responsive tabla-scroll">
 								<table className="table table-bordered">
 									<thead
 										className="text-center"
@@ -380,8 +380,8 @@ const Planning: React.FC = () => {
 																<table className="w-100">
 																	<tbody>
 																		<tr>
-																			<td className="text-start">{emp.rut}</td>
-																			<td className="text-start">{emp.name}</td>
+																			<td className="text-start w-25">{emp.rut}</td>
+																			<td className="text-start w-45">{emp.name}</td>
 																		</tr>
 																	</tbody>
 																</table>

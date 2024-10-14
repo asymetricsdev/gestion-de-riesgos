@@ -130,7 +130,7 @@ useEffect(() => {
               </Spinner>
             </div>
             ) : (
-            <div className="table-responsive">
+            <div className="table-responsive tabla-scroll">
               <table className="table table-bordered">
                 <thead
                   className="text-center"

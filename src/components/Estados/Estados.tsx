@@ -9,34 +9,47 @@ import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-interface Compañia {
+interface Estado {
+  id: number;
+  name: string;
+  description: string;
+  taskType: TaskType;
+}
+
+interface TaskType{
   id: number;
   name: string;
   description: string;
   createDate: string;
+  updateDate: string;
 }
 
-interface CompañiaData {
+interface EstadoData {
+  id?: number;
   name: string;
   description: string;
+  taskTypeId: number;
 }
 
-const Company: React.FC = () => {
+
+const Estados: React.FC = () => {
 
   const baseURL = import.meta.env.VITE_API_URL;
-  const [company, setProcess] = useState<Compañia[]>([]);
+  const [estados, setEstados] = useState<Estado[]>([]);
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [tipoTareas, setTipoTareas] = useState<TaskType[]>([]);
+  const [selectedTipoTareaId, setSelectedTipoTareaId] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false); 
   const [pendingRequests, setPendingRequests] = useState<number>(0);
 
-
   useEffect(() => {
-    getCompany();
+    getEstados();
+    getTipoTareas();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -47,11 +60,11 @@ const Company: React.FC = () => {
     };
   }, []);
 
-  const getCompany = async () => {
+  const getEstados = async () => {
     setPendingRequests(prev => prev + 1);
     try {
-      const response: AxiosResponse<Compañia[]> = await axios.get(`${baseURL}/company/`);
-      setProcess(response.data);
+      const response: AxiosResponse<Estado[]> = await axios.get(`${baseURL}/status/`);
+      setEstados(response.data);
     } catch (error) {
       showAlert("Error al obtener Compañia", "error");
     } finally {
@@ -59,25 +72,42 @@ const Company: React.FC = () => {
     }
   };
 
-  
-  const openModal = (op: string, company?: Compañia) => {
-    if (company) {
-      setId(company.id);
-      setName(company.name);
-      setDescription(company.description);
-    } else {
+  const getTipoTareas = async () => {
+    setPendingRequests(prev => prev + 1);
+    try {
+      const response: AxiosResponse<TaskType[]> = await axios.get(`${baseURL}/task_type/`);
+      console.log('Tipo de tareas:', response.data); 
+      setTipoTareas(response.data);
+    } catch (error) {
+      showAlert("Error al obtener tipo de tarea", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  
+    }
+  };
+
+ 
+  const openModal = (op: string, estado?: Estado) => {
+    if (op === "1") {
       setId(null);
       setName("");
       setDescription("");
+      setSelectedTipoTareaId(0);
+      setTitle("Registrar Estado");
+    } else if (op === "2" && estado) {
+      setId(estado.id);
+      setName(estado.name);
+      setDescription(estado.description);
+      setSelectedTipoTareaId(estado.taskType?.id || 0);
+      setTitle("Editar Estado");
     }
-    setTitle(op === "1" ? "Registrar Compañia" : "Editar Compañia");
 
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
       modal.show();
       setIsModalOpen(true);
     }
-  };
+
+  }
 
   const handleModalHidden = () => {
     setIsModalOpen(false);
@@ -85,7 +115,7 @@ const Company: React.FC = () => {
     modals.forEach(modal => modal.parentNode?.removeChild(modal));
   };
 
-  const validar = () => {
+   const validar = () => {
     if (name.trim() === "") {
       showAlert("Escribe el nombre", "warning", "nombre del Compañia");
       return;
@@ -94,20 +124,26 @@ const Company: React.FC = () => {
       showAlert("Escribe la descripción", "warning", "descripción");
       return;
     }
+    if (selectedTipoTareaId === 0) {
+      showAlert("Selecciona un tipo de tarea", "warning");
+      return;
+    } 
     setLoading(true);
     
-    const parametros: CompañiaData = { 
+    const parametros: EstadoData = { 
       name: name.trim(), 
-      description: description.trim() };
+      description: description.trim(),
+      taskTypeId: selectedTipoTareaId
+    };
 
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
-
-  const enviarSolicitud = async (method: "POST" | "PUT", data: CompañiaData) => {
+ 
+  const enviarSolicitud = async (method: "POST" | "PUT", data: EstadoData ) => {
     setLoading(true);
     try {
-      const url = method === "PUT" && id ? `${baseURL}/company/${id}` : `${baseURL}/company/`;
+      const url = method === "PUT" && id ? `${baseURL}/status/${id}` : `${baseURL}/status/`;
       const response = await axios({
       method,
       url,
@@ -116,7 +152,7 @@ const Company: React.FC = () => {
       });
     
       showAlert("Operación realizada con éxito", "success");
-      getCompany();
+      getEstados();
       if (modalRef.current) {
       const modal = bootstrap.Modal.getInstance(modalRef.current);
       modal?.hide();
@@ -132,18 +168,18 @@ const Company: React.FC = () => {
     }
   }; 
 
-  const deleteCompany = async (id: number) => {
+  const deleteEstado = async (id: number) => {
     setLoading(true);
     try {
-      await axios.delete(`${baseURL}/company/${id}`, {
+      await axios.delete(`${baseURL}/status/${id}`, {
         headers: { "Content-Type": "application/json" },
       });
-      Swal.fire("Compañia eliminado correctamente", "", "success");
-      getCompany();
+      Swal.fire("Estado eliminado correctamente", "", "success");
+       getEstados();
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Error al eliminar el Compañia.",
+        text: "Error al eliminar el estado.",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -164,17 +200,14 @@ const Company: React.FC = () => {
 		</Tooltip>
 	  );
 
-    const formatDate = (dateString: string) => {
-    return dateString.split('T')[0];
-  };
-
+    
   return (
     <div className="App">
       <div className="container-fluid">
         <div className="row mt-3">
           <div className="col-12">
             <div className="tabla-contenedor">
-              <EncabezadoTabla title='Compañías' onClick={() => openModal("1")} />
+              <EncabezadoTabla title='Estados' onClick={() => openModal("1")} />
             </div>
             {pendingRequests > 0 ? (
             <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
@@ -192,21 +225,21 @@ const Company: React.FC = () => {
                     <th>N°</th>
                     <th>Nombre</th>
                     <th>Descripción </th>
-                    <th>Fecha</th>
+                    <th>Tipo de Tarea</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                  {company.map((comp, i) => (
-                    <tr key={comp.id} className="text-center">
+                {estados?.length > 0 && estados.map((est, i) => (
+                    <tr key={est?.id || i} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{comp.name}</td>
-                      <td>{comp.description}</td>
-                      <td>{formatDate(comp.createDate)}</td>
+                      <td>{est?.name || "Sin nombre"}</td>
+                      <td>{est?.description || "Sin descripción"}</td>
+                      <td>{est.taskType?.name || "No hay Tipo de Tarea"}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button
-                        onClick={() => openModal("2", comp)}
+                        onClick={() => openModal("2", est)}
                         className="btn btn-custom-editar m-2"
                         data-bs-toggle="modal"
                         data-bs-target="#modalUsers">
@@ -224,7 +257,7 @@ const Company: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              deleteCompany(comp.id);
+                               deleteEstado(est.id);
                             }
                           });
                         }}>
@@ -233,7 +266,7 @@ const Company: React.FC = () => {
                       </OverlayTrigger>
                       </td>
                     </tr>
-                  ))}
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -256,13 +289,13 @@ const Company: React.FC = () => {
                 <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-building"></i>
+                  <i className="fa-solid fa-retweet"></i>
                   </span>
                   <input
                     type="text"
                     id="nombre"
                     className="form-control"
-                    placeholder="Nombre del Compañia"
+                    placeholder="Nombre del Estado"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -280,6 +313,22 @@ const Company: React.FC = () => {
                     onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
+                <div className="mb-3">
+									<label htmlFor="typeTask">Jefatura:</label>
+									<select
+										id="typeTask"
+										className="form-select"
+										value={selectedTipoTareaId}
+										onChange={(e) => setSelectedTipoTareaId(Number(e.target.value))}
+									>
+										<option value={0}>Selecciona...</option>
+										{tipoTareas.map((tt) => (
+											<option key={tt.id} value={tt.id}>
+												{tt.name}
+											</option>
+										))}
+									</select>
+								</div>
                 <div className="input-group mb-3">
                 </div>
               </div>
@@ -293,20 +342,21 @@ const Company: React.FC = () => {
                   Cerrar
                 </button>
                 <button
-									type="button"
-									className="btn btn-primary"
-									onClick={validar}
-									disabled={loading}>
-									{loading ? (
-										<span
-											className="spinner-border spinner-border-sm"
-											role="status"
-											aria-hidden="true"
-										></span>
-									) : (
-										"Guardar"
-									)}
-								</button>
+                type="button"
+                className="btn btn-primary"
+                onClick={validar}
+                disabled={loading}>
+                {loading ? (
+                    <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                    ></span>
+                ) : (
+                    "Guardar"
+                )}
+            </button>
+									
               </div>
             </div>
           </div>
@@ -317,5 +367,5 @@ const Company: React.FC = () => {
   );
 };
 
-export default Company;
+export default Estados;
 
