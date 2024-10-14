@@ -1,55 +1,15 @@
-.sidebar {
-    position: sticky; 
-    top: 0;
-    /* width: 100vh;    */
-     min-height: 100vh;   
-    /* min-width: 38vh;    */
-    height: 100%;
-    background-color: #3C4043;
-    transition: width 0.3s ease;
-    z-index: 1000;
-    display: flex; 
-    flex-direction: column;
-    padding-top: 1rem;
-    overflow-y: auto; 
-    overflow-x: hidden;
-    padding-right: 15px; 
-    scrollbar-width: thin; 
-}
+
 
 .text-custom-color {
     color: #4285F4 !important;
 }
 
-.sidebar.open {
-    width: 250px;
-    
-}
 
-.sidebar .nav-link {
-    padding: 10px 15px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: white;
-    display: flex;
-    align-items: center;
-    transition: background-color 0.3s, color 0.3s;
-    text-decoration: none;
-}
-
-/* Estilos cuando el usuario hace hover (pasa el cursor por encima) */
 .sidebar .nav-link:hover {
     background-color: #181818; 
     color: #fff; 
 }
 
-/* Estilos cuando el enlace está activo */
-.sidebar .nav-link.active {
-    background-color: #007bff; 
-    color: #fff; 
-    font-weight: bold; 
-}
 
 .sidebar .nav-link i {
     margin-right: 10px;
@@ -63,12 +23,7 @@
     display: inline;
 }
 
-.sidebar .nav-link.active {
-    background-color: #009FE3;
-    color: #ffffff !important;
-    border-radius: 3px;
-    padding: 8px;
-}
+
 
 .main-content {
     flex-grow: 1;
@@ -99,19 +54,8 @@
     justify-content: center;
     width: 100%; 
     padding: 0.5rem; 
+    padding-top: 0px;
   }
-
-  /* .arrow-circle {
-    background-color: white;
-    color: black;
-    margin-left: 234px;
-    clip-path: circle(60% at 92%);
-    height: 30px;
-    width: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  } */
     
   
 .btn-sidebar:focus {
@@ -124,6 +68,6 @@
 }
   
 .nav-link span {
-    margin-left: -5px; /* Si aún quieres un pequeño espacio, ajusta este valor */
+    margin-left: -5px;
 }
 
