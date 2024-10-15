@@ -11,75 +11,91 @@ import Swal from "sweetalert2";
 import "./ColaboradorEjecutarTarea.css";
 
 
-interface TaskExecution {
+type TaskExecution = {
+  id: number;
+  executedAt: string;
+  employee: Employee;
+  task: Task;
+  checker: Checker;
+  plannings: Planning[];
+  files: FileData[];
+  checkpointExecutions: {
 	id: number;
-	createDate: string;
-	updateDate: string;
-	createdAt: string;
 	executedAt: string;
-	checkpoint: Checkpoint;
-	employee: Colaboradores;
-	task: Task;
-	checker: Checker;
-	planning: Planning;
-	files: FileData[];
+	checkpoint: {
+	  id: number;
+	  name: string;
+	};
+	status: {
+	  id: number;
+	  name: string;
+	};
+	lastExecution: string;
+  }[];
+};
 
-}
+
+/* interface CheckpointExecution {
+    id: number;
+    executedAt: string;
+    checkpoint: Checkpoint;
+    status: Status;
+    lastExecution: string;
+} */
 
 interface Checkpoint {
-	id: number;
-	name: string;
+    id: number;
+    name: string;
 }
 
 interface Task {
-	id: number;
-	name: string;
-	description: string;
+    id: number;
+    name: string;
+    description?: string; // Mantener como opcional si no siempre está presente
 }
 
 interface Checker {
-	id: number;
-	name: string;
-	checkpoints: Checkpoint[];
+    id: number;
+    name: string;
 }
 
 interface Status {
-	id: number;
-	name: string;
+    id: number;
+    name: string;
 }
 
 interface Planning {
-	id: number;
-	name: string;
-	description: string;
+    id: number;
+    name: string;
+    description?: string; // Hacer opcional si no siempre está presente
 }
-interface Colaboradores {
-	id: number;
-	name: string;
-	rut: string;
-	position: {
-	name: string;
-	};
+
+interface Employee {
+    id: number;
+    name: string;
+    rut?: string;
+    position?: {
+        name: string;
+    };
 }
 
 interface FileData {
-	id: number;
-    createDate : string;
-    updateDate: string;
+    id: number;
     executedAt: string;
     fileName: string;
     mimeType: string;
-    content: string;
-	fileExtension: string;
+    createDate?: string;
+    updateDate?: string;
+    content?: string;
+    fileExtension?: string;
 }
-
 const ColaboradorEjecutarTarea: React.FC = () => {
 	const baseURL = import.meta.env.VITE_API_URL;
 	const { empId, taskId } = useParams<{ empId: string; taskId: string }>();
-	const [tasks, setTasks] = useState<TaskExecution[] | null>(null);
+	const [taskExecution, setTaskExecution] = useState<TaskExecution | null>(null);
+	const [ task, setTask ] = useState<Task | null>(null);
 	const [status, setStatus] = useState<Status[]>([]);
 	const [title, setTitle] = useState<string>("");
-	const [colaboradores, setColaboradores] = useState<Colaboradores | null>(null);
 	const { getRootProps, getInputProps, isDragActive } = useDropzone();
 	const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
 	const [isEditMode, setIsEditMode] = useState(false);
@@ -87,41 +103,34 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 
 	useEffect(() => {
 		console.log(`empId: ${empId}`);
-		getColaborador();
 		getTaskExecutionData();
 		getStatus(2);
 	}, [empId, taskId]);
 
+	
 	const getTaskExecutionData = async () => {
 		try {
 			const response = await axios.get(`${baseURL}/task/${taskId}/executions?employeeId=${empId}`);
 			console.log("Datos de ejecución obtenidos desde getTaskExecutionData:", response.data);
-			setTasks(response.data);
-			// Verificamos si hay tareas y establecemos el título
-			if (response.data && response.data.length > 0) {
-				setTitle(response.data[0].task.name); // Establecer el título usando el nombre de la tarea
+			setTaskExecution(response.data);
+			if (response.data.checkpointExecutions.length > 0) {
+				setTitle(response.data.task.name);
 			}
 		} catch (error) {
 			showAlert("Error al obtener los datos de ejecución de la tarea", "error");
 		}
 	};
+	
+	
+	
 
-	const getColaborador = async () => {
-		try {
-			const response: AxiosResponse<Colaboradores> = await axios.get(
-				`${baseURL}/employee/${empId}`
-			);
-			setColaboradores(response.data);
-		} catch (error) {
-			showAlert("Error al obtener los datos del colaborador", "error");
-		}
-	};
-
+	
 	const getStatus = async (taskTypeId: number) => {
 		try {
 			const response: AxiosResponse<Status[]> = await axios.get(
 				`${baseURL}/status/taskType/${taskTypeId}` // TaskType ID específico para Capacitación
 			);
+			console.log("Datos de ejecución obtenidos desde Status:", response.data);
 			setStatus(response.data); // Guardar los estados en el estado de React
 		} catch (error) {
 			showAlert("Error al obtener los estados", "error");
@@ -206,6 +215,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		return parsedDate.toLocaleDateString();
 	}
 
+	
 	return (
 		<div className="App">
 			<div className="container-fluid">
@@ -291,8 +301,8 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 									<th>Descargar Archivo</th>
 								</tr>
 							</thead>
-							<tbody className="table-group-divider">
-								{tasks?.map((task, taskIndex) =>
+							{/* <tbody className="table-group-divider">
+							{Array.isArray(tasks) && tasks.map((task, taskIndex) => (
 									task?.files?.map((ce, fileIndex) => (
 										<tr key={`${task.id}-${ce.id}`}>
 											<td>{fileIndex + 1}</td>
@@ -321,8 +331,8 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 											</td>
 										</tr>
 									))
-								)}
-							</tbody>
+								))}
+							</tbody> */}
 						</table>
 					</div>
 
@@ -342,50 +352,27 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 								<tr>
 									<th>N°</th>
 									<th>Items</th>
-									<th>Empleado</th>
-									<th>Planificación</th>
-									<th>Verificador</th>
 									<th>Última Ejecución</th>
 									<th>Estado Actual</th>
 									<th>Nuevo Estado</th>
 								</tr>
 							</thead>
 							<tbody>
-								{tasks && tasks.length > 0 ? (
-									tasks.map((task, taskIndex) => (
-									task?.checker?.checkpoints?.map((checkpoint, checkpointIndex) => (
-										<tr key={`${task.id}-${checkpoint.id}`}>
-										<td>{`${taskIndex + 1}.${checkpointIndex + 1}`}</td> 
-										<td>{checkpoint?.name || "Sin nombre"}</td> 
-										<td>{task?.employee?.name || "Sin empleado"}</td> 
-										<td>{task?.planning?.name || "Sin planificación"}</td> 
-										<td>{task?.checker?.name || "Sin verificador"}</td> 
-										<td>{task?.executedAt ? formatDate(task.executedAt) : "Sin ejecución"}</td> 
-										{/* <td>{task?.status?.name || "Sin estado"}</td> */} 
-
-										<td><select className="form-select">
-												{Array.isArray(status) && status.length > 0 ? (
-													status.map((status) => (
-														<option key={status.id} value={status.id}>
-															{status.name} 
-																</option>
-														))
-														) : (
-														<option value="">Cargando estados...</option>
-														)}
-												</select>
-</td>
-										</tr>
-									))
-									))
-								) : (
-									<tr>
-									<td colSpan={8} className="text-center">
-										No hay ítems para ejecutar.
-									</td>
+							{taskExecution && taskExecution.checkpointExecutions.length > 0 ? (
+								taskExecution.checkpointExecutions.map((checkpoint, index) => (
+									<tr key={checkpoint.id}>
+										<td>{index + 1}</td>
+										<td>{checkpoint.checkpoint.name}</td>
+										<td>{formatDate(checkpoint.executedAt)}</td>
+										<td>{checkpoint.status.name}</td>
 									</tr>
-								)}
-    						</tbody>
+								))
+							) : (
+						<tr>
+							<td colSpan={5} className="text-center">No hay datos disponibles</td>
+						</tr>
+						)}
+					</tbody>
 						</table>
 					</div>
 					<div className="d-flex justify-content-end">
