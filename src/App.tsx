@@ -6,6 +6,7 @@ import { AppRoutes } from './Routes/Routes';
 import LoginPage from './Pages/LoginPage';
 import { Container, Row, Col } from 'react-bootstrap';
 import './AppStyle.css';
+import { UserProvider } from './Context/UserProvider';
 
 export function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); 
@@ -32,7 +33,6 @@ export function App() {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  // Si no está autenticado, mostrar la página de login dentro del BrowserRouter
   if (!isAuthenticated) {
     return (
       <BrowserRouter>
@@ -42,7 +42,9 @@ export function App() {
   }
 
   return (
+    
     <BrowserRouter>
+    <UserProvider>
       <Header toggleMenu={toggleMenu} handleLogout={handleLogout} />
       <Container fluid>
         <Row>
@@ -54,6 +56,7 @@ export function App() {
           </Col>
         </Row>
       </Container>
+      </UserProvider>
     </BrowserRouter>
   );
 }
