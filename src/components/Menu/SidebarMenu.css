@@ -176,7 +176,7 @@ a.d-flex.align-items-center {
 
 
 .sidebar .nav-link:hover i {
-  color: #fff; 
+  color: currentColor; 
 }
 
 

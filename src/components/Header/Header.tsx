@@ -1,13 +1,12 @@
-
 import React, { useState } from 'react';
 import { Navbar, Nav, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import Swal from 'sweetalert2'; // Asegúrate de que estás usando SweetAlert2
+import Swal from 'sweetalert2';
 import logo from '../../img/logo-asy.png'; 
 import './HeaderStyle.css'; 
 
 interface HeaderProps {
   toggleMenu: () => void;
-  handleLogout: () => void; // Función para manejar el cierre de sesión
+  handleLogout: () => void;
 }
 
 export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
@@ -17,23 +16,21 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
     </Tooltip>
   );
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Inicializado en true porque el usuario está logueado
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
-  // Función para confirmar cierre de sesión
   const handleLogoutClick = () => {
-    // Uso de SweetAlert2
     Swal.fire({
       title: '¿Estás seguro?',
       text: '¡Vas a cerrar la sesión!',
-      icon: 'warning', // El icono de alerta
+      icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Sí, cerrar sesión',
       cancelButtonText: 'Cancelar',
     }).then((result) => {
       if (result.isConfirmed) {
-        setIsLoggedIn(false); // Cambiar el estado a falso para "cerrar sesión"
-        handleLogout(); // Ejecutar la función de cierre de sesión que viene como prop
-        Swal.fire('Cerrado', 'Has cerrado la sesión correctamente.', 'success'); // Mostrar alerta de confirmación
+        handleLogout();
+        setIsLoggedIn(false); 
+        Swal.fire('Cerrado', 'Has cerrado la sesión correctamente.', 'success');
       }
     });
   };
@@ -84,3 +81,4 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
     </>
   );
 };
+
