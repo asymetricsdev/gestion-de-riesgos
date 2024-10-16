@@ -37,7 +37,7 @@ const LoginPage = ({ onLogin }: { onLogin: (token: string) => void }) => {
       };
   
       const response = await axios.post(`${baseURL}/auth/login`, data);
-  
+     console.log(response);
       const token = response.data.token;
       setLoading(false);
       if (token) {
