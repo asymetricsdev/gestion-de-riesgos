@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Navbar, Nav, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Nav, Navbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Swal from 'sweetalert2';
-import logo from '../../img/logo-asy.png'; 
-import './HeaderStyle.css'; 
+import logo from '../../img/logo-asy.png';
+import './HeaderStyle.css';
 
 interface HeaderProps {
   toggleMenu: () => void;
@@ -62,7 +62,7 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
                 <i className="fa-solid fa-circle-user"></i>
               </Nav.Link>
               <Nav.Link href="#" className="d-flex align-items-center">
-                Version: 08.OCT.2024T23:15
+                Version: 16.OCT.2024T19:20
               </Nav.Link>
               <OverlayTrigger placement="bottom" overlay={renderLogOutTooltip({})}>
                 <Nav.Link href="#" className="d-flex align-items-center custom-icon" onClick={handleLogoutClick}>
