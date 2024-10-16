@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from "react-router-dom";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import menuData from '../../Json/menuData.json';
+import menuData from '../../Json/menuAdministrador.json';
 import './SidebarMenu.css';
 
 interface Submenu {
@@ -36,7 +36,17 @@ const renderTooltip = (text: string) => <Tooltip id="button-tooltip">{text}</Too
 const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isLoggedIn }) => {
   const [openMenus, setOpenMenus] = useState<{ [key: number]: boolean }>({});
 
+
+  useEffect(() => {
+    const initialMenuState = menuData.reduce((acc: { [key: number]: boolean }, item: MenuItem) => {
+      acc[item.id_menu] = false;
+      return acc;
+    }, {});
+    setOpenMenus(initialMenuState);
+  }, []);
+
   const toggleSubmenu = (menuId: number) => {
+    console.log(`Toggling menu with id ${menuId}, current state: `, openMenus[menuId]);
     setOpenMenus((prevOpenMenus) => ({
       ...prevOpenMenus,
       [menuId]: !prevOpenMenus[menuId],
@@ -44,6 +54,7 @@ const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isLoggedIn
   };
 
   const [data, setData] = useState<MenuItem[]>([]);
+
 
   useEffect(() => {
     setData(menuData);
@@ -56,19 +67,21 @@ const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isLoggedIn
           {data.map((item) => (
             <li key={item.id_menu} className="menu-item">
               <div className="d-flex align-items-center nav-link" onClick={() => toggleSubmenu(item.id_menu)}>
-                <NavLink to={item.url} className="d-flex align-items-center">
+                <NavLink to={item.url || "#"} className="d-flex align-items-center">
                   <i className={item.icono}></i> {isOpen && <span>{item.menu}</span>}
                 </NavLink>
                 {item.submenu.length > 0 && (
-                  <i className={`ms-auto ${openMenus[item.id_menu] ? "fa-chevron-up" : "fa-chevron-down"} ${item.icono_arrow}`} onClick={() => toggleSubmenu(item.id_menu)}></i>
+                  <i 
+                    className={`ms-auto ${openMenus[item.id_menu] ? "fa-chevron-up" : "fa-chevron-down"} fa-solid`} 
+                    onClick={() => toggleSubmenu(item.id_menu)}
+                  ></i>
                 )}
               </div>
 
-              {/* Submenu */}
               {item.submenu.length > 0 && openMenus[item.id_menu] && (
                 <ul className={`submenu ${isOpen ? "submenu-open" : ""}`}>
                   {item.submenu.map((subItem) => (
-                    <li key={subItem.id_menu} className="submenu-item">
+                    <li key={`${item.id_menu}-${subItem.id_menu}`} className="submenu-item">
                       <NavLink to={subItem.url} className="nav-link d-flex align-items-center">
                         <i className={subItem.icono}></i> {isOpen && <span>{subItem.menu}</span>}
                       </NavLink>
