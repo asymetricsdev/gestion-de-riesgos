@@ -121,7 +121,7 @@
           },
           {
             "menu": "Criticidad",
-            "id_menu": 423,
+            "id_menu": 424,
             "url": "/matriz-de-peligro/configuracion/criticidad-de-peligro",
             "icono": "fa-solid fa-bolt",
             "indicador": "Visible",
@@ -129,7 +129,7 @@
           },
           {
             "menu": "Jerarquía de Control",
-            "id_menu": 424,
+            "id_menu": 425,
             "url": "/matriz-de-peligro/configuracion/jerarquia-de-control",
             "icono": "fa-solid fa-network-wired",
             "indicador": "Visible",
@@ -137,7 +137,7 @@
           },
           {
             "menu": "Peligros",
-            "id_menu": 425,
+            "id_menu": 426,
             "url": "/matriz-de-peligro/configuracion/peligro",
             "icono": "fa-solid fa-circle-radiation",
             "indicador": "Visible",
@@ -145,9 +145,17 @@
           },
           {
             "menu": "Riesgos",
-            "id_menu": 426,
+            "id_menu": 427,
             "url": "/matriz-de-peligro/configuracion/riesgos",
             "icono": "fa-solid fa-circle-exclamation",
+            "indicador": "Visible",
+            "submenu": []
+          },
+          {
+            "menu": "Estados",
+            "id_menu": 423,
+            "url": "/matriz-de-peligro/configuracion/estados",
+            "icono": "fa-solid fa-circle-user",
             "indicador": "Visible",
             "submenu": []
           }

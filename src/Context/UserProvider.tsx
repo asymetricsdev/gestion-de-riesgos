@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserProfile } from '../Models/User';  // Asegúrate de que este tipo tenga `role`
+import { UserProfile } from '../Models/User'; 
 import { loginAPI } from '../Services/AuthService';
 import { Modal, Button } from 'react-bootstrap';
 
@@ -18,14 +18,14 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [role, setRole] = useState<string | null>(null); // Almacenamos el rol
+  const [role, setRole] = useState<string | null>(null); 
   const [showSessionModal, setShowSessionModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
-    const storedRole = localStorage.getItem('role'); // Recupera el rol almacenado
+    const storedRole = localStorage.getItem('role'); 
 
     if (storedUser && storedToken && storedRole) {
       setUser(JSON.parse(storedUser));
@@ -39,15 +39,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     if (res) {
       const token = res.data.token;
       const userObj = { userName: res.data.userName, email: res.data.email, role: res.data.role };
-      const userRole = res.data.role;  // Suponemos que el rol viene del backend
+      const userRole = res.data.role;  
 
       setUser(userObj);
       setToken(token);
-      setRole(userRole);  // Establecemos el rol
+      setRole(userRole); 
 
       localStorage.setItem('user', JSON.stringify(userObj));
       localStorage.setItem('token', token);
-      localStorage.setItem('role', userRole);  // Almacenamos el rol
+      localStorage.setItem('role', userRole);  
       navigate('/home');
     }
   };
