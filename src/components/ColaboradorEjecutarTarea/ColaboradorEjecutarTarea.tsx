@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosResponse, AxiosError } from "axios";
 import { showAlert } from "../functions";
 import { useDropzone } from "react-dropzone";
 import Card from "react-bootstrap/Card";
@@ -10,91 +10,86 @@ import DangerHead from "../DangerHead/DangerHead";
 import Swal from "sweetalert2";
 import "./ColaboradorEjecutarTarea.css";
 
-
-type TaskExecution = {
-  id: number;
-  executedAt: string;
-  employee: Employee;
-  task: Task;
-  checker: Checker;
-  plannings: Planning[];
-  files: FileData[];
-  checkpointExecutions: {
+interface TaskExecution {
 	id: number;
 	executedAt: string;
-	checkpoint: {
-	  id: number;
-	  name: string;
-	};
-	status: {
-	  id: number;
-	  name: string;
-	};
-	lastExecution: string;
-  }[];
-};
-
-
-/* interface CheckpointExecution {
-    id: number;
-    executedAt: string;
-    checkpoint: Checkpoint;
-    status: Status;
-    lastExecution: string;
-} */
+	employee: Employee;
+	task: Task;
+	checker: Checker;
+	plannings: Planning[];
+	files: FileData[];
+	checkpointExecutions: {
+		id: number;
+		executedAt: string;
+		checkpoint: {
+			id: number;
+			name: string;
+		};
+		status: {
+			id: number;
+			name: string;
+		};
+		lastExecution: string;
+	}[];
+}
 
 interface Checkpoint {
-    id: number;
-    name: string;
+	id: number;
+	name: string;
 }
 
 interface Task {
-    id: number;
-    name: string;
-    description?: string; // Mantener como opcional si no siempre está presente
+	id: number;
+	name: string;
+	description?: string;
 }
 
 interface Checker {
-    id: number;
-    name: string;
+	id: number;
+	name: string;
 }
 
 interface Status {
-    id: number;
-    name: string;
+	id: number;
+	name: string;
 }
 
 interface Planning {
-    id: number;
-    name: string;
-    description?: string; // Hacer opcional si no siempre está presente
+	id: number;
+	name: string;
+	description?: string;
 }
 
 interface Employee {
-    id: number;
-    name: string;
-    rut?: string;
-    position?: {
-        name: string;
-    };
+	id: number;
+	name: string;
+	rut?: string;
+	position?: {
+		name: string;
+	};
 }
 
 interface FileData {
-    id: number;
-    executedAt: string;
-    fileName: string;
-    mimeType: string;
-    createDate?: string;
-    updateDate?: string;
-    content?: string;
-    fileExtension?: string;
+	id: number;
+	executedAt: string;
+	fileName: string;
+	mimeType: string;
+	createDate?: string;
+	updateDate?: string;
+	content?: string;
+	fileExtension?: string;
 }
+
+interface ResponseData {
+	message: string;
+}
+
 const ColaboradorEjecutarTarea: React.FC = () => {
 	const baseURL = import.meta.env.VITE_API_URL;
 	const { empId, taskId } = useParams<{ empId: string; taskId: string }>();
 	const [taskExecution, setTaskExecution] = useState<TaskExecution | null>(null);
-	const [ task, setTask ] = useState<Task | null>(null);
 	const [status, setStatus] = useState<Status[]>([]);
+	const [selectedStatus, setSelectedStatus] = useState<Record<number, number>>({});
 	const [title, setTitle] = useState<string>("");
 	const { getRootProps, getInputProps, isDragActive } = useDropzone();
 	const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
@@ -107,7 +102,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		getStatus(2);
 	}, [empId, taskId]);
 
-	
+	//LLENAMOS LA TABLA DE EJECUCION DE CHECKPOINTS
 	const getTaskExecutionData = async () => {
 		try {
 			const response = await axios.get(`${baseURL}/task/${taskId}/executions?employeeId=${empId}`);
@@ -120,11 +115,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 			showAlert("Error al obtener los datos de ejecución de la tarea", "error");
 		}
 	};
-	
-	
-	
 
-	
 	const getStatus = async (taskTypeId: number) => {
 		try {
 			const response: AxiosResponse<Status[]> = await axios.get(
@@ -137,6 +128,57 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		}
 	};
 
+	//MODIFICAMOS EL ESTADO DEL SELECT
+	const handleStatusChange = (checkpointId: number, newStatusId: string) => {
+		console.log("Checkpoint ID:", checkpointId);
+		console.log("New Status ID:", newStatusId);
+		const statusIdNumber = Number(newStatusId);
+		if (!isNaN(statusIdNumber)) {
+			// Actualizamos el estado con el checkpoint ID y su nuevo estado
+			setSelectedStatus((prev) => ({ ...prev, [checkpointId]: statusIdNumber }));
+			console.log(
+				`Estado actualizado para el checkpoint ${checkpointId}: Nuevo estado ID ${statusIdNumber}`
+			);
+		} else {
+			console.error(`Error: ID de estado inválido (${newStatusId})`);
+		}
+	};
+
+	const saveCheckpointExecution = async () => {
+		// Generar el arreglo dataToSend basado en selectedStatus
+		const dataToSend = Object.entries(selectedStatus).map(([checkpointId, statusId]) => ({
+			checkpointId: Number(checkpointId),
+			statusId: Number(statusId),
+		}));
+
+		// Verificar si dataToSend está vacío o no
+		if (!dataToSend || dataToSend.length === 0) {
+			showAlert("No se ha seleccionado ningún estado.", "warning");
+			return;
+		}
+
+		console.log("Datos a enviar:", dataToSend);
+
+		try {
+			const response = await axios.post(
+				`${baseURL}/task/update/checkpointExecutions?taskId=${taskId}&employeeId=${empId}`,
+				dataToSend,
+				{ headers: { "Content-Type": "application/json" } }
+			);
+			showAlert("Datos guardados correctamente", "success");
+		} catch (error) {
+			const axiosError = error as AxiosError;
+			if (axiosError.response) {
+				console.error("Detalles del error:", axiosError.response.data);
+				const errorMessage =
+					(axiosError.response.data as ResponseData)?.message || "Error desconocido";
+				showAlert(`Error: ${errorMessage}`, "error");
+			} else {
+				console.error("Error sin respuesta del servidor:", axiosError.message);
+				showAlert(`Error sin respuesta del servidor: ${axiosError.message}`, "error");
+			}
+		}
+	};
 
 	const renderSubirArchivoTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>
@@ -215,7 +257,6 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		return parsedDate.toLocaleDateString();
 	}
 
-	
 	return (
 		<div className="App">
 			<div className="container-fluid">
@@ -301,44 +342,42 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 									<th>Descargar Archivo</th>
 								</tr>
 							</thead>
-							{/* <tbody className="table-group-divider">
-							{Array.isArray(tasks) && tasks.map((task, taskIndex) => (
-									task?.files?.map((ce, fileIndex) => (
-										<tr key={`${task.id}-${ce.id}`}>
-											<td>{fileIndex + 1}</td>
-											<td>{ce.fileName}</td>
-											<td>{ce.mimeType}</td>
-											<td>{formatDate(ce.createDate)}</td>
-											<td>
-												<OverlayTrigger
-													overlay={
-														<Tooltip id={`tooltip-download-${ce.id}`}>Descargar Archivo</Tooltip>
+							<tbody className="table-group-divider">
+								{taskExecution?.files.map((file, index) => (
+									<tr key={file.id}>
+										<td>{index + 1}</td>
+										<td>{file.fileName}</td>
+										<td>{file.mimeType}</td>
+										<td>{formatDate(file.executedAt)}</td>
+										<td>
+											<OverlayTrigger
+												overlay={
+													<Tooltip id={`tooltip-download-${file.id}`}>Descargar Archivo</Tooltip>
+												}
+											>
+												<button
+													onClick={() =>
+														downloadFile(
+															`https://testbackend-433922.uk.r.appspot.com/api/task/download/executionFile?fileId=${file.id}`,
+															file.fileName,
+															file.mimeType
+														)
 													}
+													className="btn btn-custom-descargar m-2"
 												>
-													<button
-														onClick={() =>
-															downloadFile(
-																`https://testbackend-433922.uk.r.appspot.com/api/task/downloadFile?fileId=${ce.id}`,
-																ce.fileName,
-																ce.mimeType
-															)
-														}
-														className="btn btn-custom-descargar m-2"
-													>
-														<i className="fa-solid fa-download"></i>
-													</button>
-												</OverlayTrigger>
-											</td>
-										</tr>
-									))
+													<i className="fa-solid fa-download"></i>
+												</button>
+											</OverlayTrigger>
+										</td>
+									</tr>
 								))}
-							</tbody> */}
+							</tbody>
 						</table>
 					</div>
 
 					{/* Ejecutar Items */}
 					<div className="tabla-contenedor-matriz">
-						<DangerHead title="Ejecutar Items" />
+						<DangerHead title="Ejecutar Checkpoints" />
 					</div>
 					<div className="table-responsive">
 						<table className="table table-bordered">
@@ -358,26 +397,46 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 								</tr>
 							</thead>
 							<tbody>
-							{taskExecution && taskExecution.checkpointExecutions.length > 0 ? (
-								taskExecution.checkpointExecutions.map((checkpoint, index) => (
-									<tr key={checkpoint.id}>
-										<td>{index + 1}</td>
-										<td>{checkpoint.checkpoint.name}</td>
-										<td>{formatDate(checkpoint.executedAt)}</td>
-										<td>{checkpoint.status.name}</td>
+								{taskExecution && taskExecution.checkpointExecutions.length > 0 ? (
+									taskExecution.checkpointExecutions.map((checkpoint, index) => (
+										<tr key={checkpoint.id}>
+											<td>{index + 1}</td>
+											<td>{checkpoint.checkpoint.name}</td>
+											<td>{formatDate(checkpoint.executedAt)}</td>
+											<td>{checkpoint.status.name}</td>
+											<td>
+												<select
+													className="form-select"
+													onChange={(e) =>
+														handleStatusChange(checkpoint.checkpoint.id, e.target.value)
+													}
+													defaultValue={selectedStatus[checkpoint.checkpoint.id] || ""}
+												>
+													<option value="" disabled>
+														Seleccionar Estado
+													</option>
+													{status.map((s) => (
+														<option key={s.id} value={s.id}>
+															{s.name}
+														</option>
+													))}
+												</select>
+											</td>
+										</tr>
+									))
+								) : (
+									<tr>
+										<td colSpan={5} className="text-center">
+											No hay datos disponibles
+										</td>
 									</tr>
-								))
-							) : (
-						<tr>
-							<td colSpan={5} className="text-center">No hay datos disponibles</td>
-						</tr>
-						)}
-					</tbody>
+								)}
+							</tbody>
 						</table>
 					</div>
 					<div className="d-flex justify-content-end">
 						<OverlayTrigger placement="top" overlay={renderEjecutarTooltip({})}>
-							<button className="btn btn-custom-tareas m-2">
+							<button className="btn btn-custom-tareas m-2" onClick={saveCheckpointExecution}>
 								<i className="fa-solid fa-eject"></i>
 							</button>
 						</OverlayTrigger>
