@@ -168,7 +168,11 @@ const Proceso: React.FC = () => {
 		</Tooltip>
 	  );
 
-    const formatDate = (dateString: string) => {
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) {
+      return "Sin fecha";
+    }
     return dateString.split('T')[0];
   };
 

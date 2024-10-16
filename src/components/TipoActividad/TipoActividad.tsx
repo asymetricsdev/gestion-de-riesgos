@@ -167,9 +167,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) 
 	  );
 
 
-    const formatDate = (dateString: string) => {
-    return dateString.split('T')[0];
-  };
+    const formatDate = (dateString: string | undefined) => {
+      if (!dateString) {
+        return "Sin fecha";
+      }
+      return dateString.split('T')[0];
+    };
+    
 
   return (
     <div className="App">

@@ -1,12 +1,13 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserProfile } from '../Models/User';
+import { UserProfile } from '../Models/User';  // Asegúrate de que este tipo tenga `role`
 import { loginAPI } from '../Services/AuthService';
 import { Modal, Button } from 'react-bootstrap';
 
 type UserContextType = {
   user: UserProfile | null;
+  role: string | null;
   loginUser: (username: string, password: string) => void;
   logout: () => void;
   token: string | null;
@@ -17,15 +18,19 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null); // Almacenamos el rol
   const [showSessionModal, setShowSessionModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
+    const storedRole = localStorage.getItem('role'); // Recupera el rol almacenado
+
+    if (storedUser && storedToken && storedRole) {
       setUser(JSON.parse(storedUser));
       setToken(storedToken);
+      setRole(storedRole);
     }
   }, []);
 
@@ -33,11 +38,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const res = await loginAPI(username, password);
     if (res) {
       const token = res.data.token;
-      const userObj = { userName: res.data.userName, email: res.data.email };
+      const userObj = { userName: res.data.userName, email: res.data.email, role: res.data.role };
+      const userRole = res.data.role;  // Suponemos que el rol viene del backend
+
       setUser(userObj);
       setToken(token);
+      setRole(userRole);  // Establecemos el rol
+
       localStorage.setItem('user', JSON.stringify(userObj));
       localStorage.setItem('token', token);
+      localStorage.setItem('role', userRole);  // Almacenamos el rol
       navigate('/home');
     }
   };
@@ -45,33 +55,34 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
+    setRole(null);  // Limpiamos el rol
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
     navigate('/');
   };
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
-  
+
     const resetTimer = () => {
       clearTimeout(timeoutId); 
       timeoutId = setTimeout(() => {
         setShowSessionModal(true);
-      }, 1000 * 60 * 10);
+      }, 1000 * 60 * 10); // 10 minutos de inactividad
     };
-  
+
     window.addEventListener('mousemove', resetTimer);
     window.addEventListener('keydown', resetTimer);
-  
+
     resetTimer(); 
-  
+
     return () => {
       clearTimeout(timeoutId);
       window.removeEventListener('mousemove', resetTimer);
       window.removeEventListener('keydown', resetTimer);
     };
   }, []);
-  
 
   const extendSession = () => {
     const storedToken = localStorage.getItem('token');
@@ -84,7 +95,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, loginUser, logout, token }}>
+    <UserContext.Provider value={{ user, role, loginUser, logout, token }}>
       {children}
       <Modal show={showSessionModal} onHide={logout}>
         <Modal.Header closeButton>

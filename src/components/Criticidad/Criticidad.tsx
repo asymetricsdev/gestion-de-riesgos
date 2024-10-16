@@ -174,7 +174,10 @@ const Criticidad: React.FC = () => {
     </Tooltip>
   );
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) {
+      return "Sin fecha";
+    }
     return dateString.split('T')[0];
   };
 

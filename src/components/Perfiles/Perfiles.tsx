@@ -255,9 +255,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
   };
   
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) {
+      return "Sin fecha";
+    }
     return dateString.split('T')[0];
   };
+  
 
   const opcionesTareas = tasks.map(task => ({
     value: task.id,

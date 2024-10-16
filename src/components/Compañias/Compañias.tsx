@@ -164,9 +164,12 @@ const Company: React.FC = () => {
 		</Tooltip>
 	  );
 
-    const formatDate = (dateString: string) => {
-    return dateString.split('T')[0];
-  };
+  const formatDate = (dateString: string | undefined) => {
+      if (!dateString) {
+        return "Sin fecha";
+      }
+      return dateString.split('T')[0];
+    };
 
   return (
     <div className="App">
