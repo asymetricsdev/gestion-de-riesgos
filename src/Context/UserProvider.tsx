@@ -69,7 +69,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       clearTimeout(timeoutId); 
       timeoutId = setTimeout(() => {
         setShowSessionModal(true);
-      }, 1000 * 60 * 10); // 10 minutos de inactividad
+      }, 1000 * 60 * 30);
     };
 
     window.addEventListener('mousemove', resetTimer);
