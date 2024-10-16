@@ -1,0 +1,54 @@
+[
+    {
+      "menu": "Home",
+      "id_menu": 1,
+      "url": "/home",
+      "icono": "fa-solid fa-home",
+      "icono_arrow": "fa-solid fa-chevron-down",
+      "icono_arrow_left": "fa-solid fa-chevron-left",
+      "indicador": "Visible",
+      "submenu": []
+    },
+    {
+      "menu": "Planificación",
+      "id_menu": 2,
+      "url": "",
+      "icono": "fa-solid fa-business-time",
+      "icono_arrow": "fa-solid fa-chevron-down",
+      "indicador": "Visible",
+      "submenu": [
+        {
+          "menu": "Planificación",
+          "id_menu": 21,
+          "url": "/planificacion/planificacion",
+          "icono": "fa-solid fa-calendar-week",
+          "indicador": "Visible",
+          "submenu": []
+        },
+        {
+          "menu": "Planificador de Actividad",
+          "id_menu": 22,
+          "url": "/planificacion/planificador-de-actividad",
+          "icono": "fa-solid fa-calendar-alt",
+          "indicador": "Visible",
+          "submenu": []
+        },
+        {
+          "menu": "Actividades",
+          "id_menu": 23,
+          "url": "/planificacion/actividades",
+          "icono": "fa-solid fa-chart-line",
+          "indicador": "Visible",
+          "submenu": []
+        },
+        {
+          "menu": "Perfil",
+          "id_menu": 24,
+          "url": "/planificacion/perfiles",
+          "icono": "fa-solid fa-id-badge",
+          "indicador": "Visible",
+          "submenu": []
+        }
+      ]
+    }
+]
