@@ -4,11 +4,10 @@ import { showAlert } from "../functions";
 import { useDropzone } from "react-dropzone";
 import { useParams } from "react-router-dom";
 import Card from "react-bootstrap/Card";
-import { OverlayTrigger, Tooltip, Breadcrumb } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Breadcrumb, ProgressBar } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import DangerHead from "../DangerHead/DangerHead";
 import Swal from "sweetalert2";
-import { ProgressBar } from "react-bootstrap";
 import "./ColaboradorEjecutarTarea.css";
 
 interface TaskExecution {
@@ -32,11 +31,13 @@ interface TaskExecution {
 		};
 		lastExecution: string;
 	}[];
+	completion: number;
 }
 
 interface Checkpoint {
 	id: number;
 	name: string;
+	completion: boolean;
 }
 
 interface Task {
@@ -92,12 +93,13 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 	const [status, setStatus] = useState<Status[]>([]);
 	const [selectedStatus, setSelectedStatus] = useState<Record<number, number>>({});
 	const [checkerId, setCheckerId] = useState<number | null>(null);
+	const [progressCompletion, setProgressCompletion] = useState<number>(0);
 	const [title, setTitle] = useState<string>("");
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop: (acceptedFiles) => handleFileUpload(acceptedFiles)
-    });
+		onDrop: (acceptedFiles) => handleFileUpload(acceptedFiles),
+	});
 	const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-	
+
 	const { id } = useParams<{ id: string }>();
 
 	useEffect(() => {
@@ -111,9 +113,26 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		try {
 			const response = await axios.get(`${baseURL}/task/${taskId}/executions?employeeId=${empId}`);
 			console.log("Datos de ejecución obtenidos desde getTaskExecutionData:", response.data);
+
 			setTaskExecution(response.data);
-			if (response.data.checkpointExecutions.length > 0) {
+
+			// Si existen ejecuciones de checkpoints
+			if (response.data.checkpointExecutions && response.data.checkpointExecutions.length > 0) {
 				setTitle(response.data.task.name);
+
+				// Calcular el progreso basado en las ejecuciones de los checkpoints
+				const totalCheckpoints = response.data.checkpointExecutions.length;
+
+				// Filtrar checkpoints completados (en este caso, con el estado "Asiste")
+				const completedCheckpoints = response.data.checkpointExecutions.filter(
+					(checkpoint: any) => checkpoint.status.name === "Asiste"
+				).length;
+
+				// Calcular el porcentaje de progreso
+				const progress = (completedCheckpoints / totalCheckpoints) * 100;
+
+				// Asignar el progreso al estado
+				setProgressCompletion(progress);
 			}
 		} catch (error) {
 			showAlert("Error al obtener los datos de ejecución de la tarea", "error");
@@ -136,28 +155,28 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 	const handleFileUpload = async (files: File[]) => {
 		if (files.length === 0) return;
 
-		 // Verificar el tamaño del archivo
-		 const maxSizeInMB = 20;
-		 const maxSizeInBytes = maxSizeInMB * 1024 * 1024; // Convertir MB a Bytes
-	 
-		 // Validar si el tamaño del archivo excede el límite
-		 if (files[0].size > maxSizeInBytes) {
-			 Swal.fire("Error", `El archivo debe ser menor a ${maxSizeInMB} MB.`, "error");
-			 return;
-		 }
-	
+		// Verificar el tamaño del archivo
+		const maxSizeInMB = 20;
+		const maxSizeInBytes = maxSizeInMB * 1024 * 1024; // Convertir MB a Bytes
+
+		// Validar si el tamaño del archivo excede el límite
+		if (files[0].size > maxSizeInBytes) {
+			Swal.fire("Error", `El archivo debe ser menor a ${maxSizeInMB} MB.`, "error");
+			return;
+		}
+
 		// Verificar los valores que estás utilizando
 		console.log("Iniciando subida de archivo...");
 		console.log("Files: ", files);
 		console.log("TaskExecution: ", taskExecution);
 		console.log("CheckerId: ", taskExecution?.checker?.id);
 		console.log("PlanningId: ", taskExecution?.planning?.id);
-	
+
 		const formData = new FormData();
 		formData.append("file", files[0]); // Subir un archivo
 		formData.append("taskId", taskId!);
 		formData.append("employeeId", empId!);
-	
+
 		// Validar que taskExecution y planning existan antes de acceder a planningId
 		let planningId: string | undefined;
 		if (taskExecution && taskExecution.planning && taskExecution.planning.id) {
@@ -166,7 +185,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		} else {
 			console.error("Planning ID no está disponible.");
 		}
-	
+
 		// Validar si checkerId está disponible
 		if (taskExecution && taskExecution.checker && taskExecution.checker.id) {
 			const checkerId = taskExecution?.checker?.id.toString();
@@ -174,7 +193,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		} else {
 			console.error("Checker ID no está disponible.");
 		}
-	
+
 		try {
 			const response: AxiosResponse<TaskExecution> = await axios.post(
 				`${baseURL}/task/upload/executionFile`,
@@ -192,8 +211,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 			const axiosError = error as AxiosError;
 			if (axiosError.response) {
 				console.error("Detalles del error:", axiosError.response.data);
-				const errorMessage =
-					(axiosError.response.data as any)?.message || "Error desconocido";
+				const errorMessage = (axiosError.response.data as any)?.message || "Error desconocido";
 				Swal.fire("Error", errorMessage, "error");
 			} else {
 				console.error("Error sin respuesta del servidor:", axiosError.message);
@@ -201,7 +219,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 			}
 		}
 	};
-	
+
 	//MODIFICAMOS EL ESTADO DEL SELECT
 	const handleStatusChange = (checkpointId: number, newStatusId: string) => {
 		console.log("Checkpoint ID:", checkpointId);
@@ -218,7 +236,8 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		}
 	};
 
-	const saveCheckpointExecution = async () => {
+	
+	 const saveCheckpointExecution = async () => {
 		// Generar el arreglo dataToSend basado en selectedStatus
 		const dataToSend = Object.entries(selectedStatus).map(([checkpointId, statusId]) => ({
 			checkpointId: Number(checkpointId),
@@ -240,6 +259,9 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 				{ headers: { "Content-Type": "application/json" } }
 			);
 			showAlert("Datos guardados correctamente", "success");
+
+			// Recalcular el progreso después de la actualización
+			await getTaskExecutionData(); // Llama a la función para obtener los datos de ejecución nuevamente
 		} catch (error) {
 			const axiosError = error as AxiosError;
 			if (axiosError.response) {
@@ -253,18 +275,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 			}
 		}
 	};
-
-	const renderSubirArchivoTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-		<Tooltip id="button-tooltip-edit" {...props}>
-			Subir Archivo
-		</Tooltip>
-	);
-
-	const renderDescargarArchivoTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-		<Tooltip id="button-tooltip-edit" {...props}>
-			Descargar Archivo
-		</Tooltip>
-	);
+ 
 
 	const renderEjecutarTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>
@@ -329,7 +340,6 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		const now = 60;
 		return <ProgressBar now={now} label={`${now}%`} />;
 	}
-	  
 
 	return (
 		<div className="App">
@@ -341,26 +351,26 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 						</div>
 						<div className="card-contenedor">
 							<Card className="card">
-							<Card.Body>
-                                <Card.Title>Cargar Archivo</Card.Title>
-                                <div className="container">
-                                    <div className="col-md-12">
-                                        <div className="dropzone" {...getRootProps()}>
-                                            <input {...getInputProps()} />
-                                            {isDragActive ? (
-                                                <p>Suelta el archivo aquí ...</p>
-                                            ) : (
-                                                <p>Arrastra y suelta un archivo aquí, o haz clic para seleccionar uno.</p>
-                                            )}
-                                        </div>
-                                        {uploadedFiles.length > 0 && (
-                                            <div className="mt-3">
-                                                <p>Archivo subido: {uploadedFiles[0].name}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </Card.Body>
+								<Card.Body>
+									<Card.Title>Cargar Archivo</Card.Title>
+									<div className="container">
+										<div className="col-md-12">
+											<div className="dropzone" {...getRootProps()}>
+												<input {...getInputProps()} />
+												{isDragActive ? (
+													<p>Suelta el archivo aquí ...</p>
+												) : (
+													<p>Arrastra y suelta un archivo aquí, o haz clic para seleccionar uno.</p>
+												)}
+											</div>
+											{uploadedFiles.length > 0 && (
+												<div className="mt-3">
+													<p>Archivo subido: {uploadedFiles[0].name}</p>
+												</div>
+											)}
+										</div>
+									</div>
+								</Card.Body>
 							</Card>
 						</div>
 					</div>
@@ -431,7 +441,14 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 							</tbody>
 						</table>
 					</div>
-
+					{/* Progreso de la Tarea */}
+					<div className="mb-3 mt-3">
+						<h5>Progreso de la Tarea</h5>
+						{/* Barra de progreso animada */}
+						{taskExecution && (
+							<ProgressBar animated now={taskExecution.completion} label={`${taskExecution.completion}%`} />
+						)}
+					</div>
 					{/* Ejecutar Items */}
 					<div className="tabla-contenedor-matriz">
 						<DangerHead title="Ejecutar Checkpoints" />
