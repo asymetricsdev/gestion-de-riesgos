@@ -153,3 +153,103 @@
 .modal-content {
     border: none;
 }
+
+
+
+.newmenu-container {
+  display: flex;
+  flex-direction: column;
+  padding-top: 1rem;
+  padding-right: 15px;
+  overflow-y: auto;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+}
+
+.newmenu-icon {
+  padding: 10px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  transition: background-color 0.3s, color 0.3s;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Evita que el icono principal tenga hover */
+.newmenu-icon.main-icon {
+  background-color: transparent !important;  /* Fondo transparente */
+  color: white !important;  /* Mantener el color del ícono */
+  pointer-events: none; /* Evita hover en el ícono principal */
+}
+
+.newmenu-link.active {
+  background-color: #009FE3;
+  color: #ffffff !important;
+  font-weight: bold;
+  border-radius: 3px;
+  padding: 8px;
+}
+
+.newmenu-icon i {
+  margin-right: 10px;
+}
+
+.newmenu-submenu {
+  display: none;
+  flex-direction: column;
+  padding-left: 20px;
+  transition: all 0.3s ease;
+}
+
+.newmenu-submenu-item {
+  color: #000000;
+  padding: 8px 20px;
+}
+
+.newmenu-submenu-item:hover {
+  background-color: #6c757d;
+  width: 90%;
+  color: #ffffff;
+}
+
+.newmenu-item .newmenu-link1:hover {
+  background-color: transparent;
+}
+
+.newmenu-item .newmenu-link:hover {
+  background-color: #495057;
+}
+
+.newmenu-item .newmenu-link i {
+  margin-right: 10px;
+}
+
+.newmenu-icon span {
+  display: none;
+}
+
+.newmenu-item.open .newmenu-icon span {
+  display: inline;
+}
+
+.newmenu-submenu.open {
+  display: block;
+  animation: fadeInNewMenu 0.3s ease;
+}
+
+@keyframes fadeInNewMenu {
+  from {
+      opacity: 0;
+      transform: translateY(-10px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}

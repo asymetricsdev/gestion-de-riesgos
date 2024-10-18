@@ -2,176 +2,165 @@ import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from "../functions";
-import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
+import { showAlert } from '../functions';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import * as bootstrap from "bootstrap";
+import "/index.css"; 
+import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
-interface Proceso {
-	id: number;
-	name: string;
-	description: string;
-	createDate: string;
+interface Roles {
+  id: string;
+  name: string;
 }
 
-interface ProcesoData {
-	name: string;
-	description: string;
-	createDate?: string;
+interface RolesData {
+  id?: number;
+  name: string;
 }
 
 const Roles: React.FC = () => {
-	const baseURL = import.meta.env.VITE_API_URL;
-	const [process, setProcess] = useState<Proceso[]>([]);
-	const [id, setId] = useState<number | null>(null);
-	const [name, setName] = useState<string>("");
-	const [description, setDescription] = useState<string>("");
-	const [title, setTitle] = useState<string>("");
-	const modalRef = useRef<HTMLDivElement | null>(null);
-	const [pendingRequests, setPendingRequests] = useState<number>(0);
-	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-	const [loading, setLoading] = useState<boolean>(false);
+  const baseURL = import.meta.env.VITE_API_URL;
+  const [rol, setCity] = useState<Roles[]>([]);
+  const [id, setId] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  const [pendingRequests, setPendingRequests] = useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-	useEffect(() => {
-		getProcess();
-		if (modalRef.current) {
-			modalRef.current.addEventListener("hidden.bs.modal", handleModalHidden);
-		}
-		return () => {
-			if (modalRef.current) {
-				modalRef.current.removeEventListener("hidden.bs.modal", handleModalHidden);
-			}
-		};
-	}, []);
+  useEffect(() => {
+    getRol();
+    if (modalRef.current) {
+      modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
+    }
+    return () => {
+      if (modalRef.current) {
+        modalRef.current.removeEventListener('hidden.bs.modal', handleModalHidden);
+      }
+    };
+  }, []);
 
-	const getProcess = async () => {
-		setPendingRequests((prev) => prev + 1);
-		try {
-			const response: AxiosResponse<Proceso[]> = await axios.get(`${baseURL}/process/`);
-			setProcess(response.data);
-		} catch (error) {
-			showAlert("Error al obtener Proceso", "error");
-		} finally {
-			setPendingRequests((prev) => prev - 1);
-		}
-	};
+  const getRol = async () => {
+    setPendingRequests(prev => prev + 1);
+    try {
+      const response: AxiosResponse<Roles[]> = await axios.get(`${baseURL}/role/`);
+      const data = response.data.map(rol => ({
+        ...rol,
+       
+      }));
+      setCity(data);
+    } catch (error) {
+      showAlert("Error al obtener los Roles", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);
+    }
+  };
 
-	const openModal = (op: string, process?: Proceso) => {
-		if (process) {
-			setId(process.id);
-			setName(process.name);
-			setDescription(process.description);
-		} else {
-			setId(null);
-			setName("");
-			setDescription("");
-		}
-		setTitle(op === "1" ? "Registrar Proceso" : "Editar Proceso");
+  const openModal = (op: string, rol?: Roles) => {
+    if (rol) {
+      setId(rol.id);
+      setName(rol.name);
+      
+    } else {
+      setId("");
+      setName("");
+    }
+    setTitle(op === "1" ? "Registrar Roles" : "Editar Roles");
 
-		if (modalRef.current) {
-			const modal = new bootstrap.Modal(modalRef.current);
-			modal.show();
-			setIsModalOpen(true);
-		}
-	};
+    if (modalRef.current) {
+      const modal = new bootstrap.Modal(modalRef.current);
+      modal.show();
+      setIsModalOpen(true);
+    }
+  };
 
-	const handleModalHidden = () => {
-		setIsModalOpen(false);
-		const modals = document.querySelectorAll(".modal-backdrop");
-		modals.forEach((modal) => modal.parentNode?.removeChild(modal));
-	};
+  const handleModalHidden = () => {
+    setIsModalOpen(false);
+    const modals = document.querySelectorAll('.modal-backdrop');
+    modals.forEach(modal => modal.parentNode?.removeChild(modal));
+  };
 
-	const validar = () => {
-		if (name.trim() === "") {
-			showAlert("Escribe el nombre", "warning", "nombre del proceso");
-			return;
-		}
-		if (description.trim() === "") {
-			showAlert("Escribe la descripción", "warning", "descripción");
-			return;
-		}
+  const validar = () => {
+    if (!name.trim()) {
+      showAlert("Escribe el nombre", "warning", "nombre");
+      return;
+    }
+    setLoading(true);
+    
+    const parametros : RolesData = {  
+      name: name.trim(), 
 
-		setLoading(true);
+    };
+    const metodo = id ? "PUT" : "POST";
+    enviarSolicitud(metodo, parametros);
+  };
 
-		const parametros: ProcesoData = {
-			name: name.trim(),
-			description: description.trim(),
-		};
+  const enviarSolicitud = async (method: "POST" | "PUT", data: RolesData) => {
+    setLoading(true);
+    try {
+      const url = method === "PUT" && id ? `${baseURL}/rol/${id}` : `${baseURL}/rol/`;
+      const response = await axios({
+        method,
+        url,
+        data,
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      showAlert("Operación realizada con éxito", "success");
+      getRol();
+      if (modalRef.current) {
+        const modal = bootstrap.Modal.getInstance(modalRef.current);
+        modal?.hide();
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+      } else {
+        showAlert("Error al realizar la solicitud", "error");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }; 
 
-		const metodo = id ? "PUT" : "POST";
-		enviarSolicitud(metodo, parametros);
-	};
+  const deleteRol = async (id: string) => {
+    setLoading(true);
+    try {
+      await axios.delete(`${baseURL}/rol/${id}`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      Swal.fire("Roles eliminada correctamente", "", "success");
+      getRol();
+    } catch (error) {
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar la Roles.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    } finally {
+      setLoading(false);}
+  };
 
-	const enviarSolicitud = async (method: "POST" | "PUT", data: ProcesoData) => {
-		setLoading(true);
-		try {
-			const url = method === "PUT" && id ? `${baseURL}/process/${id}` : `${baseURL}/process/`;
-			const response = await axios({
-				method,
-				url,
-				data,
-				headers: { "Content-Type": "application/json" },
-			});
-
-			showAlert("Operación realizada con éxito", "success");
-			getProcess();
-			if (modalRef.current) {
-				const modal = bootstrap.Modal.getInstance(modalRef.current);
-				modal?.hide();
-			}
-		} catch (error) {
-			if (axios.isAxiosError(error) && error.response) {
-				showAlert(
-					`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`,
-					"error"
-				);
-			} else {
-				showAlert("Error al realizar la solicitud", "error");
-			}
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	const deleteProcess = async (id: number) => {
-		setLoading(true);
-		try {
-			await axios.delete(`${baseURL}/process/${id}`, {
-				headers: { "Content-Type": "application/json" },
-			});
-			Swal.fire("Proceso eliminado correctamente", "", "success");
-			getProcess();
-		} catch (error) {
-			Swal.fire({
-				title: "Error",
-				text: "Error al eliminar el Proceso.",
-				icon: "error",
-				confirmButtonText: "OK",
-			});
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+  const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>
-			Editar
+		  Editar
 		</Tooltip>
-	);
-
-	const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+	  );
+	  
+	  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-delete" {...props}>
-			Eliminar
+		  Eliminar
 		</Tooltip>
-	);
+	  );
 
-	const formatDate = (dateString: string) => {
-		return dateString.split("T")[0];
-	};
-
-	return (
+  return (
 		<div className="App">
 			<div className="container-fluid">
 				<div className="row mt-3">
@@ -199,24 +188,20 @@ const Roles: React.FC = () => {
 										}}
 									>
 										<tr>
-											<th>N°</th>
-											<th>Nombre</th>
-											<th>Descripción </th>
-											<th>Fecha</th>
+											<th>ID</th>
+											<th>Nombre del Rol</th>
 											<th>Acciones</th>
 										</tr>
 									</thead>
 									<tbody className="table-group-divider">
-										{process.map((proc, i) => (
-											<tr key={proc.id} className="text-center">
+										{rol.map((rol, i) => (
+											<tr key={rol.id} className="text-center">
 												<td>{i + 1}</td>
-												<td>{proc.name}</td>
-												<td>{proc.description}</td>
-												<td>{formatDate(proc.createDate)}</td>
+												<td>{rol.name}</td>
 												<td className="text-center">
 													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
 														<button
-															onClick={() => openModal("2", proc)}
+															onClick={() => openModal("2", rol)}
 															className="btn btn-custom-editar m-2"
 															data-bs-toggle="modal"
 															data-bs-target="#modalUsers"
@@ -237,12 +222,12 @@ const Roles: React.FC = () => {
 																	cancelButtonText: "Cancelar",
 																}).then((result) => {
 																	if (result.isConfirmed) {
-																		deleteProcess(proc.id);
+																		deleteRol(rol.id);
 																	}
 																});
 															}}
 														>
-															<i className="fa-solid fa-circle-xmark"></i>
+															<FontAwesomeIcon icon={faCircleXmark} />
 														</button>
 													</OverlayTrigger>
 												</td>
@@ -254,11 +239,22 @@ const Roles: React.FC = () => {
 						)}
 					</div>
 				</div>
-				<div className="modal fade" id="modalUsers" tabIndex={-1} aria-hidden="true" ref={modalRef}>
-					<div className="modal-dialog modal-dialog-top modal-md">
+				<div
+					className="modal fade"
+					id="modalUsers"
+					ref={modalRef}
+					data-bs-backdrop="true"
+					data-bs-keyboard="false"
+					tabIndex={-1}
+					aria-labelledby="modalTitle"
+					aria-hidden="true"
+				>
+					<div className="modal-dialog">
 						<div className="modal-content">
 							<div className="modal-header">
-								<h5 className="modal-title w-100">{title}</h5>
+								<h1 className="modal-title fs-5" id="modalTitle">
+									{title}
+								</h1>
 								<button
 									type="button"
 									className="btn-close"
@@ -267,34 +263,19 @@ const Roles: React.FC = () => {
 								></button>
 							</div>
 							<div className="modal-body">
-								<input type="hidden" id="id" />
 								<div className="input-group mb-3">
 									<span className="input-group-text">
-										<i className="fa-solid fa-arrows-rotate"></i>
+										<i className="fa-solid fa-tree-rol"></i>
 									</span>
 									<input
 										type="text"
-										id="nombre"
+										id="name"
 										className="form-control"
-										placeholder="Nombre del Proceso"
+										placeholder="Nombre"
 										value={name}
 										onChange={(e) => setName(e.target.value)}
 									/>
 								</div>
-								<div className="input-group mb-3">
-									<span className="input-group-text">
-										<i className="fa-regular fa-solid fa-file-alt"></i>
-									</span>
-									<input
-										type="text"
-										id="descripcion"
-										className="form-control"
-										placeholder="Descripción"
-										value={description}
-										onChange={(e) => setDescription(e.target.value)}
-									/>
-								</div>
-								<div className="input-group mb-3"></div>
 							</div>
 							<div className="modal-footer">
 								<button
