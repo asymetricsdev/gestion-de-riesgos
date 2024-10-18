@@ -1,0 +1,29 @@
+[
+    {
+      "menu": "",
+      "id_menu": 1,
+      "url": "/home",
+      "icono": "fa-solid fa-circle-user",
+      "icono_arrow": "fa-solid fa-chevron-down",
+      "indicador": "Visible",
+      "submenu": []
+    },
+    {
+      "menu": "Usuarios",
+      "id_menu": 66,
+      "url": "/usuarios",
+      "icono": "fa-solid fa-users",
+      "icono_arrow": "fa-solid fa-chevron-down",
+      "indicador": "Visible",
+      "submenu": [
+        {
+          "menu": "Roles",
+          "id_menu": 77,
+          "url": "/roles",
+          "icono": "fa-solid fa-users-gear",
+          "indicador": "Visible",
+          "submenu": []
+        }
+      ]
+    }
+]

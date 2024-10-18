@@ -16,7 +16,7 @@ export const handleError = (error: any) => {
     } else if (err?.data) {
         showAlert(err.data, "error");
     } else if (err?.status === 401) {
-        showAlert("Please log in again", "error");
+        showAlert("Por favor inicia sesión", "error");
         window.history.pushState({}, "Login", "/login");    
     } else if (err) {
         showAlert(err?.data, "error");
