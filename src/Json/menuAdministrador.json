@@ -155,7 +155,7 @@
             "menu": "Estados",
             "id_menu": 423,
             "url": "/matriz-de-peligro/configuracion/estados",
-            "icono": "fa-solid fa-circle-user",
+            "icono": "fa-solid fa-user-check",
             "indicador": "Visible",
             "submenu": []
           }

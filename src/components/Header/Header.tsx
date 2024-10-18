@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Nav, Navbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Navbar, Nav, OverlayTrigger, Tooltip, Dropdown } from 'react-bootstrap';
 import Swal from 'sweetalert2';
-import logo from '../../img/logo-asy.png';
-import './HeaderStyle.css';
+import logo from '../../img/logo-asy.png'; 
+import './HeaderStyle.css'; 
+import menuDataRoles from '../../Json/menuRoles.json';
 
 interface HeaderProps {
   toggleMenu: () => void;
@@ -15,9 +16,9 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
       Cerrar sesión
     </Tooltip>
   );
-
-  const [isLoggedIn, setIsLoggedIn] = useState(true); 
-
+  const mainMenu = menuDataRoles.find((item: any) => item.menu === "");
+  const usuariosRolesMenu = menuDataRoles.find((item: any) => item.menu === "Usuarios");
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const handleLogoutClick = () => {
     Swal.fire({
@@ -35,6 +36,16 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
       }
     });
   };
+
+  const renderSubmenu = (submenu: any) => {
+    return submenu.map((subItem: any) => (
+      <Dropdown.Item key={subItem.id_menu} href={subItem.url} className="newmenu-submenu-item newmenu-link">
+        <i className={subItem.icono}></i> {subItem.menu}
+      </Dropdown.Item>
+    ));
+  };
+
+
 
   return (
     <>
@@ -58,9 +69,22 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
               <Nav.Link href="#" className="d-flex align-items-center custom-icon">
                 <i className="fa-solid fa-bell"></i>
               </Nav.Link>
-              <Nav.Link href="#" className="d-flex align-items-center custom-icon">
-                <i className="fa-solid fa-circle-user"></i>
-              </Nav.Link>
+            
+              {mainMenu && usuariosRolesMenu && (
+                <Dropdown className="newmenu-item">
+                  <Dropdown.Toggle as={Nav.Link} className="d-flex align-items-center custom-icon newmenu-link1 main-icon">
+                   <i className={mainMenu.icono}></i>
+                  </Dropdown.Toggle>
+
+                  <Dropdown.Menu className="newmenu-submenu">
+                    <Dropdown.Item href={usuariosRolesMenu.url} className="newmenu-submenu-item newmenu-link">
+                      <i className={usuariosRolesMenu.icono}></i> {usuariosRolesMenu.menu}
+                    </Dropdown.Item>
+                    {renderSubmenu(usuariosRolesMenu.submenu)}
+                  </Dropdown.Menu>
+                </Dropdown>
+              )}
+
               <Nav.Link href="#" className="d-flex align-items-center">
                 Version: 16.OCT.2024T19:20
               </Nav.Link>
@@ -82,4 +106,3 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
     </>
   );
 };
-

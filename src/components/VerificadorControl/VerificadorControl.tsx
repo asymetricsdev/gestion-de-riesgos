@@ -176,36 +176,30 @@ const VerificadorControl: React.FC = () => {
         showAlert("Escribe el nombre del verificador", "warning");
         return;
     }
-     if (description.trim() === "") {
+    if (description.trim() === "") {
         showAlert("Escribe la descripción del verificador", "warning");
-     }
-     if (selectedCheckerTypeId === 0) {
+        return;
+    }
+    if (selectedCheckerTypeId === 0) {
         showAlert("Selecciona un tipo de jerarquía", "warning");
         return;
     }
-    /* if (!selectedTaskId) {
-        showAlert("Selecciona una tarea", "warning");
-        return;
-    } */
-     if (!selectedCheckpointIds) {
-        showAlert("Debes seleccionar al menos un checkpoint o dejarlo vacío", "warning");
-        return;
-    } 
+
 
     setLoading(true);
-  
 
-    const parametros : VerificadorControlData = {
+    const parametros: VerificadorControlData = {
         name: name.trim(),
         description: description.trim(),
-        checkerTypeId: selectedCheckerTypeId,  
-        taskId: selectedTaskId ? selectedTaskId : null, 
+        checkerTypeId: selectedCheckerTypeId,
+        taskId: selectedTaskId ? selectedTaskId : null,
         checkpointIds: selectedCheckpointIds,
     };
-    
+
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
-  };
+};
+
 
 const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlData) => {
   setLoading(true);

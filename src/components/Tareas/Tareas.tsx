@@ -356,7 +356,7 @@ function Tareas() {
 	const opcionesVerificadores = checker
 		? checker.map((sp) => ({
 				value: sp.id,
-				label: sp.description,
+				label: sp.name,
 		  }))
 		: [];
 
@@ -424,7 +424,7 @@ function Tareas() {
 														<Accordion.Item eventKey="0">
 															<Accordion.Header>Verificadores</Accordion.Header>
 															<Accordion.Body>
-																<ul>{tr.checker ? tr.checker.description : "Sin Verificador"}</ul>
+																<ul>{tr.checker ? tr.checker.name : "Sin Verificador"}</ul>
 															</Accordion.Body>
 														</Accordion.Item>
 													</Accordion>

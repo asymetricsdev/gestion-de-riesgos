@@ -14,7 +14,7 @@ type LoginFormsInputs = {
 };
 
 const validationSchema = Yup.object().shape({
-  userName: Yup.string().required("Username es requerido"),
+  userName: Yup.string().required("Usuario es requerido"),
   password: Yup.string().required("Password es requerido"),
 });
 
@@ -79,7 +79,7 @@ const LoginPage = ({ onLogin }: { onLogin: (token: string) => void }) => {
             {errorMessage && <p className="text-danger">{errorMessage}</p>}
             <form className="login-form" onSubmit={handleSubmit(handleLogin)}>
               <div className="mb-3">
-                <label htmlFor="userName" className="form-label text-white fw-bold">Email</label>
+                <label htmlFor="userName" className="form-label text-white fw-bold">Usuario</label>
                 <input 
                   type="text" 
                   className="form-control" 

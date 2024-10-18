@@ -55,7 +55,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
-    setRole(null);  // Limpiamos el rol
+    setRole(null); 
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     localStorage.removeItem('role');
