@@ -26,7 +26,7 @@ interface Checker {
 interface CheckpointData {
 	name: string;
 	description: string;
-	checkerId: number;
+	checkerId: number | null;
 }
 
 const Items: React.FC = () => {
@@ -114,21 +114,20 @@ const Items: React.FC = () => {
 			showAlert("Escribe la descripción", "warning", "descripción");
 			return;
 		}
-		if (selectedCheckerId === 0) {
-			showAlert("Selecciona un verificador", "warning");
-			return;
-		}
 
+	
+	
 		const parametros: CheckpointData = {
 			name: name.trim(),
 			description: description.trim(),
-			checkerId: selectedCheckerId,
+			checkerId: selectedCheckerId !== 0 ? selectedCheckerId : null,
 		};
-
+	
 		const metodo = id ? "PUT" : "POST";
 		enviarSolicitud(metodo, parametros);
 	};
-
+	
+	
 	const enviarSolicitud = async (method: "POST" | "PUT", data: CheckpointData) => {
 		setLoading(true);
 		try {
