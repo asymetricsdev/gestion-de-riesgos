@@ -46,7 +46,6 @@ const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isLoggedIn
   }, []);
 
   const toggleSubmenu = (menuId: number) => {
-    console.log(`Toggling menu with id ${menuId}, current state: `, openMenus[menuId]);
     setOpenMenus((prevOpenMenus) => ({
       ...prevOpenMenus,
       [menuId]: !prevOpenMenus[menuId],
