@@ -29,6 +29,7 @@ interface EstadoData {
   name: string;
   description: string;
   taskTypeId: number;
+  objective: boolean;
 }
 
 
@@ -41,6 +42,7 @@ const Estados: React.FC = () => {
   const [description, setDescription] = useState<string>("");
   const [tipoTareas, setTipoTareas] = useState<TaskType[]>([]);
   const [selectedTipoTareaId, setSelectedTipoTareaId] = useState<number>(0);
+  const [checkValue, setCheckValue] = useState<boolean>(false);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -68,7 +70,7 @@ const Estados: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener Compañia", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1);
     }
   };
 
@@ -92,12 +94,14 @@ const Estados: React.FC = () => {
       setName("");
       setDescription("");
       setSelectedTipoTareaId(0);
+      setCheckValue(false);
       setTitle("Registrar Estado");
     } else if (op === "2" && estado) {
       setId(estado.id);
       setName(estado.name);
       setDescription(estado.description);
       setSelectedTipoTareaId(estado.taskType?.id || 0);
+      setCheckValue(false); 
       setTitle("Editar Estado");
     }
 
@@ -115,31 +119,33 @@ const Estados: React.FC = () => {
     modals.forEach(modal => modal.parentNode?.removeChild(modal));
   };
 
-   const validar = () => {
+  const validar = () => {
     if (name.trim() === "") {
-      showAlert("Escribe el nombre", "warning", "nombre del Compañia");
-      return;
+        showAlert("Escribe el nombre", "warning", "nombre del Compañia");
+        return;
     }
     if (description.trim() === "") {
-      showAlert("Escribe la descripción", "warning", "descripción");
-      return;
+        showAlert("Escribe la descripción", "warning", "descripción");
+        return;
     }
     if (selectedTipoTareaId === 0) {
-      showAlert("Selecciona un tipo de tarea", "warning");
-      return;
+        showAlert("Selecciona un tipo de tarea", "warning");
+        return;
     } 
     setLoading(true);
     
+    // Incluimos checkValue en los parámetros
     const parametros: EstadoData = { 
-      name: name.trim(), 
-      description: description.trim(),
-      taskTypeId: selectedTipoTareaId
+        name: name.trim(), 
+        description: description.trim(),
+        taskTypeId: selectedTipoTareaId,
+        objective: checkValue // Añadir esta línea
     };
 
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
-  };
- 
+};
+
   const enviarSolicitud = async (method: "POST" | "PUT", data: EstadoData ) => {
     setLoading(true);
     try {
@@ -289,7 +295,7 @@ const Estados: React.FC = () => {
                 <input type="hidden" id="id" />
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-retweet"></i>
+                  <i className="fa-solid fa-user-check"></i>
                   </span>
                   <input
                     type="text"
@@ -314,7 +320,7 @@ const Estados: React.FC = () => {
                   />
                 </div>
                 <div className="mb-3">
-									<label htmlFor="typeTask">Jefatura:</label>
+									<label htmlFor="typeTask">Tipo de Tarea:</label>
 									<select
 										id="typeTask"
 										className="form-select"
@@ -329,6 +335,28 @@ const Estados: React.FC = () => {
 										))}
 									</select>
 								</div>
+                  {/* Checkbox agregado */}
+            {/*   <div className="form-check mb-3">
+                <input
+                  type="checkbox"
+                  id="myCheckbox"
+                  className="form-check-input"
+                  checked={checkValue}
+                  onChange={(e) => setCheckValue(e.target.checked)}
+                />
+                <label className="form-check-label" htmlFor="myCheckbox">
+                ¿Es un estado objetivo para completar la tarea?
+                </label>
+              </div> */}
+              {/*otro check */}
+            
+                  <div className="form-check mb-3">
+                    <input className="form-check-input" type="checkbox" id="customCheck" checked={checkValue} onChange={e => setCheckValue(e.target.checked)} />
+                    <label className="form-check-label" htmlFor="customCheck">
+                    ¿Es un estado objetivo para completar la tarea?
+                    </label>
+                  </div>
+                
                 <div className="input-group mb-3">
                 </div>
               </div>
