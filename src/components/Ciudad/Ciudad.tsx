@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
+import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from 'bootstrap';
+import React, { useEffect, useRef, useState } from "react";
+import { OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from '../functions';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
-import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import "/index.css"; 
-import * as bootstrap from 'bootstrap';
+import { showAlert } from '../functions';
+import "/index.css";
 
 const MySwal = withReactContent(Swal);
 
@@ -206,7 +206,7 @@ const Ciudad: React.FC = () => {
                   <tr>
                     <th>ID</th>
                     <th>Nombre</th>
-                    <th>Descripción</th>
+                    {/*<th>Descripción</th>*/}
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -215,7 +215,7 @@ const Ciudad: React.FC = () => {
                     <tr key={cit.id} className="text-center">
                       <td>{i + 1}</td>
                       <td>{cit.name}</td>
-                      <td>{cit.description}</td>
+                      {/*<td>{cit.description}</td>*/}
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button

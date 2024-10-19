@@ -1,13 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from 'bootstrap';
+import React, { useEffect, useRef, useState } from "react";
+import { Accordion, OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
+import Select from 'react-select';
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import Select from 'react-select';
-import { Accordion, AccordionItem, AccordionHeader, AccordionBody } from 'react-bootstrap';
-import * as bootstrap from 'bootstrap';
+import { showAlert } from '../functions';
 
 
 const MySwal = withReactContent(Swal);
@@ -265,7 +264,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
 
   const opcionesTareas = tasks.map(task => ({
     value: task.id,
-    label: task.description,
+    label: task.name,
   }));
 
   return (
@@ -290,7 +289,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    <th>Descripción</th>
+                    {/*<th>Descripción</th>*/}
                     <th>Proceso</th>
                     <th>Tareas</th> 
                     <th>Fecha</th>
@@ -302,7 +301,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                     <tr key={JSON.stringify(prof)} className="text-center">
                       <td>{i + 1}</td>
                       <td>{prof.name}</td>
-                      <td>{prof.description}</td>
+                      {/*<td>{prof.description}</td>*/}
                       <td>{prof.process.name}</td> 
                       <td>
                         <Accordion>
@@ -404,7 +403,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                     {process.map(proc => (
                       <option key={JSON.stringify(proc)} value={proc.id}>{proc.name}</option>
                     ))}
-                 </select>
+                  </select>
                 </div>
                 <div className="form-group mt-3">
                     <label htmlFor="hazzard">Tareas:</label>

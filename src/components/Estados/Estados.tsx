@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from 'bootstrap';
+import React, { useEffect, useRef, useState } from "react";
+import { OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import * as bootstrap from 'bootstrap';
+import { showAlert } from '../functions';
 
 const MySwal = withReactContent(Swal);
 
@@ -14,6 +14,7 @@ interface Estado {
   name: string;
   description: string;
   taskType: TaskType;
+  objective: boolean;
 }
 
 interface TaskType{
@@ -101,7 +102,7 @@ const Estados: React.FC = () => {
       setName(estado.name);
       setDescription(estado.description);
       setSelectedTipoTareaId(estado.taskType?.id || 0);
-      setCheckValue(false); 
+      setCheckValue(estado.objective); //MOC:  10/OCT/2024 -> Modifique linea desde false al valor que viene en estado
       setTitle("Editar Estado");
     }
 
@@ -230,8 +231,9 @@ const Estados: React.FC = () => {
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    <th>Descripción </th>
+                    {/*<th>Descripción </th>*/}
                     <th>Tipo de Tarea</th>
+                    <th>Es Objetivo</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -240,8 +242,9 @@ const Estados: React.FC = () => {
                     <tr key={est?.id || i} className="text-center">
                       <td>{i + 1}</td>
                       <td>{est?.name || "Sin nombre"}</td>
-                      <td>{est?.description || "Sin descripción"}</td>
+                      {/*<td>{est?.description || "Sin descripción"}</td>*/}
                       <td>{est.taskType?.name || "No hay Tipo de Tarea"}</td>
+                      <td>{est.objective ? "Sí" : "No"}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button
@@ -263,7 +266,7 @@ const Estados: React.FC = () => {
                             cancelButtonText: "Cancelar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                               deleteEstado(est.id);
+                              deleteEstado(est.id);
                             }
                           });
                         }}>
@@ -271,6 +274,7 @@ const Estados: React.FC = () => {
                         </button>
                       </OverlayTrigger>
                       </td>
+                      
                     </tr>
                     ))}
                 </tbody>

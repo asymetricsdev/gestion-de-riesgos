@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from "bootstrap";
+import React, { useEffect, useRef, useState } from "react";
+import { OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { capitalizeFirstLetter, showAlert } from "../functions";
-import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import * as bootstrap from "bootstrap";
+import { capitalizeFirstLetter, showAlert } from "../functions";
 
 const MySwal = withReactContent(Swal);
 
@@ -371,7 +371,7 @@ const Actividades: React.FC = () => {
                     <tr>
                       <th>N°</th>
                       <th>Nombre</th>
-                      <th>Descripción</th>
+                      {/*<th>Descripción</th>*/}
                       <th>Tipo de Actividad</th>
                       <th>Proceso</th>
                       <th>Peligro / Criticidad</th>
@@ -384,7 +384,7 @@ const Actividades: React.FC = () => {
                         <tr key={act.id} className="text-center">
                           <td>{i + 1}</td>
                           <td>{capitalizeFirstLetter(act.name)}</td>
-                          <td>{capitalizeFirstLetter(act.description)}</td>
+                          {/*<td>{capitalizeFirstLetter(act.description)}</td>*/}
                           <td>{act.activityType?.name || "Sin tipo de actividad"}</td>
                           <td>{act.process?.name || "Sin proceso"}</td>
                           <td>
@@ -473,9 +473,13 @@ const Actividades: React.FC = () => {
                     ))}
                   </select>
                 </div>
+                <div className="mb-3">
+                  <label htmlFor="nombre" className="form-label">Actividad:</label>
+                </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text"><i className="fa-solid fa-chart-line"></i></span>
                   <input
+                    id="nombre"
                     type="text"
                     className="form-control"
                     placeholder="Nombre de la actividad"

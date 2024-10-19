@@ -1,12 +1,12 @@
 
-import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from "bootstrap";
+import React, { useEffect, useRef, useState } from "react";
+import { OverlayTrigger, Spinner, Tooltip } from "react-bootstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from "../functions";
-import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import * as bootstrap from "bootstrap";
+import { showAlert } from "../functions";
 
 const MySwal = withReactContent(Swal);
 
@@ -221,7 +221,7 @@ const Items: React.FC = () => {
 										<tr>
 											<th>N°</th>
 											<th>Nombre</th>
-											<th>Descripción</th>
+											{/*<th>Descripción</th>*/}
 											<th>Tipo de Verificación</th>
 											<th>Acciones</th>
 										</tr>
@@ -231,7 +231,7 @@ const Items: React.FC = () => {
 											<tr key={JSON.stringify(check)} className="text-center">
 												<td>{i + 1}</td>
 												<td>{check.name}</td>
-												<td>{check.description}</td>
+												{/*<td>{check.description}</td>*/}
 												<td>{check.checker && check.checker.name}</td>
 												<td className="text-center">
 													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>

@@ -403,7 +403,7 @@ function Tareas() {
 										<th>N°</th>
 										<th>Tipo de Tarea</th>
 										<th>Nombre</th>
-										<th>Descripción</th>
+										{/*<th>Descripción</th>*/}
 										<th>Versión</th>
 										<th>Verificadores</th>
 										<th>Archivo</th>
@@ -417,7 +417,7 @@ function Tareas() {
 												<td>{i + 1}</td>
 												<td>{tr.taskType?.name || "N/A"}</td>
 												<td>{tr.name}</td>
-												<td>{tr.description}</td>
+												{/*<td>{tr.description}</td>*/}
 												<td>{tr.version}</td>
 												<td>
 													<Accordion>
@@ -567,7 +567,7 @@ function Tareas() {
 									<option value={0}>Selecciona...</option>
 									{taskType.map((ts) => (
 										<option key={ts.id} value={ts.id}>
-											{ts.name} - {ts.description}
+											{ts.name} {/*- {ts.description*/} 
 										</option>
 									))}
 								</select>

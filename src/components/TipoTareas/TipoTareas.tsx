@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from "bootstrap";
+import React, { useEffect, useRef, useState } from "react";
+import { OverlayTrigger, Spinner, Tooltip } from "react-bootstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from "../functions";
-import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import * as bootstrap from "bootstrap";
+import { showAlert } from "../functions";
 
 const MySwal = withReactContent(Swal);
 
@@ -193,7 +193,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 									<tr>
 										<th>N°</th>
 										<th>Nombre</th>
-										<th>Descripción </th>
+										{/*<th>Descripción </th>*/}
 										<th>Fecha</th>
 										<th>Acciones</th>
 									</tr>
@@ -203,7 +203,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 										<tr key={JSON.stringify(div)} className="text-center">
 											<td>{i + 1}</td>
 											<td>{div.name}</td>
-											<td>{div.description}</td>
+											{/*<td>{div.description}</td>*/}
 											<td>{div.createDate ? formatDate(div.createDate) : ""}</td>
 											<td className="text-center">
 												<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>

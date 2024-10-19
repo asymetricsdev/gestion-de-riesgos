@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from 'bootstrap';
+import React, { useEffect, useRef, useState } from "react";
+import { OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import * as bootstrap from 'bootstrap';
+import { showAlert } from '../functions';
 
 
 const MySwal = withReactContent(Swal);
@@ -288,9 +288,9 @@ const deleteDivision = async (id: number) => {
 									<tr>
 										<th>N°</th>
 										<th>Nombre</th>
-										<th>Descripción</th>
-										<th>Compañia</th>
-										<th>Ciudad</th>
+										{/*<th>Descripción</th>*/}
+										<th>Compañía</th>
+										<th>Sitio/Sucursal</th>
 										<th>Fecha</th>
 										<th>Acciones</th>
 									</tr>
@@ -300,7 +300,7 @@ const deleteDivision = async (id: number) => {
 										<tr key={JSON.stringify(div)} className="text-center">
 											<td>{i + 1}</td>
 											<td>{div.name}</td>
-											<td>{div.description}</td>
+											{/*<td>{div.description}</td>*/}
 											<td>{div.company.name}</td>
 											<td>{div.city.name}</td> 
 											<td>{div.createDate ? formatDate(div.createDate) : ''}</td>
