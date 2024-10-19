@@ -196,7 +196,7 @@
         "submenu": []
       },
       {
-        "menu": "Compañias",
+        "menu": "Compañías",
         "id_menu": 62,
         "url": "/organizacion/compañias",
         "icono": "fa-solid fa-building",

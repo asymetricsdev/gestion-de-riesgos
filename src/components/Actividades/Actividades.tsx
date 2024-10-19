@@ -383,11 +383,11 @@ const Actividades: React.FC = () => {
                       actividades.map((act, i) => (
                         <tr key={act.id} className="text-center">
                           <td>{i + 1}</td>
-                          <td>{capitalizeFirstLetter(act.name)}</td>
+                          <td style={{ textAlign: 'left' }}>{capitalizeFirstLetter(act.name)}</td>
                           {/*<td>{capitalizeFirstLetter(act.description)}</td>*/}
                           <td>{act.activityType?.name || "Sin tipo de actividad"}</td>
                           <td>{act.process?.name || "Sin proceso"}</td>
-                          <td>
+                          <td style={{ textAlign: 'left' }}>
                             {Array.isArray(act.hazzards) && act.hazzards.length > 0 ? (
                               <ul>
                                 {act.hazzards.map((hz, index) => {
@@ -403,7 +403,7 @@ const Actividades: React.FC = () => {
   
                                   return (
                                     <li key={`${hz.hazzard?.id}-${hz.criticity?.id}-${index}`}>
-                                      {`${hazzard} / ${criticityText}`}
+                                      {`${hazzard} [${criticityText}]`}
                                     </li>
                                   );
                                 })}

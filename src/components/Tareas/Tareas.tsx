@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios, { AxiosResponse } from "axios";
 import * as bootstrap from "bootstrap";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Accordion, OverlayTrigger, Spinner, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Spinner, Tooltip } from "react-bootstrap";
 import { useDropzone } from "react-dropzone";
 import Select from "react-select";
 import Swal from "sweetalert2";
@@ -420,14 +420,13 @@ function Tareas() {
 												{/*<td>{tr.description}</td>*/}
 												<td>{tr.version}</td>
 												<td>
-													<Accordion>
-														<Accordion.Item eventKey="0">
-															<Accordion.Header>Verificadores</Accordion.Header>
-															<Accordion.Body>
-																<ul>{tr.checker ? tr.checker.name : "Sin Verificador"}</ul>
-															</Accordion.Body>
-														</Accordion.Item>
-													</Accordion>
+													{
+														tr.checker && tr.checker.name ? (
+														tr.checker.name
+														) : (
+														"-"
+														)
+													}
 												</td>
 												<td>
 													<OverlayTrigger

@@ -230,7 +230,7 @@ const Items: React.FC = () => {
 										{checkpoint.map((check, i) => (
 											<tr key={JSON.stringify(check)} className="text-center">
 												<td>{i + 1}</td>
-												<td>{check.name}</td>
+												<td style={{ textAlign: 'left' }}>{check.name}</td>
 												{/*<td>{check.description}</td>*/}
 												<td>{check.checker && check.checker.name}</td>
 												<td className="text-center">

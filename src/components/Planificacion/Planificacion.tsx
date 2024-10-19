@@ -1,14 +1,13 @@
 
-import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from "bootstrap";
+import React, { useEffect, useRef, useState } from "react";
+import { OverlayTrigger, Spinner, Tooltip } from "react-bootstrap";
+import Select from "react-select";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from "../functions";
-import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import Select from "react-select";
-import { Accordion, AccordionItem, AccordionHeader, AccordionBody } from "react-bootstrap";
-import * as bootstrap from "bootstrap";
+import { showAlert } from "../functions";
 
 const MySwal = withReactContent(Swal);
 
@@ -327,7 +326,7 @@ const Planning: React.FC = () => {
 
 	const opcionesEmpleados = employees.map((emp) => ({
 		value: emp.id,
-		label: `${emp.rut} - ${emp.name}`,
+		label: `${emp.description}`,
 	}));
 	
     

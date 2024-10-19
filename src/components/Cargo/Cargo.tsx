@@ -1,13 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from 'bootstrap';
+import React, { useEffect, useRef, useState } from "react";
+import { Accordion, OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
+import Select from 'react-select';
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import Select from 'react-select';
-import { Accordion } from 'react-bootstrap';
-import * as bootstrap from 'bootstrap';
+import { showAlert } from '../functions';
 
 const MySwal = withReactContent(Swal);
 
@@ -293,7 +292,8 @@ const Cargo: React.FC = () => {
 
   const opcionesEquipo = subordinatePositions.map(sp => ({
     value: sp.id,
-    label: sp.description,
+    label: sp.name
+    /*label: sp.description,]*/
   }));
 
   return (
@@ -337,15 +337,18 @@ const Cargo: React.FC = () => {
 												<td>{pos.name}</td>
 												<td>{pos.managerPosition?.name || "N/A"}</td>
 												<td>
+                        {pos.subordinatePositions && pos.subordinatePositions.length > 0 ? (
 													<Accordion>
 														<Accordion.Item eventKey="0">
-															<Accordion.Header>Equipo de Jefatura</Accordion.Header>
+															<Accordion.Header>Dependientes</Accordion.Header>
 															<Accordion.Body>
 																<ul>
 																	{pos.subordinatePositions &&
 																	pos.subordinatePositions.length > 0 ? (
 																		pos.subordinatePositions.map((sub) => (
+                                      sub.id!==pos.id ?
 																			<li key={sub.id}>{sub.description}</li>
+                                      : null
 																		))
 																	) : (
 																		<li>No hay subordinados</li>
@@ -354,6 +357,9 @@ const Cargo: React.FC = () => {
 															</Accordion.Body>
 														</Accordion.Item>
 													</Accordion>
+                        ) : (
+                          "-"
+                        )}
 												</td>
 												<td className="text-center">
 													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
