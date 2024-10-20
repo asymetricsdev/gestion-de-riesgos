@@ -1,6 +1,6 @@
 .encabezado-tabla {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     padding: 20px;
     position: relative;
@@ -30,10 +30,30 @@
     box-sizing: border-box; 
     overflow-x: auto;
   }
-
+  .encabezado-titulo {
+    flex: 1;  /* El título tomará el espacio restante disponible */
+    text-align: center;  /* Centrar el texto del título */
+    margin: 0; /* Asegúrate de que no haya márgenes inesperados */
+  }
   .action-button {
-    position: absolute;
-    left: 758px;
-    top: 20%;
+    margin-left: auto;
+    padding: 10px;
+    background-color: #1566ea; /* Fondo del botón azul claro */
+    color: white; /* Color de ícono blanco */
+    border: none;
+    border-radius: 50%; /* Forma circular */
+    cursor: pointer;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    transition: background-color 0.3s ease; /* Efecto de transición */
+    
+  }
+  
+  .action-button:hover {
+    background-color: #0057e3; /* Color más oscuro al hacer hover */
+  }
+  
+  /* Si usas FontAwesome o íconos, puedes ajustar el color aquí */
+  .action-button .fa-plus {
+    color: white; /* Color del ícono */
   }
   

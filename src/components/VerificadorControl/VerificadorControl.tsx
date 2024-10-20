@@ -1,14 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from 'bootstrap';
+import React, { useEffect, useRef, useState } from "react";
+import { Accordion, OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
+import Select from 'react-select';
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import { Accordion, AccordionItem, AccordionHeader, AccordionBody } from 'react-bootstrap';
-import Select from 'react-select';
-import { capitalizeFirstLetter } from '../functions';
-import * as bootstrap from 'bootstrap';
+import { capitalizeFirstLetter, showAlert } from '../functions';
 
 
 const MySwal = withReactContent(Swal);
@@ -342,11 +340,11 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                    
                     <tr key={JSON.stringify(check)} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{check.name}</td>
+                      <td>{check.name.toUpperCase()}</td>
                       <td>
                         <Accordion>
                           <Accordion.Item eventKey="0">
-                            <Accordion.Header>Descripción</Accordion.Header>
+                            <Accordion.Header>Más Info.</Accordion.Header>
                             <Accordion.Body>
                               <ul>
                                 {check.description

@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import { showAlert } from "../functions";
+import "./Planificacion.css";
 
 const MySwal = withReactContent(Swal);
 
@@ -47,6 +48,7 @@ interface Employees {
     name: string;
     rut: string;
     description: string;
+	fullName : string;
     createDate: string;
     updateDate: string;
   }
@@ -349,7 +351,7 @@ const Planning: React.FC = () => {
 								</Spinner>
 							</div>
 						) : (
-							<div className="table-responsive tabla-scroll">
+							<div className="table-responsive">
 								<table className="table table-bordered">
 									<thead
 										className="text-center"
@@ -361,7 +363,7 @@ const Planning: React.FC = () => {
 										<tr>
 											<th>N°</th>
 											<th>Perfiles</th>
-											<th className="w-50">Rut-Empleados</th>
+											<th className="w-50">Colaboradores</th>
 											<th>Fecha de Inicio</th>
 											<th>Fecha de Fin</th>
 											<th>Acciones</th>
@@ -370,27 +372,21 @@ const Planning: React.FC = () => {
 									<tbody className="table-group-divider">
 										{planning.map((plan, i) => (
 											<tr key={JSON.stringify(plan)} className="text-center">
-												<td>{i + 1}</td>
-												<td>{plan.profile?.name}</td>
-												<td className="text-start">
-													<ul className="list-unstyled">
+												<td className="vtop">{i + 1}</td>
+												<td className="vtop">{plan.profile?.name}</td>
+												<td className="vtop">
+													<table className="w-100 vtop">
 														{plan.employees?.map((emp) => (
-															<li key={emp.id}>
-																<table className="w-100">
-																	<tbody>
-																		<tr>
-																			<td className="text-start w-25">{emp.rut}</td>
-																			<td className="text-start w-45">{emp.name}</td>
-																		</tr>
-																	</tbody>
-																</table>
-															</li>
+														<tr className="vtop">
+															<td className="w-25 vtop">{emp.rut}</td>
+															<td className="text-start w-45 vtop">{emp.fullName}</td>
+														</tr>
 														))}
-													</ul>
+													</table>
 												</td>
-												<td>{formatDate(plan.startDate)}</td>
-												<td>{formatDate(plan.endDate)}</td>
-												<td className="text-center">
+												<td className="vtop">{formatDate(plan.startDate)}</td>
+												<td className="vtop">{formatDate(plan.endDate)}</td>
+												<td className="vtop text-center">
 													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
 														<button
 															onClick={() => openModal("2", plan)}

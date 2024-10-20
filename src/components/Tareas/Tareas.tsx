@@ -422,7 +422,7 @@ function Tareas() {
 												<td>
 													{
 														tr.checker && tr.checker.name ? (
-														tr.checker.name
+														tr.checker.name.toUpperCase()
 														) : (
 														"-"
 														)

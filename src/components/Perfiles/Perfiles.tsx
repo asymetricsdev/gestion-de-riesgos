@@ -19,7 +19,14 @@ interface Profiles {
   createDate: string;
   updateDate: string;
   process: Process;
+  positions: Position[];
   tasks: Tasks[];
+}
+
+type Position = {
+  id: number;
+  name: string;
+  description: string;
 }
 
 interface Tasks {
@@ -43,6 +50,7 @@ interface ProfilesData{
   name: string;
   description: string;
   processId: number;
+  positionIds: number[];
   taskIds: number[];
 }
 
@@ -52,12 +60,14 @@ const Profiles: React.FC = () => {
   const [profiles, setProfiles] = useState<Profiles[]>([]);
   const [description, setDescription] = useState<string>("");
   const [process, setProcess] = useState<Process[]>([]);
+  const [positions, setPositions] = useState<Position[]>([]);
   const [tasks, setTasks] = useState<Tasks[]>([]);
   const [id, setId] = useState<number | null>(null);
   const [name, setName] = useState<string>("");
   const [selectedActivityTypeId, setSelectedActivityTypeId] = useState<number>(0);
   const [selectedProcessId, setSelectedProcessId] = useState<number>(0);
   const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
+  const [selectedPositionIds, setSelectedPositionIds] = useState<number[]>([]);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [pendingRequests, setPendingRequests] = useState<number>(0);
@@ -66,7 +76,8 @@ const Profiles: React.FC = () => {
 
   useEffect(() => {
     getProfiles();
-    getProcess(); 
+    getProcess();
+    getPositions();
     getTasks();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
@@ -89,7 +100,17 @@ const Profiles: React.FC = () => {
       setPendingRequests(prev => prev - 1);  
     }
   };
-  
+  const getPositions = async () => {
+    setPendingRequests(prev => prev + 1);
+    try {
+      const response: AxiosResponse<Position[]> = await axios.get(`${baseURL}/position/managers`);
+      setPositions(response.data);
+    } catch (error) {
+      showAlert("Error al obtener los cargos", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);  
+    }
+  };   
   
   const getProcess = async () => {
     setPendingRequests(prev => prev + 1);
@@ -121,6 +142,7 @@ const Profiles: React.FC = () => {
       setName("");
       setDescription("");
       setSelectedTaskIds([]);
+      setSelectedPositionIds([]);
       setSelectedProcessId(0);
       setTitle("Registrar Perfil");
     } else if (op === "2" && profiles) {
@@ -128,6 +150,7 @@ const Profiles: React.FC = () => {
       setName(profiles.name);
       setDescription(profiles.description);
       setSelectedTaskIds(profiles.tasks.map(h => h.id));
+      setSelectedPositionIds(profiles.positions.map(h => h.id));
       setSelectedProcessId(profiles.process.id);
       setTitle("Editar Perfil");
     }
@@ -168,7 +191,8 @@ const Profiles: React.FC = () => {
       name: name.trim(),
       description: description.trim(),
       processId: selectedProcessId,
-      taskIds: selectedTaskIds,  
+      taskIds: selectedTaskIds,
+      positionIds: selectedPositionIds, 
     };
     
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
@@ -267,6 +291,11 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
     label: task.name,
   }));
 
+  const positionOptions = positions.map(position => ({
+    value: position.id,
+    label: position.name,
+  }));
+
   return (
     <div className="App">
       <div className="container-fluid">
@@ -282,7 +311,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
               </Spinner>
             </div>
             ) : (
-            <div className="table-responsive tabla-scroll">
+            <div className="table">
               <table className="table table-bordered">
                 <thead className="text-center"
                   style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
@@ -291,8 +320,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                     <th>Nombre</th>
                     {/*<th>Descripción</th>*/}
                     <th>Proceso</th>
+                    <th>Responsable</th>
                     <th>Tareas</th> 
-                    <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -304,20 +333,27 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                       {/*<td>{prof.description}</td>*/}
                       <td>{prof.process.name}</td> 
                       <td>
+                      <ul style={{ listStyleType: "none", paddingLeft: 0, textAlign: "left" }}>
+                        {prof.positions.map((pos) => (
+                        <li key={pos.id}>{pos.name}</li>
+                        ))}
+                      </ul>
+                      </td>
+                      <td>
                         <Accordion>
                           <Accordion.Item eventKey="0">
                             <Accordion.Header>Ver Tareas</Accordion.Header>
                             <Accordion.Body>
                               <ul>
                                 {prof.tasks.map((task) => (
-                                  <li key={task.id}>{task.description}</li>
+                                  <li key={task.id}>{task.name}</li>
                                 ))}
                               </ul>
                             </Accordion.Body>
                           </Accordion.Item>
                         </Accordion>
                       </td>
-                      <td>{formatDate(prof.createDate)}</td>
+                      
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                           <button
@@ -405,6 +441,18 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                     ))}
                   </select>
                 </div>
+                <div className="form-group mt-3">
+                    <label htmlFor="hazzard">Responsable:</label>
+                    <Select
+                      isMulti
+                      value={positionOptions.filter(position => selectedPositionIds.includes(position.value))}
+                      onChange={(selectedPositions) => {
+                        const selectedIds = selectedPositions.map((option) => option.value);
+                        setSelectedPositionIds(selectedIds); 
+                      }}
+                      options={positionOptions}
+                    />
+              </div>
                 <div className="form-group mt-3">
                     <label htmlFor="hazzard">Tareas:</label>
                     <Select

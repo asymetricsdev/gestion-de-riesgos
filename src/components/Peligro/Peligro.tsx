@@ -1,13 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from 'bootstrap';
+import React, { useEffect, useRef, useState } from "react";
+import { OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
+import Select from 'react-select';
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import Select from 'react-select';
-import { capitalizeFirstLetter } from '../functions';
-import * as bootstrap from 'bootstrap';
+import { capitalizeFirstLetter, showAlert } from '../functions';
 
 
 const MySwal = withReactContent(Swal);
@@ -267,7 +266,7 @@ const Peligro: React.FC = () => {
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    <th>Verificación</th>
+                    <th>Verificador</th>
                     <th>Riesgos</th> 
                     <th>Fecha</th>
                     <th>Acciones</th>
@@ -278,7 +277,7 @@ const Peligro: React.FC = () => {
                     <tr key={JSON.stringify(hazz)} className="text-center">
                       <td>{i + 1}</td>
                       <td>{capitalizeFirstLetter(hazz.name)}</td>
-                      <td>{hazz.checker.name}</td>
+                      <td>{hazz.checker.name.toUpperCase()}</td>
                       <td>{hazz.risks.map(h => capitalizeFirstLetter(h.name)).join(', ')}</td>
                       <td>{formatDate(hazz.createDate)}</td>
                       <td className="text-center">

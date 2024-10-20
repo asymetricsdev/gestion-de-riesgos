@@ -1,6 +1,6 @@
 import React from "react";
-import './EncabezadoTablaStyle.css';
 import ActionButton from "../Boton/ActionButton";
+import './EncabezadoTablaStyle.css';
 
 interface EncabezadoTablaProps {
   title: string;
@@ -10,7 +10,8 @@ interface EncabezadoTablaProps {
 const EncabezadoTabla: React.FC<EncabezadoTablaProps> = ({ title, onClick }) => {
   return (
     <div className="encabezado-tabla">
-      <h2 className="encabezado-titulo">{title}<ActionButton onClick={onClick} /></h2>
+      <h2 className="encabezado-titulo">{title}</h2>
+      <ActionButton onClick={onClick} />
     </div>
   );
 };

@@ -1,8 +1,8 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import './ActionButtonStyle.css'; 
+import './ActionButtonStyle.css';
 
 interface ActionButtonProps {
   onClick: () => void;
