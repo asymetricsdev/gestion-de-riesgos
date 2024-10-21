@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from "bootstrap";
+import React, { useEffect, useRef, useState } from "react";
+import { OverlayTrigger, Spinner, Tooltip } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from "../functions";
-import { OverlayTrigger, Tooltip, Spinner } from "react-bootstrap";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import * as bootstrap from "bootstrap";
-import { useNavigate } from "react-router-dom";
+import { showAlert } from "../functions";
 
 const MySwal = withReactContent(Swal);
 interface Colaboradores {
@@ -284,7 +284,7 @@ const Colaboradores: React.FC = () => {
 								</Spinner>
 							</div>
 						) : (
-							<div className="table-responsive tabla-scroll">
+							<div className="table-responsive">
 								<table className="table table-bordered">
 									<thead
 										className="text-center"

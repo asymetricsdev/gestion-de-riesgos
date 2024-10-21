@@ -192,7 +192,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: JerarquiaControlDat
               </Spinner>
             </div>
             ) : (
-            <div className="table-responsive tabla-scroll">
+            <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center" 
                 style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', 

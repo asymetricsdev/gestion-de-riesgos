@@ -209,7 +209,7 @@ const Items: React.FC = () => {
 								</Spinner>
 							</div>
 						) : (
-							<div className="table-responsive tabla-scroll">
+							<div className="table-responsive">
 								<table className="table table-bordered">
 									<thead
 										className="text-center"
@@ -221,8 +221,8 @@ const Items: React.FC = () => {
 										<tr>
 											<th>N°</th>
 											<th>Nombre</th>
-											{/*<th>Descripción</th>*/}
-											<th>Tipo de Verificación</th>
+											<th>Descripción</th>
+											<th>Verificador</th>
 											<th>Acciones</th>
 										</tr>
 									</thead>
@@ -231,8 +231,8 @@ const Items: React.FC = () => {
 											<tr key={JSON.stringify(check)} className="text-center">
 												<td>{i + 1}</td>
 												<td style={{ textAlign: 'left' }}>{check.name}</td>
-												{/*<td>{check.description}</td>*/}
-												<td>{check.checker && check.checker.name}</td>
+												<td>{check.description}</td>
+												<td>{check.checker && check.checker.name.toUpperCase()}</td>
 												<td className="text-center">
 													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
 														<button

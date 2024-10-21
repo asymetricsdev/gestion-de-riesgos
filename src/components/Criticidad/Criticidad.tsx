@@ -1,33 +1,37 @@
-import React, { useEffect, useState, useRef } from "react";
 import axios, { AxiosResponse } from "axios";
+import * as bootstrap from 'bootstrap';
+import React, { useEffect, useRef, useState } from "react";
+import { OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { showAlert } from '../functions';
-import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import { capitalizeFirstLetter } from '../functions';
-import * as bootstrap from 'bootstrap';
+import { capitalizeFirstLetter, showAlert } from '../functions';
 
 const MySwal = withReactContent(Swal);
 
 interface Criticidad {
   id: number;
+  level: number;
   name: string;
+  color: string;
   description: string;
   createDate: string;
 }
 
 interface CriticidadData {
-  name: string;
+  level: number;
   description: string;
+  color : string;
 }
 
 const Criticidad: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
   const [criticity, setCriticityType] = useState<Criticidad[]>([]);
   const [id, setId] = useState<string>("");
+  const [level, setLevel] = useState<number>(1);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+  const [color, setColor] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -64,11 +68,13 @@ const Criticidad: React.FC = () => {
       setId("");
       setName("");
       setDescription("");
+      setColor("")
       setTitle("Registrar Criticidad");
     } else if (op === "2" && criticity) {
       setId(criticity.id.toString());
       setName(criticity.name);
       setDescription(criticity.description);
+      setColor(criticity.color)
       setTitle("Editar Criticidad");
     }
 
@@ -97,8 +103,10 @@ const Criticidad: React.FC = () => {
     setLoading(true);
     
     const parametros : CriticidadData = {  
-      name: name.trim(), 
-      description: description.trim() };
+      level: level, 
+      description: description.trim(),
+      color: color
+    };
 
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
@@ -196,15 +204,17 @@ const Criticidad: React.FC = () => {
               </Spinner>
             </div>
             ) : (
-            <div className="table-responsive tabla-scroll">
+            <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center" 
                   style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
                   <tr>
                     <th>N°</th>
                     <th>Nivel</th>
+                    {/*<th>Nombre</th>*/}
                     <th>Descripción</th>
-                    <th>Fecha</th>
+                    <th>Color</th>
+                    <th>Fecha Actualización</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -212,8 +222,12 @@ const Criticidad: React.FC = () => {
                   {criticity.map((crit, i) => (
                     <tr key={crit.id} className="text-center">
                       <td>{i + 1}</td>
-                      <td>{crit.name}</td>
+                      <td>{crit.level}</td>
+                      {/*<td>{crit.name}</td>*/}
                       <td>{capitalizeFirstLetter(crit.description)}</td>
+                      <td style={{ backgroundColor: crit.color, color: '#fff', borderRadius: '4px', padding: '5px' }}>
+                        {crit.color}
+                      </td>
                       <td>{formatDate(crit.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
@@ -272,12 +286,12 @@ const Criticidad: React.FC = () => {
                     <i className="fa-solid fa-bolt"></i>
                   </span>
                   <input
-                    type="text"
-                    id="nombre"
+                    type="number"
+                    id="level"
                     className="form-control"
                     placeholder="Nivel de Criticidad"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={level}
+                    onChange={(e) => setLevel(Number(e.target.value))}
                   />
                 </div>
                 <div className="input-group mb-3">
@@ -291,6 +305,19 @@ const Criticidad: React.FC = () => {
                     placeholder="Descripción"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                  />
+                </div>
+                <div className="input-group mb-3">
+                  <span className="input-group-text">
+                    <i className="fa-solid fa-bolt"></i>
+                  </span>
+                  <input
+                    type="color"
+                    id="color"
+                    className="form-control"
+                    placeholder="Color"
+                    value={color}
+                    onChange={(e) => setColor(e.target.value)}
                   />
                 </div>
               </div>

@@ -321,7 +321,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
               </Spinner>
             </div>
             ) : (
-            <div className="table-responsive tabla-scroll">
+            <div className="table-responsive">
               <table className="table table-bordered">
                 <thead className="text-center"
                   style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
@@ -329,7 +329,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                     <th>N°</th>
                     <th>Nombre</th>
                     <th>Medidas Preventivas</th>
-                    <th>Tipo de jerarquia</th>
+                    <th>Jerarquía</th>
                     <th>Tareas</th>
                     <th>Items</th>
                     <th>Acciones</th>

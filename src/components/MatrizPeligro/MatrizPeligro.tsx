@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
-import { showAlert } from "../functions";
-import DangerHead from "../DangerHead/DangerHead";
+import React, { useEffect, useState } from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { capitalizeFirstLetter } from '../functions';
+import DangerHead from "../DangerHead/DangerHead";
+import { capitalizeFirstLetter, showAlert } from "../functions";
 import "./MatrizPeligroStyle.css";
 
 interface MatrizPeligro {
@@ -19,6 +18,7 @@ interface MatrizPeligro {
   risk: string;
   criticityName: string;
   criticityDescription: string;
+  criticityColor: string;
   securityMeasures: string;
   checker: string;
   checkerType: string;
@@ -77,7 +77,7 @@ const MatrizPeligro: React.FC = () => {
           <div className="tabla-contenedor">
             <DangerHead title="Matriz de Peligro" />
           </div>
-          <div className="table-responsive-xl tabla-scroll">
+          <div className="table-responsive-xl table-scroll">
             <table className="table table-bordered">
               <thead className="text-center">
                 <tr>
@@ -87,7 +87,6 @@ const MatrizPeligro: React.FC = () => {
                   <th>Peligro</th>
                   <th>Riesgo</th>
                   <th>Criticidad</th>
-                  <th>Nivel de Criticidad</th>
                   <th>Medidas Preventivas</th>
                   <th>Verificador de Control</th>
                   <th>Jerarquía de Control</th>
@@ -108,8 +107,7 @@ const MatrizPeligro: React.FC = () => {
                       {item.hazzard.charAt(0).toUpperCase() + item.hazzard.slice(1).toLowerCase()}
                     </td>
                     <td>{capitalizeFirstLetter(item.risk)}</td>
-                    <td>{item.criticityName}</td>
-                    <td>{capitalizeFirstLetter(item.criticityDescription)}</td>
+                    <td style={{ backgroundColor: item.criticityColor, color: '#fff', borderRadius: '4px', padding: '5px' }}>({item.criticityName}) - {capitalizeFirstLetter(item.criticityDescription)}</td>
                     <td
                       onClick={() => toggleRowExpansion(item.activityId)}
                       style={{
@@ -135,7 +133,7 @@ const MatrizPeligro: React.FC = () => {
                         </span>
                       </OverlayTrigger>
                     </td>
-                    <td>{item.checker}</td>
+                    <td>{item.checker.toUpperCase()}</td>
                     <td>{item.checkerType}</td>
                   </tr>
                 ))}

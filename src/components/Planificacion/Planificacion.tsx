@@ -222,8 +222,10 @@ const Planning: React.FC = () => {
 		const parametros: PlanningData = {
 			name: name.trim(),
 			description: description.trim(),
-			startDate: formattedStartDate,
-			endDate: formattedEndDate,
+			//startDate: formattedStartDate,
+			//endDate: formattedEndDate,
+			startDate: startDate,
+			endDate: endDate,
 			employeeIds: selectedEmployeeIds,
 			profileId: selectedProfileId,
 		};
@@ -362,8 +364,9 @@ const Planning: React.FC = () => {
 									>
 										<tr>
 											<th>N°</th>
+											<th>Planificación</th>
 											<th>Perfiles</th>
-											<th className="w-50">Colaboradores</th>
+											<th className="w-40">Colaboradores</th>
 											<th>Fecha de Inicio</th>
 											<th>Fecha de Fin</th>
 											<th>Acciones</th>
@@ -373,13 +376,14 @@ const Planning: React.FC = () => {
 										{planning.map((plan, i) => (
 											<tr key={JSON.stringify(plan)} className="text-center">
 												<td className="vtop">{i + 1}</td>
+												<td className="vtop">{plan.name}</td>
 												<td className="vtop">{plan.profile?.name}</td>
 												<td className="vtop">
-													<table className="w-100 vtop">
+													<table className="vtop">
 														{plan.employees?.map((emp) => (
 														<tr className="vtop">
-															<td className="w-25 vtop">{emp.rut}</td>
-															<td className="text-start w-45 vtop">{emp.fullName}</td>
+															<td className="w-30 vtop">{emp.rut}</td>
+															<td className="text-start w-70 vtop">{emp.fullName}</td>
 														</tr>
 														))}
 													</table>

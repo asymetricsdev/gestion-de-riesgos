@@ -182,7 +182,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 						</Spinner>
 						</div>
 						) : (
-						<div className="table-responsive tabla-scroll">
+						<div className="table-responsive">
 							<table className="table table-bordered">
 								<thead
 									className="text-center"
