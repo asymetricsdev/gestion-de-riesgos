@@ -1,3 +1,5 @@
+//ÚLTIMO CÓDIGO DE COLABORADORES EJECUTAR TAREAS 22-10-24
+
 import React, { useEffect, useState } from "react";
 import axios, { AxiosResponse, AxiosError } from "axios";
 import { showAlert } from "../functions";
@@ -54,6 +56,10 @@ interface Checker {
 interface Status {
 	id: number;
 	name: string;
+	taskType: {
+		id: number;
+		name: string;
+	};
 }
 
 interface Planning {
@@ -94,6 +100,8 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 	const [selectedStatus, setSelectedStatus] = useState<Record<number, number>>({});
 	const [checkerId, setCheckerId] = useState<number | null>(null);
 	const [progressCompletion, setProgressCompletion] = useState<number>(0);
+	//const [taskTypeId, setTaskTypeId] = useState<number>(0);
+	const [taskTypeId, setTaskTypeId] = useState<number | null>(null); // Cambiar el tipo a null
 	const [title, setTitle] = useState<string>("");
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		onDrop: (acceptedFiles) => handleFileUpload(acceptedFiles),
@@ -103,13 +111,52 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 	const { id } = useParams<{ id: string }>();
 
 	useEffect(() => {
-		console.log(`empId: ${empId}`);
-		getTaskExecutionData();
-		getStatus(2);
-	}, [empId, taskId]);
+		if (empId && taskId) {
+		  console.log(`empId: ${empId}`);
+		  getTaskExecutionData();
+		  getTask(); // Solo llama si ambos valores están definidos
+		}
+	  }, [empId, taskId]);
+
+	
+	// Obtener los estados según el tipo de tarea
+	const getTask = async () => {
+		try {
+		  const response = await axios.get(`${baseURL}/task/${taskId}`);
+		  console.log("Tipo de tarea obtenido desde getTask:", response.data);
+		  const fetchedTaskId = response.data.taskType?.id;
+		  console.log("ID de tipo de tarea obtenido xxx:", fetchedTaskId);
+	
+		  if (fetchedTaskId) {
+			setTaskTypeId(fetchedTaskId); // Asigna el ID del tipo de tarea
+			await getStatus(fetchedTaskId); // Llama a getStatus solo si `taskTypeId` es válido
+		  } else {
+			console.warn("El tipo de tarea es nulo o indefinido");
+		  }
+		} catch (error) {
+		  console.error("Error al obtener tipo de tarea:", error);
+		  showAlert("Error al obtener el tipo de tarea. Intenta nuevamente.", "error");
+		}
+	  };
+
+	  const getStatus = async (taskTypeId: number) => {
+		if (!taskTypeId) {
+		  console.error("El ID de tipo de tarea no es válido");
+		  return;
+		}
+	
+		try {
+		  const response = await axios.get(`${baseURL}/status/taskType/${taskTypeId}`);
+		  setStatus(response.data); // Guardar los estados en el estado de React
+		} catch (error) {
+		  console.error("Error al obtener los estados:", error);
+		  showAlert("Error al obtener los estados. Intenta nuevamente.", "error");
+		}
+	  };
+
 
 	//LLENAMOS LA TABLA DE EJECUCION DE CHECKPOINTS
-	const getTaskExecutionData = async () => {
+	/* const getTaskExecutionData = async () => {
 		try {
 			const response = await axios.get(`${baseURL}/task/${taskId}/executions?employeeId=${empId}`);
 			console.log("Datos de ejecución obtenidos desde getTaskExecutionData:", response.data);
@@ -118,14 +165,14 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 
 			// Si existen ejecuciones de checkpoints
 			if (response.data.checkpointExecutions && response.data.checkpointExecutions.length > 0) {
-				setTitle(response.data.task.name);
+				setTitle(response.data.task?.name || "Tarea desconocida");
 
 				// Calcular el progreso basado en las ejecuciones de los checkpoints
 				const totalCheckpoints = response.data.checkpointExecutions.length;
 
 				// Filtrar checkpoints completados (en este caso, con el estado "Asiste")
 				const completedCheckpoints = response.data.checkpointExecutions.filter(
-					(checkpoint: any) => checkpoint.status.name === "Asiste"
+					(checkpoint: any) => checkpoint.status?.name === "Asiste"
 				).length;
 
 				// Calcular el porcentaje de progreso
@@ -133,23 +180,73 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 
 				// Asignar el progreso al estado
 				setProgressCompletion(progress);
+			} else {
+				console.warn("No hay ejecuciones de checkpoint disponibles.");
+				setProgressCompletion(0); // Si no hay checkpoints, el progreso es 0
 			}
-		} catch (error) {
-			showAlert("Error al obtener los datos de ejecución de la tarea", "error");
+		} catch (error: any) {
+			// Revisar si es un error de respuesta, de solicitud o de otro tipo
+			if (error.response) {
+				// El servidor respondió con un código de estado fuera del rango 2xx
+				console.error("Error en la respuesta del servidor:", error.response.data);
+				showAlert(
+					`Error del servidor: ${error.response.status} - ${
+						error.response.data.message || "Error desconocido"
+					}`,
+					"error"
+				);
+			} else if (error.request) {
+				// La solicitud fue hecha pero no hubo respuesta
+				console.error("No se recibió respuesta del servidor:", error.request);
+				showAlert(
+					"No se recibió respuesta del servidor. Verifica tu conexión a Internet.",
+					"error"
+				);
+			} else {
+				// Otro tipo de error (por ejemplo, configuración de axios o algo inesperado)
+				console.error("Error inesperado:", error.message);
+				showAlert(`Error inesperado: ${error.message}`, "error");
+			}
 		}
-	};
+	}; */
 
-	const getStatus = async (taskTypeId: number) => {
-		try {
-			const response: AxiosResponse<Status[]> = await axios.get(
-				`${baseURL}/status/taskType/${taskTypeId}` // TaskType ID específico para Capacitación
-			);
-			console.log("Datos de ejecución obtenidos desde Status:", response.data);
-			setStatus(response.data); // Guardar los estados en el estado de React
-		} catch (error) {
-			showAlert("Error al obtener los estados", "error");
+	const getTaskExecutionData = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/task/${taskId}/executions?employeeId=${empId}`);
+      console.log("Datos de ejecución obtenidos desde getTaskExecutionData:", response.data);
+
+      setTaskExecution(response.data);
+
+      if (response.data.checkpointExecutions && response.data.checkpointExecutions.length > 0) {
+        // Calcular el progreso basado en las ejecuciones de los checkpoints
+        const totalCheckpoints = response.data.checkpointExecutions.length;
+        const completedCheckpoints = response.data.checkpointExecutions.filter(
+          (checkpoint: any) => checkpoint.status?.name === "Asiste"
+        ).length;
+
+        const progress = (completedCheckpoints / totalCheckpoints) * 100;
+        setProgressCompletion(progress);
+      } else {
+        console.warn("No hay ejecuciones de checkpoint disponibles.");
+        setProgressCompletion(0);
+      }
+    } catch (error: any) {
+      handleAxiosError(error);
+    }
+  };
+
+	const handleAxiosError = (error: any) => {
+		if (error.response) {
+		  console.error("Error en la respuesta del servidor:", error.response.data);
+		  showAlert(`Error del servidor: ${error.response.status} - ${error.response.data.message || "Error desconocido"}`, "error");
+		} else if (error.request) {
+		  console.error("No se recibió respuesta del servidor:", error.request);
+		  showAlert("No se recibió respuesta del servidor. Verifica tu conexión a Internet.", "error");
+		} else {
+		  console.error("Error inesperado:", error.message);
+		  showAlert(`Error inesperado: ${error.message}`, "error");
 		}
-	};
+	  };
 
 	//CARGA DE ARCHIVO
 	const handleFileUpload = async (files: File[]) => {
@@ -220,8 +317,28 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		}
 	};
 
-	//MODIFICAMOS EL ESTADO DEL SELECT
 	const handleStatusChange = (checkpointId: number, newStatusId: string) => {
+		const statusIdNumber = Number(newStatusId);
+		if (!isNaN(statusIdNumber)) {
+			setSelectedStatus((prev) => ({ ...prev, [checkpointId]: statusIdNumber }));
+		}
+	};
+
+	/* const handleStatusChange = (checkpointId: string, newStatusId: string) => {
+		const statusIdNumber = Number(newStatusId);
+		if (!isNaN(statusIdNumber)) {
+			// Actualizamos el estado con el checkpoint ID y su nuevo estado
+			setSelectedStatus((prev) => ({ ...prev, [Number(checkpointId)]: statusIdNumber }));
+			console.log(
+				`Estado actualizado para el checkpoint ${checkpointId}: Nuevo estado ID ${statusIdNumber}`
+			);
+		} else {
+			console.error(`Error: ID de estado inválido (${newStatusId})`);
+		}
+	}; */
+
+	//MODIFICAMOS EL ESTADO DEL SELECT
+	/* const handleStatusChange = (checkpointId: number, newStatusId: string) => {
 		console.log("Checkpoint ID:", checkpointId);
 		console.log("New Status ID:", newStatusId);
 		const statusIdNumber = Number(newStatusId);
@@ -234,10 +351,9 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 		} else {
 			console.error(`Error: ID de estado inválido (${newStatusId})`);
 		}
-	};
+	}; */
 
-	
-	 const saveCheckpointExecution = async () => {
+	const saveCheckpointExecution = async () => {
 		// Generar el arreglo dataToSend basado en selectedStatus
 		const dataToSend = Object.entries(selectedStatus).map(([checkpointId, statusId]) => ({
 			checkpointId: Number(checkpointId),
@@ -275,7 +391,6 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 			}
 		}
 	};
- 
 
 	const renderEjecutarTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
 		<Tooltip id="button-tooltip-edit" {...props}>
@@ -415,7 +530,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 										<td>{index + 1}</td>
 										<td>{file.fileName}</td>
 										<td>{file.mimeType}</td>
-										<td>{formatDate(file.executedAt)}</td>
+										<td>{file.executedAt}</td>
 										<td>
 											<OverlayTrigger
 												overlay={
@@ -446,7 +561,11 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 						<h5>Progreso de la Tarea</h5>
 						{/* Barra de progreso animada */}
 						{taskExecution && (
-							<ProgressBar animated now={taskExecution.completion} label={`${taskExecution.completion}%`} />
+							<ProgressBar
+								animated
+								now={taskExecution.completion}
+								label={`${taskExecution.completion}%`}
+							/>
 						)}
 					</div>
 					{/* Ejecutar Items */}
@@ -454,59 +573,60 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 						<DangerHead title="Ejecutar Checkpoints" />
 					</div>
 					<div className="table-responsive">
-						<table className="table table-bordered">
-							<thead
-								className="text-center"
-								style={{
-									background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
-									color: "#fff",
-								}}
-							>
-								<tr>
-									<th>N°</th>
-									<th>Items</th>
-									<th>Última Ejecución</th>
-									<th>Estado Actual</th>
-									<th>Nuevo Estado</th>
-								</tr>
-							</thead>
-							<tbody>
-								{taskExecution && taskExecution.checkpointExecutions.length > 0 ? (
-									taskExecution.checkpointExecutions.map((checkpoint, index) => (
-										<tr key={checkpoint.id}>
-											<td>{index + 1}</td>
-											<td>{checkpoint.checkpoint.name}</td>
-											<td>{formatDate(checkpoint.executedAt)}</td>
-											<td>{checkpoint.status.name}</td>
-											<td>
-												<select
-													className="form-select"
-													onChange={(e) =>
-														handleStatusChange(checkpoint.checkpoint.id, e.target.value)
-													}
-													defaultValue={selectedStatus[checkpoint.checkpoint.id] || ""}
-												>
-													<option value="" disabled>
-														Seleccionar Estado
-													</option>
-													{status.map((s) => (
-														<option key={s.id} value={s.id}>
-															{s.name}
-														</option>
-													))}
-												</select>
-											</td>
-										</tr>
-									))
-								) : (
-									<tr>
-										<td colSpan={5} className="text-center">
-											No hay datos disponibles
-										</td>
-									</tr>
-								)}
-							</tbody>
-						</table>
+					<table className="table table-bordered">
+  <thead
+    className="text-center"
+    style={{
+      background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
+      color: "#fff",
+    }}
+  >
+    <tr>
+      <th>N°</th>
+      <th>Items</th>
+      <th>Última Ejecución</th>
+      <th>Estado Actual</th>
+      <th>Nuevo Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    {taskExecution && taskExecution.checkpointExecutions.length > 0 ? (
+      taskExecution.checkpointExecutions.map((checkpoint, index) => (
+        <tr key={checkpoint.id}>
+          <td>{index + 1}</td>
+          <td>{checkpoint.checkpoint?.name || "Nombre no disponible"}</td>
+          <td>{checkpoint.executedAt || "Fecha no disponible"}</td>
+          <td>{checkpoint.status?.name || "Estado no disponible"}</td>
+          <td>
+            <select
+              className="form-select"
+              onChange={(e) =>
+               handleStatusChange(checkpoint.checkpoint?.id || 0, e.target.value)
+              }
+              defaultValue={selectedStatus[checkpoint.checkpoint?.id] || ""}
+            >
+              <option value="" disabled>
+                Seleccionar Estado
+              </option>
+              {status.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </td>
+        </tr>
+      ))
+    ) : (
+      <tr>
+        <td colSpan={5} className="text-center">
+          No hay datos disponibles
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
+
 					</div>
 					<div className="d-flex justify-content-end">
 						<OverlayTrigger placement="top" overlay={renderEjecutarTooltip({})}>
