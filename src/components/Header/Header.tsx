@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import { Dropdown, Nav, Navbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom'; 
 import Swal from 'sweetalert2';
 import logo from '../../img/logo-asy.png';
 import menuDataRoles from '../../Json/menuRoles.json';
@@ -11,13 +13,16 @@ interface HeaderProps {
 }
 
 export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
+  const navigate = useNavigate(); 
   const renderLogOutTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
     <Tooltip id="button-tooltip-edit" {...props}>
       Cerrar sesión
     </Tooltip>
   );
-  const mainMenu = menuDataRoles.find((item: any) => item.menu === "");
-  const usuariosRolesMenu = menuDataRoles.find((item: any) => item.menu === "Usuarios");
+
+
+  const mainMenu = menuDataRoles.find((item: any) => item.id_menu === 1);
+  const usuariosRolesMenu = menuDataRoles.find((item: any) => item.id_menu === 66); 
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const handleLogoutClick = () => {
@@ -37,15 +42,22 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
     });
   };
 
+  const handleNavigation = (url: string) => {
+    navigate(url); 
+  };
+
+
   const renderSubmenu = (submenu: any) => {
     return submenu.map((subItem: any) => (
-      <Dropdown.Item key={subItem.id_menu} href={subItem.url} className="newmenu-submenu-item newmenu-link">
+      <Dropdown.Item
+        key={subItem.id_menu}
+        className="newmenu-submenu-item newmenu-link"
+        onClick={() => handleNavigation(subItem.url)}
+      >
         <i className={subItem.icono}></i> {subItem.menu}
       </Dropdown.Item>
     ));
   };
-
-
 
   return (
     <>
@@ -69,24 +81,30 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
               <Nav.Link href="#" className="d-flex align-items-center custom-icon">
                 <i className="fa-solid fa-bell"></i>
               </Nav.Link>
-            
+
+              {/* Menu principal con submenu anidado */}
               {mainMenu && usuariosRolesMenu && (
                 <Dropdown className="newmenu-item">
                   <Dropdown.Toggle as={Nav.Link} className="d-flex align-items-center custom-icon newmenu-link1 main-icon">
-                   <i className={mainMenu.icono}></i>
+                    <i className={mainMenu.icono}></i>
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu className="newmenu-submenu">
-                    <Dropdown.Item href={usuariosRolesMenu.url} className="newmenu-submenu-item newmenu-link">
+                    {/* Submenu Usuarios */}
+                    <Dropdown.Item
+                      className="newmenu-submenu-item newmenu-link"
+                      onClick={() => handleNavigation(usuariosRolesMenu.url)}
+                    >
                       <i className={usuariosRolesMenu.icono}></i> {usuariosRolesMenu.menu}
                     </Dropdown.Item>
+                    {/* Submenu Roles dentro de Usuarios */}
                     {renderSubmenu(usuariosRolesMenu.submenu)}
                   </Dropdown.Menu>
                 </Dropdown>
               )}
 
               <Nav.Link href="#" className="d-flex align-items-center">
-                Version: 21.OCT.2024 16:30
+                Version: 20.OCT.2024 20:30
               </Nav.Link>
               <OverlayTrigger placement="bottom" overlay={renderLogOutTooltip({})}>
                 <Nav.Link href="#" className="d-flex align-items-center custom-icon" onClick={handleLogoutClick}>
@@ -97,12 +115,14 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
           </Nav>
         </Navbar.Collapse>
       </Navbar>
+
       <button 
         className="navbar-toggler always-visible custom-button" 
         type="button" 
-        onClick={toggleMenu}>
+        onClick={toggleMenu}
+      >
         <i className="fa-solid fa-bars"></i>
       </button>
     </>
   );
-};
+}
