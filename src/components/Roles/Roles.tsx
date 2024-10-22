@@ -50,7 +50,7 @@ const Roles: React.FC = () => {
     setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Roles[]> = await axios.get(`${baseURL}/role/`);
-      setRoles(response.data);
+      setRoles(response.data);  // No modificar el valor del servidor aquí
     } catch (error) {
       showAlert("Error al obtener los Roles", "error");
     } finally {
@@ -87,11 +87,22 @@ const Roles: React.FC = () => {
       showAlert("Escribe el nombre del rol", "warning", "nombre");
       return;
     }
+
+    // Evitar duplicación de "ROLE_" solo al registrar o editar
+    let formattedName = name.trim();
+    if (!formattedName.startsWith("ROLE_")) {
+      formattedName = "ROLE_" + formattedName;
+    } else {
+      // Si ya contiene "ROLE_", no le agregamos nada
+      formattedName = formattedName;
+    }
+
     setLoading(true);
 
-    const parametros : RolesData = {  
-      name: name.trim(),
+    const parametros: RolesData = {
+      name: formattedName,
     };
+
     const metodo = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
   };
@@ -108,7 +119,7 @@ const Roles: React.FC = () => {
       });
   
       showAlert("Operación realizada con éxito", "success");
-      getRoles();
+      getRoles();  // Recarga los roles sin modificar el formato del nombre
       if (modalRef.current) {
         const modal = bootstrap.Modal.getInstance(modalRef.current);
         modal?.hide();
@@ -122,7 +133,7 @@ const Roles: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }; 
+  };
 
   const deleteRol = async (id: string) => {
     setLoading(true);
@@ -193,7 +204,7 @@ const Roles: React.FC = () => {
                     {roles.map((rol, i) => (
                       <tr key={rol.id} className="text-center">
                         <td>{i + 1}</td>
-                        <td>{rol.name}</td>
+                        <td>{rol.name}</td> {/* Mostrar el nombre sin cambiarlo */}
                         <td className="text-center">
                           <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                             <button
