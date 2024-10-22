@@ -201,12 +201,6 @@ const Usuarios: React.FC<UsuariosProps> = ({ isNewRecord }: UsuariosProps) => {
     }
   };
 
-  const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-    <Tooltip id="button-tooltip-edit" {...props}>
-      Editar
-    </Tooltip>
-  );
-
   const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
     <Tooltip id="button-tooltip-delete" {...props}>
       Eliminar
