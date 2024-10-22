@@ -1,11 +1,10 @@
-
 import axios, { AxiosResponse } from "axios";
 import * as bootstrap from 'bootstrap';
 import React, { useEffect, useRef, useState } from "react";
 import { OverlayTrigger, Spinner, Tooltip } from 'react-bootstrap';
-import Select from 'react-select';
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import Select from 'react-select';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import { showAlert } from '../functions';
 
@@ -22,34 +21,37 @@ interface Usuarios {
 interface Roles {
   id: number;
   name: string;
-  enabled?: boolean;
 }
 
 interface UsuarioData {
   id?: number;
   username: string;
   password?: string;
-  roles: number[]; // Enviar los IDs de roles
+  roleIds: number[];
   enabled: boolean;
 }
 
-const Usuarios: React.FC = () => {
+interface UsuariosProps {
+  isNewRecord: boolean;
+}
+
+const Usuarios: React.FC<UsuariosProps> = ({ isNewRecord }: UsuariosProps) => {
   const baseURL = import.meta.env.VITE_API_URL;
-  const [users, setUsers] = useState<Usuarios[]>([]);
+  const [usuarios, setUsuarios] = useState<Usuarios[]>([]);
   const [roles, setRoles] = useState<Roles[]>([]);
   const [id, setId] = useState<number | null>(null);
-  const [username, setUsername] = useState<string>(""); 
-  const [password, setPassword] = useState<string>(""); 
-  const [selectedRoles, setSelectedRoles] = useState<number[]>([]); 
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [estado, setEstado] = useState<boolean>(true);
+  const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [pendingRequests, setPendingRequests] = useState<number>(0);
-  const [estado, setEstado] = useState<boolean>(true);
 
   useEffect(() => {
-    getUsers();
+    getUsuarios();
     getRoles();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
@@ -61,11 +63,11 @@ const Usuarios: React.FC = () => {
     };
   }, []);
 
-  const getUsers = async () => {
+  const getUsuarios = async () => {
     setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Usuarios[]> = await axios.get(`${baseURL}/user/`);
-      setUsers(response.data);
+      setUsuarios(response.data);
     } catch (error) {
       showAlert("Error al obtener los usuarios", "error");
     } finally {
@@ -85,20 +87,20 @@ const Usuarios: React.FC = () => {
     }
   };
 
-  const openModal = (op: string, user?: Usuarios) => {
+  const openModal = (op: string, usuario?: Usuarios) => {
     if (op === "1") {
       setId(null);
       setUsername("");
       setPassword(""); 
-      setSelectedRoles([]);
-      setEstado(true); 
-      setTitle("Crear Usuario");
-    } else if (op === "2" && user) {
-      setId(user.id);
-      setUsername(user.username || "");
+      setEstado(true);
+      setSelectedRoleIds([]);
+      setTitle("Registrar Usuario");
+    } else if (op === "2" && usuario) {
+      setId(usuario.id);
+      setUsername(usuario.username);
       setPassword(""); 
-      setSelectedRoles(user.roles?.map(role => role.id) || []); 
-      setEstado(user.enabled);
+      setEstado(usuario.enabled);
+      setSelectedRoleIds(usuario.roles.map(role => role.id));
       setTitle("Editar Usuario");
     }
 
@@ -116,13 +118,12 @@ const Usuarios: React.FC = () => {
   };
 
   const validar = (): void => {
-    if (!username || username.trim() === "") {
-      showAlert("Escribe el username del usuario", "warning");
+    if (username.trim() === "") {
+      showAlert("Escribe el nombre del usuario", "warning");
       return;
     }
-
-    if (selectedRoles.length === 0) {
-      showAlert("Selecciona al menos un rol", "warning");
+    if (selectedRoleIds.length === 0) {
+      showAlert("Selecciona al menos un Rol", "warning");
       return;
     }
 
@@ -130,9 +131,9 @@ const Usuarios: React.FC = () => {
 
     const parametros: UsuarioData = {
       username: username.trim(),
-      password: password ? password.trim() : undefined, 
-      roles: selectedRoles, 
-      enabled: estado
+      password: password ? password.trim() : undefined,
+      roleIds: selectedRoleIds,
+      enabled: estado,
     };
 
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
@@ -152,13 +153,14 @@ const Usuarios: React.FC = () => {
       });
   
       const newUser = response.data;
+      
   
       showAlert("Operación realizada con éxito", "success");
   
       if (method === "POST") {
-        setUsers((prev) => [...prev, newUser]);
+        setUsuarios((prev) => [...prev, newUser]);
       } else if (method === "PUT") {
-        setUsers((prev) =>
+        setUsuarios((prev) =>
           prev.map((us) => (us.id === newUser.id ? newUser : us))
         );
       }
@@ -169,6 +171,7 @@ const Usuarios: React.FC = () => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        console.log("Error en la solicitud:", error.response?.data);
         showAlert(`Error: ${error.response?.data?.message || "No se pudo completar la solicitud."}`, "error");
       } else {
         showAlert("Error al realizar la solicitud", "error");
@@ -177,206 +180,221 @@ const Usuarios: React.FC = () => {
       setLoading(false);
     }
   };
-  
-  const deleteUser = async (id: number) => {
+
+  const deleteUsuario = async (id: number) => {
+    setLoading(true);
     try {
-      const response = await axios.delete(`${baseURL}/user/${id}`, {
-        headers: { "Content-Type": "application/json" }, 
+      await axios.delete(`${baseURL}/user/${id}`, {
+        headers: { "Content-Type": "application/json" },
       });
-  
-      if (response.status === 200) {
-        setUsers(users.filter((user) => user.id !== id));
-        showAlert("Usuario eliminado con éxito", "success");
-      } else {
-        showAlert("Error al eliminar el usuario", "error");
-      }
+      Swal.fire("Usuario eliminado correctamente", "", "success");
+      getUsuarios();
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("Error en la eliminación:", error.response?.data);
-      }
-      showAlert("Error al eliminar el usuario", "error");
+      Swal.fire({
+        title: "Error",
+        text: "Error al eliminar el Usuario.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
-    <div className="App">
-      <div className="container-fluid">
-        <div className="row mt-3">
-          <div className="col-12">
-            <div className="tabla-contenedor">
-              <EncabezadoTabla title="Usuarios" onClick={() => openModal("1")} />
-            </div>
-            {pendingRequests > 0 ? (
-              <div
-                className="d-flex justify-content-center align-items-center"
-                style={{ height: "100vh", marginTop: "-200px" }}
-              >
-                <Spinner animation="border" role="status" style={{ color: "#A17BB6" }}>
-                  <span className="visually-hidden">Loading...</span>
-                </Spinner>
-              </div>
-            ) : (
-              <div className="table-responsive">
-                <table className="table table-bordered">
-                  <thead
-                    className="text-center"
-                    style={{
-                      background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
-                      color: "#fff",
-                    }}
-                  >
-                    <tr>
-                      <th>ID</th>
-                      <th>Username</th>
-                      <th>Roles</th>
-                      <th>Estado</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="table-group-divider">
-                    {users &&
-                      users.length > 0 &&
-                      users.map((us, i) => (
-                        <tr key={us.id} className="text-center">
-                          <td>{i + 1}</td>
-                          <td>{us.username || "N/A"}</td>
-                          <td>
-                            <ul>
-                              {us.roles?.map((role) => (
-                                <li key={role.id}>{role.name}</li>
-                              )) || <li>No roles</li>}
-                            </ul>
-                          </td>
-                          <td>{us.enabled ? "Activo" : "Inactivo"}</td>
-                          <td className="text-center">
-                            <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-edit">Editar</Tooltip>}>
-                              <button
-                                onClick={() => openModal("2", us)}
-                                className="btn btn-custom-editar m-2"
-                              >
-                                <i className="fa-solid fa-edit"></i>
-                              </button>
-                            </OverlayTrigger>
-                            <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-delete">Eliminar</Tooltip>}>
-                              <button
-                                className="btn btn-custom-danger"
-                                onClick={() => {
-                                  MySwal.fire({
-                                    title: "¿Estás seguro?",
-                                    text: "No podrás revertir esto",
-                                    icon: "warning",
-                                    showCancelButton: true,
-                                    confirmButtonText: "Sí, bórralo",
-                                    cancelButtonText: "Cancelar",
-                                  }).then((result) => {
-                                    if (result.isConfirmed) {
-                                      deleteUser(us.id);
-                                    }
-                                  });
-                                }}
-                              >
-                                <i className="fa-solid fa-circle-xmark"></i>
-                              </button>
-                            </OverlayTrigger>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="modal fade" id="modalEquipo" tabIndex={-1} ref={modalRef}>
-          <div className="modal-dialog modal-dialog-top modal-md">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title w-100">{title}</h5>
-                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-              <div className="modal-body">
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-solid fa-user"></i>
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </div>
-                <div className="input-group mb-3">
-                  <span className="input-group-text">
-                    <i className="fa-solid fa-key"></i>
-                  </span>
-                  <input
-                    type="password"
-                    className="form-control"
-                    placeholder="Contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="Estado">Estado:</label>
-                  <select
-                    id="Estado"
-                    className="form-select"
-                    value={estado ? 1 : 0}
-                    onChange={(e) => setEstado(e.target.value === "1")}
-                  >
-                    <option value={1}>Activo</option>
-                    <option value={0}>Inactivo</option>
-                  </select>
-                </div>
-                <div className="form-group mt-3">
-                  <label htmlFor="roles">Roles:</label>
-                  <Select
-                    isMulti
-                    value={roles
-                      .filter((role) => selectedRoles.includes(role.id))
-                      .map((role) => ({ value: role.id, label: role.name }))}
-                    onChange={(selectedOptions) => {
-                      const selectedIds = selectedOptions.map((option) => option.value);
-                      setSelectedRoles(selectedIds);
-                    }}
-                    options={roles.map((role) => ({
-                      value: role.id,
-                      label: role.name,
-                    }))}
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
-                  Cerrar
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={validar}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <span
-                      className="spinner-border spinner-border-sm"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                  ) : (
-                    "Guardar"
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+    <Tooltip id="button-tooltip-delete" {...props}>
+      Eliminar
+    </Tooltip>
   );
+
+  return (
+		<div className="App">
+			<div className="container-fluid">
+				<div className="row mt-3">
+					<div className="col-12">
+						<div className="tabla-contenedor">
+							<EncabezadoTabla title="Usuarios" onClick={() => openModal("1")} />
+						</div>
+						{pendingRequests > 0 ? (
+							<div
+								className="d-flex justify-content-center align-items-center"
+								style={{ height: "100vh", marginTop: "-200px" }}
+							>
+								<Spinner animation="border" role="status" style={{ color: "#A17BB6" }}>
+									<span className="visually-hidden">Loading...</span>
+								</Spinner>
+							</div>
+						) : (
+							<div className="table-responsive">
+								<table className="table table-bordered">
+									<thead
+										className="text-center"
+										style={{
+											background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
+											color: "#fff",
+										}}
+									>
+										<tr>
+											<th>ID</th>
+											<th>Username</th>
+											<th>Roles</th>
+											<th>Estado</th>
+											<th>Acciones</th>
+										</tr>
+									</thead>
+									<tbody className="table-group-divider">
+										{usuarios.map((usuario, i) => (
+											<tr key={usuario.id} className="text-center">
+												<td>{i + 1}</td>
+												<td>{usuario.username}</td>
+												<td>
+													<ul>
+														{usuario.roles.map((role) => (
+															<li key={role.id}>{role.name}</li>
+														))}
+													</ul>
+												</td>
+												<td>{usuario.enabled ? "Activo" : "Inactivo"}</td>
+												<td className="text-center">
+													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
+														<button
+															onClick={() => openModal("2", usuario)}
+															className="btn btn-custom-editar m-2"
+														>
+															<i className="fa-solid fa-edit"></i>
+														</button>
+													</OverlayTrigger>
+													<OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
+														<button
+															className="btn btn-custom-danger"
+															onClick={() => {
+																MySwal.fire({
+																	title: "¿Estás seguro?",
+																	text: "No podrás revertir esto",
+																	icon: "warning",
+																	showCancelButton: true,
+																	confirmButtonText: "Sí, bórralo",
+																	cancelButtonText: "Cancelar",
+																}).then((result) => {
+																	if (result.isConfirmed) {
+																		deleteUsuario(usuario.id);
+																	}
+																});
+															}}
+														>
+															<i className="fa-solid fa-circle-xmark"></i>
+														</button>
+													</OverlayTrigger>
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+						)}
+					</div>
+				</div>
+
+				<div
+					className="modal fade"
+					id="modalUsuario"
+					tabIndex={-1}
+					aria-hidden="true"
+					ref={modalRef}
+				>
+					<div className="modal-dialog modal-dialog-top modal-md">
+						<div className="modal-content">
+							<div className="modal-header">
+								<h5 className="modal-title w-100">{title}</h5>
+								<button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+							</div>
+							<div className="modal-body">
+								<div className="input-group mb-3">
+									<span className="input-group-text">
+										<i className="fa-solid fa-user"></i>
+									</span>
+									<input
+										type="text"
+										className="form-control"
+										placeholder="Username"
+										value={username}
+										onChange={(e) => setUsername(e.target.value)}
+									/>
+								</div>
+								<div className="input-group mb-3">
+									<span className="input-group-text">
+										<i className="fa-solid fa-key"></i>
+									</span>
+									<input
+										type="password"
+										className="form-control"
+										placeholder="Contraseña"
+										value={password}
+										onChange={(e) => setPassword(e.target.value)}
+									/>
+								</div>
+								<div className="mb-3">
+									<label htmlFor="Estado">Estado:</label>
+									<select
+										id="Estado"
+										className="form-select"
+										value={estado ? 1 : 0}
+										onChange={(e) => setEstado(e.target.value === "1")}
+									>
+										<option value={1}>Activo</option>
+										<option value={0}>Inactivo</option>
+									</select>
+								</div>
+								<div className="form-group mt-3">
+									<label htmlFor="roles">Roles:</label>
+									<Select
+										isMulti
+										value={roles
+											.filter((role) => selectedRoleIds.includes(role.id))
+											.map((role) => ({ value: role.id, label: role.name }))} 
+										onChange={(selectedOptions) => {
+											const selectedIds = selectedOptions.map((option) => option.value);
+											setSelectedRoleIds(selectedIds);
+										}}
+										options={roles.map((role) => ({
+											value: role.id,
+											label: role.name,
+										}))}
+									/>
+								</div>
+							</div>
+							<div className="modal-footer">
+								<button
+									type="button"
+									className="btn btn-secondary"
+									data-bs-dismiss="modal"
+									id="btnCerrar"
+								>
+									Cerrar
+								</button>
+								<button
+									type="button"
+									className="btn btn-primary"
+									onClick={validar}
+									disabled={loading}
+								>
+									{loading ? (
+										<span
+											className="spinner-border spinner-border-sm"
+											role="status"
+											aria-hidden="true"
+										></span>
+									) : (
+										"Guardar"
+									)}
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default Usuarios;
