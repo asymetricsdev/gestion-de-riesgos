@@ -104,7 +104,7 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
               )}
 
               <Nav.Link href="#" className="d-flex align-items-center">
-                Version: 21.OCT.2024 23:30
+                Version: 22.OCT.2024 12:10
               </Nav.Link>
               <OverlayTrigger placement="bottom" overlay={renderLogOutTooltip({})}>
                 <Nav.Link href="#" className="d-flex align-items-center custom-icon" onClick={handleLogoutClick}>
