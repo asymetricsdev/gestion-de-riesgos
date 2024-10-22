@@ -1,3 +1,4 @@
+
 import axios, { AxiosResponse } from "axios";
 import * as bootstrap from 'bootstrap';
 import React, { useEffect, useRef, useState } from "react";
@@ -153,7 +154,6 @@ const Usuarios: React.FC<UsuariosProps> = ({ isNewRecord }: UsuariosProps) => {
       });
   
       const newUser = response.data;
-      
   
       showAlert("Operación realizada con éxito", "success");
   
@@ -200,6 +200,13 @@ const Usuarios: React.FC<UsuariosProps> = ({ isNewRecord }: UsuariosProps) => {
       setLoading(false);
     }
   };
+
+  // Función que faltaba para el tooltip de editar
+  const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
+    <Tooltip id="button-tooltip-edit" {...props}>
+      Editar
+    </Tooltip>
+  );
 
   const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
     <Tooltip id="button-tooltip-delete" {...props}>
