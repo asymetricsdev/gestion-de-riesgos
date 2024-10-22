@@ -45,13 +45,13 @@ export function App() {
   return (
 <BrowserRouter>
 <UserProvider>
-  <Header toggleMenu={toggleMenu} handleLogout={handleLogout} />
   <Container fluid>
     <Row>
       <Col xs={isMenuOpen ? 2 : 1} className="p-0">
         <Menu isOpen={isMenuOpen} toggleSidebar={toggleMenu} isLoggedIn={isAuthenticated} />
       </Col>
       <Col xs={isMenuOpen ? 10 : 11} className="main-content">
+        <Header toggleMenu={toggleMenu} handleLogout={handleLogout} />
         <AppRoutes isAuthenticated={isAuthenticated} onLogin={handleLogin} />
       </Col>
     </Row>

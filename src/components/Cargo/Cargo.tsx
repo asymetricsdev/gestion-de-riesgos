@@ -148,10 +148,12 @@ const Cargo: React.FC = () => {
       return;
     }
 
+    /*
     if (selectedManagerId === 0) {
       showAlert("Selecciona Jefatura", "warning");
       return;
     }
+    */
 
     if (selectedDivisionIds.length === 0) {
       showAlert("Selecciona al menos una Division", "warning");

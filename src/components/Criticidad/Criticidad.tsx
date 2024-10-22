@@ -92,7 +92,7 @@ const Criticidad: React.FC = () => {
   };
 
   const validar = () => {
-    if (!/^\d+$/.test(name.trim())) {
+    if (!/^\d+$/.test(level.toString())) {
       showAlert("Solo se permiten números en el campo de nivel de criticidad", "warning", "nombre");
       return;
     }

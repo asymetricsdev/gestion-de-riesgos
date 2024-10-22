@@ -54,12 +54,12 @@ interface VerificadorControlData{
   taskId: number | null;
   checkpointIds: number[] | null;
 }
-
-interface MatrizPeligro {
+/*
+interface Hazzard {
   id: string;
   securityMeasures: string;
-
 }
+*/
 
 const VerificadorControl: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
@@ -68,12 +68,12 @@ const VerificadorControl: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [checkerType, setCheckerType] = useState<CheckerType[]>([]);
-  const [task, setTask] = useState<Task[]>([]);
-  const [matrizdePeligro, setMatrizdePeligro] = useState<MatrizPeligro[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  //const [hazzards, setHazzards] = useState<Hazzard[]>([]);
   const [checkpoint, setCheckpoint] = useState<Checkpoint[]>([]);
   const [selectedCheckerTypeId, setSelectedCheckerTypeId] = useState<number>(0);
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
-  const [selectedCheckpointIds, setSelectedCheckpointIds] = useState<number[] | null>(null);
+  const [selectedCheckpointIds, setSelectedCheckpointIds] = useState<number[] | null>([]);
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [pendingRequests, setPendingRequests] = useState<number>(0);
@@ -83,9 +83,8 @@ const VerificadorControl: React.FC = () => {
   useEffect(() => {
     getChecker();
     getCheckerType();
-    getTask();
     getCheckpoint();
-    getMatrizPeligro();
+    //getHazzards();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -96,6 +95,60 @@ const VerificadorControl: React.FC = () => {
     };
   }, []);
 
+
+  useEffect(() => {
+    const controller = new AbortController();  // Controlador de cancelación
+      if (id) {
+      // Si es una edición, obtener el checker por su ID y luego cargar las tareas.
+      getCheckerById(id).then(() => getTasks(controller)); 
+    } else {
+      // Si es un nuevo checker, solo cargar las tareas no asignadas.
+      getTasks(controller);
+    }
+      return () => controller.abort();  // Cancelar la solicitud si el componente se desmonta
+  }, [id]);
+  
+  // Función para obtener un Checker por ID cuando se edita
+const getCheckerById = async (checkerId: number) => {
+  setPendingRequests(prev => prev + 1);
+  try {
+    const response: AxiosResponse<VerificadorControl> = await axios.get(`${baseURL}/checker/${checkerId}`);
+    const checkerData = response.data;
+    
+    setName(checkerData.name);
+    setDescription(checkerData.description);
+    setSelectedCheckerTypeId(checkerData.checkerType.id);
+    setSelectedTaskId(checkerData.task?.id || null);  // Guardar la tarea relacionada
+    setSelectedCheckpointIds(checkerData.checkpoints.map(h => h.id));
+  } catch (error) {
+    showAlert("Error al obtener el Verificador de Control", "error");
+  } finally {
+    setPendingRequests(prev => prev - 1);
+  }
+};
+const getTasks = async (controller: AbortController) => {
+  setPendingRequests(prev => prev + 1);
+  try {
+    const response: AxiosResponse<Task[]> = await axios.get(`${baseURL}/task/unassigned`, { signal: controller.signal });
+
+    if (selectedTaskId) {
+      // Si hay una tarea relacionada, incluirla también en la lista de tareas
+      const taskResponse: AxiosResponse<Task> = await axios.get(`${baseURL}/task/${selectedTaskId}`);
+      setTasks([taskResponse.data, ...response.data]); // Añadir la tarea relacionada y luego las no asignadas
+    } else {
+      setTasks(response.data); // Solo tareas no asignadas si no hay tarea relacionada
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.code !== 'ERR_CANCELED') {
+        showAlert("Error al obtener las tareas", "error");
+      }
+    }
+  } finally {
+    setPendingRequests(prev => prev - 1);
+  }
+};
+
   const  getChecker = async () => {
     setPendingRequests(prev => prev + 1);
     try {
@@ -104,11 +157,11 @@ const VerificadorControl: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener los verificadores de control", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  
+      setPendingRequests(prev => prev - 1);
     }
   };
-  
-   const getCheckerType = async () => {
+
+  const getCheckerType = async () => {
     setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<CheckerType[]> = await axios.get(`${baseURL}/checker_type/`);
@@ -116,22 +169,9 @@ const VerificadorControl: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener al jerarquía de control", "error");
     }finally {
-      setPendingRequests(prev => prev - 1);  
+      setPendingRequests(prev => prev - 1);
     }
   };
-
-  const getTask = async () => {
-    setPendingRequests(prev => prev + 1);
-    try {
-      const response: AxiosResponse<Checkpoint[]> = await axios.get(`${baseURL}/task/`);
-      setTask(response.data);
-    } catch (error) {
-      showAlert("Error al obtener las tareas", "error");
-    } finally {
-      setPendingRequests(prev => prev - 1);  
-    }
-  }; 
-  
   const getCheckpoint = async () => {
     setPendingRequests(prev => prev + 1);
     try {
@@ -140,22 +180,22 @@ const VerificadorControl: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener los items", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  
+      setPendingRequests(prev => prev - 1);
     }
-  }; 
-
-  const getMatrizPeligro = async () => {
+  };
+  /*
+  const getHazzards = async () => {
     setPendingRequests(prev => prev + 1);
     try {
-      const response: AxiosResponse<MatrizPeligro[]> = await axios.get(`${baseURL}/hazzard/`);
-      setMatrizdePeligro(response.data);
+      const response: AxiosResponse<Hazzard[]> = await axios.get(`${baseURL}/hazzard/`);
+      setHazzards(response.data);
     } catch (error) {
       showAlert("Error al obtener las medidas preventivas", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  
+      setPendingRequests(prev => prev - 1);
     }
   }; 
-
+  */
   
   const openModal = (op: string, checker?: VerificadorControl) => {
     if (op === "1") {
@@ -171,7 +211,7 @@ const VerificadorControl: React.FC = () => {
       setName(checker.name);
       setDescription(checker.description);
       setSelectedCheckerTypeId(checker.checkerType.id); 
-      setSelectedTaskId(checker.task.id); 
+      setSelectedTaskId(checker.task?.id && checker.task.id); 
       setSelectedCheckpointIds(checker.checkpoints.map(h => h.id));
       setTitle("Editar Verificación de Control");
     }
@@ -206,13 +246,13 @@ const VerificadorControl: React.FC = () => {
 
     setLoading(true);
 
-    const parametros: VerificadorControlData = {
+  const parametros: VerificadorControlData = {
         name: name.trim(),
         description: description.trim(),
         checkerTypeId: selectedCheckerTypeId,
         taskId: selectedTaskId ? selectedTaskId : null,
         checkpointIds: selectedCheckpointIds,
-    };
+  };
 
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
     enviarSolicitud(metodo, parametros);
@@ -246,6 +286,9 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
       const modal = bootstrap.Modal.getInstance(modalRef.current);
       modal?.hide();
     }
+
+    getTasks(new AbortController());
+
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       showAlert(`Error: ${error.response.data.message || "La tarea seleccionada ya esta asignada"}`, "error");
@@ -336,8 +379,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
-                {checker && checker.length > 0 && checker.map((check, i) => (
-                   
+                {checker.length > 0 && checker.map((check, i) => (
                     <tr key={JSON.stringify(check)} className="text-center">
                       <td>{i + 1}</td>
                       <td>{check.name.toUpperCase()}</td>
@@ -361,7 +403,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                       </td>
                       <td>{check.checkerType.name}</td>
                       <td>{check.task ? check.task.name : "Sin Tarea"}</td>
-					  <td>{Array.isArray(check.checkpoints) && check.checkpoints.length > 0 ? check.checkpoints.map((h) => h.name).join(", ") : "Sin Items"}</td>
+                      <td>{Array.isArray(check.checkpoints) && check.checkpoints.length > 0 ? check.checkpoints.map((h) => h.name).join(", ") : "Sin Items"}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                           <button
@@ -418,7 +460,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Nombre de la verificación"
+                    placeholder="Nombre del verificador"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -430,13 +472,13 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Descripción de la verificación"
+                    placeholder="Descripción del verificador"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
                 <div className="mb-3">
-                  <label htmlFor="checkerType" className="form-label">Tipo de Jerarquia:</label>
+                  <label htmlFor="checkerType" className="form-label">Jerarquía:</label>
                   <select
                     id="checkerType"
                     className="form-select"
@@ -445,7 +487,7 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                   >
                     <option value={0}>Selecciona...</option>
                     {checkerType.map(actv => (
-                      <option key={JSON.stringify(actv)} value={actv.id}>{actv.description}</option>
+                      <option key={JSON.stringify(actv)} value={actv.id}>{actv.name}</option>
                     ))}
                   </select>
                 </div>
@@ -458,8 +500,8 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
                     onChange={(e) => setSelectedTaskId(Number(e.target.value))}
                   >
                     <option value={0}>Tarea no asignada</option>
-                    {task.map(ts => (
-                      <option key={JSON.stringify(ts)} value={ts.id}>{ts.name}</option>
+                    {tasks.map(task => (
+                      <option key={JSON.stringify(task)} value={task.id}>{task.name}</option>
                     ))}
                   </select>
                 </div>
@@ -513,358 +555,3 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlD
 };
 
 export default VerificadorControl;
-
-
-
-
-// import React, { useEffect, useState, useRef } from "react";
-// import axios, { AxiosResponse } from "axios";
-// import Swal from "sweetalert2";
-// import withReactContent from "sweetalert2-react-content";
-// import { showAlert } from '../functions';
-// import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
-// import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-// import { Accordion } from 'react-bootstrap';
-// import * as bootstrap from 'bootstrap';
-
-// const MySwal = withReactContent(Swal);
-
-// interface VerificadorControl {
-//   id: number;
-//   name: string;
-//   description: string;
-//   createDate: string;
-//   updateDate: string;
-//   checkerType: CheckerType;
-//   task: Task;
-//   checkpoints: Checkpoint[];
-// }
-
-// interface CheckerType {
-//   id: number;
-//   name: string;
-//   description: string;
-// }
-
-// interface Checkpoint {
-//   id: number;
-//   name: string;
-//   description: string;
-// }
-
-// interface Task {
-//   id: number;
-//   name: string;
-//   description: string;
-// }
-
-// interface VerificadorControlData {
-//   name: string;
-//   description: string;
-//   checkerTypeId: number;
-//   taskId: number | null;
-//   checkpointIds: number[] | null;
-// }
-
-// interface MatrizPeligro {
-//   id: string;
-//   securityMeasures: string;
-// }
-
-// const VerificadorControl: React.FC = () => {
-//   const baseURL = import.meta.env.VITE_API_URL;
-//   const [checker, setChecker] = useState<VerificadorControl[]>([]);
-//   const [id, setId] = useState<number | null>(null);
-//   const [name, setName] = useState<string>("");
-//   const [description, setDescription] = useState<string>("");
-//   const [checkerType, setCheckerType] = useState<CheckerType[]>([]);
-//   const [task, setTask] = useState<Task[]>([]);
-//   const [matrizdePeligro, setMatrizdePeligro] = useState<MatrizPeligro[]>([]);
-//   const [checkpoint, setCheckpoint] = useState<Checkpoint[]>([]);
-//   const [selectedCheckerTypeId, setSelectedCheckerTypeId] = useState<number>(0);
-//   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
-//   const [selectedCheckpointIds, setSelectedCheckpointIds] = useState<number[] | null>(null);
-//   const [title, setTitle] = useState<string>("");
-//   const modalRef = useRef<HTMLDivElement | null>(null);
-//   const [loading, setLoading] = useState<boolean>(false);
-
-//   useEffect(() => {
-//     getChecker();
-//     getCheckerType();
-//     getTask();
-//     getCheckpoint();
-//     getMatrizPeligro();
-//     if (modalRef.current) {
-//       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
-//     }
-//     return () => {
-//       if (modalRef.current) {
-//         modalRef.current.removeEventListener('hidden.bs.modal', handleModalHidden);
-//       }
-//     };
-//   }, []);
-
-//   const getChecker = async () => {
-//     try {
-//       const response: AxiosResponse<VerificadorControl[]> = await axios.get(`${baseURL}/checker/`);
-//       setChecker(response.data);
-//     } catch (error) {
-//       showAlert("Error al obtener los verificadores de control", "error");
-//     }
-//   };
-
-//   const getCheckerType = async () => {
-//     try {
-//       const response: AxiosResponse<CheckerType[]> = await axios.get(`${baseURL}/checker_type/`);
-//       setCheckerType(response.data);
-//     } catch (error) {
-//       showAlert("Error al obtener la jerarquía de control", "error");
-//     }
-//   };
-
-//   const getTask = async () => {
-//     try {
-//       const response: AxiosResponse<Checkpoint[]> = await axios.get(`${baseURL}/task/`);
-//       setTask(response.data);
-//     } catch (error) {
-//       showAlert("Error al obtener las tareas", "error");
-//     }
-//   };
-
-//   const getCheckpoint = async () => {
-//     try {
-//       const response: AxiosResponse<Checkpoint[]> = await axios.get(`${baseURL}/checkpoint/`);
-//       setCheckpoint(response.data);
-//     } catch (error) {
-//       showAlert("Error al obtener los ítems", "error");
-//     }
-//   };
-
-//   const getMatrizPeligro = async () => {
-//     try {
-//       const response: AxiosResponse<MatrizPeligro[]> = await axios.get(`${baseURL}/hazzard/`);
-//       setMatrizdePeligro(response.data);
-//     } catch (error) {
-//       showAlert("Error al obtener las medidas preventivas", "error");
-//     }
-//   };
-
-//   const openModal = (op: string, checker?: VerificadorControl) => {
-//     if (op === "1") {
-//       setId(null);
-//       setName("");
-//       setDescription("");
-//       setSelectedCheckerTypeId(0);
-//       setSelectedTaskId(null);
-//       setSelectedCheckpointIds([]);
-//       setTitle("Registrar Verificación de Control");
-//     } else if (op === "2" && checker) {
-//       setId(checker?.id || null);
-//       setName(checker.name);
-//       setDescription(checker.description);
-//       setSelectedCheckerTypeId(checker.checkerType.id);
-//       setSelectedTaskId(checker.task.id);
-//       setSelectedCheckpointIds(checker.checkpoints.map(h => h.id));
-//       setTitle("Editar Verificación de Control");
-//     }
-
-//     if (modalRef.current) {
-//       const modal = new bootstrap.Modal(modalRef.current);
-//       modal.show();
-//     }
-//   };
-
-//   const handleModalHidden = () => {
-//     const modals = document.querySelectorAll('.modal-backdrop');
-//     modals.forEach(modal => modal.parentNode?.removeChild(modal));
-//   };
-
-//   const validar = (): void => {
-//     if (name.trim() === "") {
-//       showAlert("Escribe el nombre del verificador", "warning");
-//       return;
-//     }
-//     if (description.trim() === "") {
-//       showAlert("Escribe la descripción del verificador", "warning");
-//       return;
-//     }
-//     if (selectedCheckerTypeId === 0) {
-//       showAlert("Selecciona un tipo de jerarquía", "warning");
-//       return;
-//     }
-
-//     const parametros: VerificadorControlData = {
-//       name: name.trim(),
-//       description: description.trim(),
-//       checkerTypeId: selectedCheckerTypeId,
-//       taskId: selectedTaskId ? selectedTaskId : null,
-//       checkpointIds: selectedCheckpointIds,
-//     };
-
-//     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
-//     enviarSolicitud(metodo, parametros);
-//   };
-
-//   const enviarSolicitud = async (method: "POST" | "PUT", data: VerificadorControlData) => {
-//     setLoading(true);
-//     try {
-//       const url = method === "PUT" && id ? `${baseURL}/checker/${id}` : `${baseURL}/checker/`;
-//       const response = await axios({
-//         method,
-//         url,
-//         data,
-//         headers: { "Content-Type": "application/json" },
-//       });
-
-//       const newChecker = response.data;
-//       showAlert("Operación realizada con éxito", "success");
-
-//       if (method === "POST") {
-//         setChecker((prev) => [...prev, newChecker]);
-//       } else if (method === "PUT") {
-//         setChecker((prev) =>
-//           prev.map((check) => (check.id === newChecker.id ? newChecker : check))
-//         );
-//       }
-
-//       if (modalRef.current) {
-//         const modal = bootstrap.Modal.getInstance(modalRef.current);
-//         modal?.hide();
-//       }
-//     } catch (error) {
-//       if (axios.isAxiosError(error) && error.response) {
-//         showAlert(`Error: ${error.response.data.message || "Error en la solicitud"}`, "error");
-//       } else {
-//         showAlert("Error al realizar la solicitud", "error");
-//       }
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const deleteChecker = async (id: number) => {
-//     setLoading(true);
-//     try {
-//       await axios.delete(`${baseURL}/checker/${id}`, {
-//         headers: { "Content-Type": "application/json" },
-//       });
-//       Swal.fire("Verificador de control eliminado correctamente", "", "success");
-//       setChecker((prev) => prev.filter((check) => check.id !== id));
-//     } catch (error) {
-//       Swal.fire({
-//         title: "Error",
-//         text: "Error al eliminar el verificador de control.",
-//         icon: "error",
-//         confirmButtonText: "OK",
-//       });
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const renderEditTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-//     <Tooltip id="button-tooltip-edit" {...props}>
-//       Editar
-//     </Tooltip>
-//   );
-
-//   const renderDeleteTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-//     <Tooltip id="button-tooltip-delete" {...props}>
-//       Eliminar
-//     </Tooltip>
-//   );
-
-//   const getSecurityMeasures = (verificadorId: number) => {
-//     const matriz = matrizdePeligro.find((peligro) => peligro.id === verificadorId.toString());
-//     return matriz ? matriz.securityMeasures : "Sin medidas preventivas";
-//   };
-
-//   return (
-//     <div className="App">
-//       <div className="container-fluid">
-//         <div className="row mt-3">
-//           <div className="col-12">
-//             <div className="tabla-contenedor">
-//               <EncabezadoTabla title="Verificadores de Control" onClick={() => openModal("1")} />
-//             </div>
-//             {loading ? (
-//               <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh', marginTop: '-200px' }}>
-//                 <Spinner animation="border" role="status" style={{ color: '#A17BB6' }}>
-//                   <span className="visually-hidden">Loading...</span>
-//                 </Spinner>
-//               </div>
-//             ) : (
-//               <div className="table-responsive tabla-scroll">
-//                 <table className="table table-bordered">
-//                   <thead className="text-center"
-//                     style={{ background: 'linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)', color: '#fff' }}>
-//                     <tr>
-//                       <th>N°</th>
-//                       <th>Nombre</th>
-//                       <th>Medidas Preventivas</th>
-//                       <th>Tipo de jerarquía</th>
-//                       <th>Tareas</th>
-//                       <th>Items</th>
-//                       <th>Acciones</th>
-//                     </tr>
-//                   </thead>
-//                   <tbody className="table-group-divider">
-//                     {checker.length > 0 && checker.map((check, i) => (
-//                       <tr key={check.id} className="text-center">
-//                         <td>{i + 1}</td>
-//                         <td>{check.name}</td>
-//                         <td>
-//                           <Accordion>
-//                             <Accordion.Item eventKey="0">
-//                               <Accordion.Header>Medidas Preventivas</Accordion.Header>
-//                               <Accordion.Body>
-//                                 <ul>
-//                                   <li>{getSecurityMeasures(check.id)}</li>
-//                                   <li>{check.description}</li>
-//                                 </ul>
-//                               </Accordion.Body>
-//                             </Accordion.Item>
-//                           </Accordion>
-//                         </td>
-//                         <td>{check.checkerType.name}</td>
-//                         <td>{check.task ? check.task.name : "Sin Tarea"}</td>
-//                         <td>{check.checkpoints.map(h => h.name).join(", ") || "Sin Items"}</td>
-//                         <td className="text-center">
-//                           <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
-//                             <button onClick={() => openModal("2", check)} className="btn btn-custom-editar m-2">
-//                               <i className="fa-solid fa-edit"></i>
-//                             </button>
-//                           </OverlayTrigger>
-//                           <OverlayTrigger placement="top" overlay={renderDeleteTooltip({})}>
-//                             <button className="btn btn-custom-danger" onClick={() => {
-//                               MySwal.fire({
-//                                 title: "¿Estás seguro?",
-//                                 text: "No podrás revertir esto",
-//                                 icon: "warning",
-//                                 showCancelButton: true,
-//                                 confirmButtonText: "Sí, bórralo",
-//                                 cancelButtonText: "Cancelar",
-//                               }).then((result) => {
-//                                 if (result.isConfirmed) {
-//                                   deleteChecker(check.id);
-//                                 }
-//                               });
-//                             }}>
-//                               <i className="fa-solid fa-circle-xmark"></i>
-//                             </button>
-//                           </OverlayTrigger>
-//                         </td>
-//                       </tr>
-//                     ))}
-//                   </tbody>
-//                 </table>
-//               </div>
-//             )}
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default VerificadorControl;

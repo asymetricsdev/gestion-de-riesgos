@@ -1,37 +1,37 @@
 .sidebar {
-    width: 85px;
-    transition: width 0.3s;
+  width: 85px;
+  transition: width 0.3s;
 }
 
 /* .sidebar.open {
-    width: 250px;
+  width: 250px;
 } */
 
 .main-content {
-    padding: 20px;
-    margin-top: -70px;
-    transition: margin-left 0.3s;
+  padding: 5px;
+  margin-top: 0px;
+  transition: margin-left 0.4s;
 }
 
 .main-content.with-sidebar {
-    margin-left: 250px;
+  margin-left: 200px;
 }
 
 /* CSS PROVISORIOS */
 /* 
 .sidebar.open {
-    width: 250px;
-    display: none;
+  width: 250px;
+  display: none;
 }
 
 .p-0{
-    display: none;
+  display: none;
 }
 
 .custom-button{
-    display: none;
+  display: none;
 }
 
 .header-container{
-    display: none;
+  display: none;
 } */

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Dropdown, Nav, Navbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import logo from '../../img/logo-asy.png';
 import menuDataRoles from '../../Json/menuRoles.json';
@@ -104,7 +104,7 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
               )}
 
               <Nav.Link href="#" className="d-flex align-items-center">
-                Version: 20.OCT.2024 20:30
+                Version: 21.OCT.2024 23:30
               </Nav.Link>
               <OverlayTrigger placement="bottom" overlay={renderLogOutTooltip({})}>
                 <Nav.Link href="#" className="d-flex align-items-center custom-icon" onClick={handleLogoutClick}>
@@ -115,7 +115,7 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
           </Nav>
         </Navbar.Collapse>
       </Navbar>
-
+              {/*}
       <button 
         className="navbar-toggler always-visible custom-button" 
         type="button" 
@@ -123,6 +123,7 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
       >
         <i className="fa-solid fa-bars"></i>
       </button>
+      */}
     </>
   );
 }
