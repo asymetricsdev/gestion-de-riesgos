@@ -1,3 +1,5 @@
+//ÚLTIMO CÓDIGO DE COLABORADORES EJECUTAR TAREAS 22-10-24
+
 import React, { useEffect, useState } from "react";
 import axios, { AxiosResponse, AxiosError } from "axios";
 import { showAlert } from "../functions";
@@ -54,6 +56,10 @@ interface Checker {
 interface Status {
 	id: number;
 	name: string;
+	taskType: {
+		id: number;
+		name: string;
+	};
 }
 
 interface Planning {
@@ -94,6 +100,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 	const [selectedStatus, setSelectedStatus] = useState<Record<number, number>>({});
 	const [checkerId, setCheckerId] = useState<number | null>(null);
 	const [progressCompletion, setProgressCompletion] = useState<number>(0);
+	const [taskTypeId, setTaskTypeId] = useState<number>(0);
 	const [title, setTitle] = useState<string>("");
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		onDrop: (acceptedFiles) => handleFileUpload(acceptedFiles),
@@ -102,55 +109,77 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 
 	const { id } = useParams<{ id: string }>();
 
-	useEffect(() => {
+	 useEffect(() => {
 		console.log(`empId: ${empId}`);
 		getTaskExecutionData();
-		getStatus(2);
-	}, [empId, taskId]);
+		getStatus( [1, 2, 8] );
+	}, [empId, taskId]); 
 
+	 const getStatus = async (taskTypeIds: number[]) => {
+		try {
+		  const requests = taskTypeIds.map(taskTypeId => axios.get(`${baseURL}/status/taskType/${taskTypeId}`));
+		  const responses = await Promise.all(requests);
+	  
+		  const allStatuses = responses.flatMap(response => response.data);
+		  const uniqueStatuses = allStatuses.filter((status, index, self) =>
+			index === self.findIndex((s) => s.id === status.id)
+		  );
+	  
+		  setStatus(uniqueStatuses);
+		} catch (error) {
+		  console.error("Error al obtener estados para múltiples tipos de tarea:", error);
+		  showAlert("Error al obtener los estados. Intenta nuevamente.", "error");
+		}
+	  }; 
+	  
 	//LLENAMOS LA TABLA DE EJECUCION DE CHECKPOINTS
 	const getTaskExecutionData = async () => {
 		try {
-			const response = await axios.get(`${baseURL}/task/${taskId}/executions?employeeId=${empId}`);
-			console.log("Datos de ejecución obtenidos desde getTaskExecutionData:", response.data);
-
-			setTaskExecution(response.data);
-
-			// Si existen ejecuciones de checkpoints
-			if (response.data.checkpointExecutions && response.data.checkpointExecutions.length > 0) {
-				setTitle(response.data.task.name);
-
-				// Calcular el progreso basado en las ejecuciones de los checkpoints
-				const totalCheckpoints = response.data.checkpointExecutions.length;
-
-				// Filtrar checkpoints completados (en este caso, con el estado "Asiste")
-				const completedCheckpoints = response.data.checkpointExecutions.filter(
-					(checkpoint: any) => checkpoint.status.name === "Asiste"
-				).length;
-
-				// Calcular el porcentaje de progreso
-				const progress = (completedCheckpoints / totalCheckpoints) * 100;
-
-				// Asignar el progreso al estado
-				setProgressCompletion(progress);
-			}
-		} catch (error) {
-			showAlert("Error al obtener los datos de ejecución de la tarea", "error");
+		  const response = await axios.get(`${baseURL}/task/${taskId}/executions?employeeId=${empId}`);
+		  console.log("Datos de ejecución obtenidos desde getTaskExecutionData:", response.data);
+	  
+		  setTaskExecution(response.data);
+	  
+		  // Si existen ejecuciones de checkpoints
+		  if (response.data.checkpointExecutions && response.data.checkpointExecutions.length > 0) {
+			setTitle(response.data.task?.name || "Tarea desconocida");
+	  
+			// Calcular el progreso basado en las ejecuciones de los checkpoints
+			const totalCheckpoints = response.data.checkpointExecutions.length;
+	  
+			// Filtrar checkpoints completados (en este caso, con el estado "Asiste")
+			const completedCheckpoints = response.data.checkpointExecutions.filter(
+			  (checkpoint: any) => checkpoint.status?.name === "Asiste"
+			).length;
+	  
+			// Calcular el porcentaje de progreso
+			const progress = (completedCheckpoints / totalCheckpoints) * 100;
+	  
+			// Asignar el progreso al estado
+			setProgressCompletion(progress);
+		  } else {
+			console.warn("No hay ejecuciones de checkpoint disponibles.");
+			setProgressCompletion(0);  // Si no hay checkpoints, el progreso es 0
+		  }
+		} catch (error: any) {
+		  // Revisar si es un error de respuesta, de solicitud o de otro tipo
+		  if (error.response) {
+			// El servidor respondió con un código de estado fuera del rango 2xx
+			console.error("Error en la respuesta del servidor:", error.response.data);
+			showAlert(`Error del servidor: ${error.response.status} - ${error.response.data.message || 'Error desconocido'}`, "error");
+		  } else if (error.request) {
+			// La solicitud fue hecha pero no hubo respuesta
+			console.error("No se recibió respuesta del servidor:", error.request);
+			showAlert("No se recibió respuesta del servidor. Verifica tu conexión a Internet.", "error");
+		  } else {
+			// Otro tipo de error (por ejemplo, configuración de axios o algo inesperado)
+			console.error("Error inesperado:", error.message);
+			showAlert(`Error inesperado: ${error.message}`, "error");
+		  }
 		}
-	};
-
-	const getStatus = async (taskTypeId: number) => {
-		try {
-			const response: AxiosResponse<Status[]> = await axios.get(
-				`${baseURL}/status/taskType/${taskTypeId}` // TaskType ID específico para Capacitación
-			);
-			console.log("Datos de ejecución obtenidos desde Status:", response.data);
-			setStatus(response.data); // Guardar los estados en el estado de React
-		} catch (error) {
-			showAlert("Error al obtener los estados", "error");
-		}
-	};
-
+	  };
+	  
+	  
 	//CARGA DE ARCHIVO
 	const handleFileUpload = async (files: File[]) => {
 		if (files.length === 0) return;
@@ -237,7 +266,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 	};
 
 	
-	 const saveCheckpointExecution = async () => {
+	  const saveCheckpointExecution = async () => {
 		// Generar el arreglo dataToSend basado en selectedStatus
 		const dataToSend = Object.entries(selectedStatus).map(([checkpointId, statusId]) => ({
 			checkpointId: Number(checkpointId),
@@ -274,7 +303,8 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 				showAlert(`Error sin respuesta del servidor: ${axiosError.message}`, "error");
 			}
 		}
-	};
+	}; 
+	
  
 
 	const renderEjecutarTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
@@ -415,7 +445,7 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 										<td>{index + 1}</td>
 										<td>{file.fileName}</td>
 										<td>{file.mimeType}</td>
-										<td>{formatDate(file.executedAt)}</td>
+										<td>{file.executedAt}</td>
 										<td>
 											<OverlayTrigger
 												overlay={
@@ -475,9 +505,9 @@ const ColaboradorEjecutarTarea: React.FC = () => {
 									taskExecution.checkpointExecutions.map((checkpoint, index) => (
 										<tr key={checkpoint.id}>
 											<td>{index + 1}</td>
-											<td>{checkpoint.checkpoint.name}</td>
-											<td>{formatDate(checkpoint.executedAt)}</td>
-											<td>{checkpoint.status.name}</td>
+											<td>{checkpoint.checkpoint?.name || "Nombre no disponible"}</td>
+											<td>{checkpoint.executedAt}</td>
+											<td>{checkpoint.status?.name || "Estado no disponible"}</td> 
 											<td>
 												<select
 													className="form-select"
