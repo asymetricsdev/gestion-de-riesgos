@@ -7,70 +7,50 @@ import { showAlert } from '../functions';
 import { OverlayTrigger, Tooltip, Spinner } from 'react-bootstrap';
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
 import Select from 'react-select';
-import { Accordion } from 'react-bootstrap';
 import * as bootstrap from 'bootstrap';
 
 const MySwal = withReactContent(Swal);
 
 interface Usuarios {
   id: number;
-  name: string;
-  password: string;
+  username: string;
+  password?: string;
   roles: Roles[];
-  managerPosition: ManagerPosition;
-  subordinatePositions: SubordinatePosition[];
+  enabled: boolean;
 }
 
 interface Roles {
   id: number;
   name: string;
-}
-
-interface SubordinatePosition {
-  id: number;
-  name: string;
-  roles: string;
-  createDate: string;
-  updateDate: string;
-}
-
-interface ManagerPosition {
-  id: number;
-  name: string;
-  roles: string;
-  createDate?: string;
-  updateDate?: string;
+  enabled?: boolean;
 }
 
 interface UsuarioData {
   id?: number;
-  name: string;
-  password: string;
-  roles: string;
-  managerPositionId: number;
+  username: string;
+  password?: string;
+  roles: number[]; // Enviar los IDs de roles
+  enabled: boolean;
 }
 
 const Usuarios: React.FC = () => {
   const baseURL = import.meta.env.VITE_API_URL;
-  const [positions, setPositions] = useState<Usuarios[]>([]);
-  const [roles, setRoles] = useState<string>("");
-  const [managerPosition, setManagerPosition] = useState<ManagerPosition[]>([]);
-  const [subordinatePositions, setSubordinatePositions] = useState<SubordinatePosition[]>([]);
+  const [users, setUsers] = useState<Usuarios[]>([]);
+  const [roles, setRoles] = useState<Roles[]>([]);
   const [id, setId] = useState<number | null>(null);
-  const [name, setName] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [selectedManagerIds, setSelectedManagerIds] = useState<number[]>([]);
+  const [username, setUsername] = useState<string>(""); 
+  const [password, setPassword] = useState<string>(""); 
+  const [selectedRoles, setSelectedRoles] = useState<number[]>([]); 
   const [title, setTitle] = useState<string>("");
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false); 
+  const [loading, setLoading] = useState<boolean>(false);
   const [pendingRequests, setPendingRequests] = useState<number>(0);
-  const [estado, setEstado] = useState<number>(1);
+  const [estado, setEstado] = useState<boolean>(true);
 
   useEffect(() => {
-    getPositions();
-    getManagerPositions();
-    getSubordinatePositions();
+    getUsers();
+    getRoles();
     if (modalRef.current) {
       modalRef.current.addEventListener('hidden.bs.modal', handleModalHidden);
     }
@@ -81,64 +61,53 @@ const Usuarios: React.FC = () => {
     };
   }, []);
 
-  const getPositions = async () => {
+  const getUsers = async () => {
     setPendingRequests(prev => prev + 1);
     try {
       const response: AxiosResponse<Usuarios[]> = await axios.get(`${baseURL}/user/`);
-      setPositions(response.data);
+      setUsers(response.data);
     } catch (error) {
-      showAlert("Error al obtener los Usuarios", "error");
-    } finally {
-      setPendingRequests(prev => prev - 1); 
-    }
-  };
-
-  const getManagerPositions = async () => {
-    setPendingRequests(prev => prev + 1);
-    try {
-      const response: AxiosResponse<ManagerPosition[]> = await axios.get(`${baseURL}/role/`);
-      setManagerPosition(response.data);
-    } catch (error) {
-      showAlert("Error al obtener las Jefaturas", "error");
-    } finally {
-      setPendingRequests(prev => prev - 1); 
-    }
-  };
-
-  const getSubordinatePositions = async () => {
-    setPendingRequests(prev => prev + 1);
-    try {
-      const response: AxiosResponse<SubordinatePosition[]> = await axios.get(`${baseURL}/role/`);
-      setSubordinatePositions(response.data);
-    } catch (error) {
-      showAlert("Error al obtener las Tareas", "error");
+      showAlert("Error al obtener los usuarios", "error");
     } finally {
       setPendingRequests(prev => prev - 1);
     }
   };
 
-  const openModal = (op: string, position?: Usuarios) => {
+  const getRoles = async () => {
+    setPendingRequests(prev => prev + 1);
+    try {
+      const response: AxiosResponse<Roles[]> = await axios.get(`${baseURL}/role/`);
+      setRoles(response.data);
+    } catch (error) {
+      showAlert("Error al obtener los roles", "error");
+    } finally {
+      setPendingRequests(prev => prev - 1);
+    }
+  };
+
+  const openModal = (op: string, user?: Usuarios) => {
     if (op === "1") {
       setId(null);
-      setName("");
-      setPassword("");
-      setSelectedManagerIds([]); 
-      setTitle("Crear Usuarios");
-    } else if (op === "2" && position) {
-      setId(position.id);
-      setName(position.name);
-      setPassword(position.password);
-      setSelectedManagerIds([position.managerPosition?.id || 0]);
-      setTitle("Editar Usuarios");
+      setUsername("");
+      setPassword(""); 
+      setSelectedRoles([]);
+      setEstado(true); 
+      setTitle("Crear Usuario");
+    } else if (op === "2" && user) {
+      setId(user.id);
+      setUsername(user.username || "");
+      setPassword(""); 
+      setSelectedRoles(user.roles?.map(role => role.id) || []); 
+      setEstado(user.enabled);
+      setTitle("Editar Usuario");
     }
-  
+
     if (modalRef.current) {
       const modal = new bootstrap.Modal(modalRef.current);
       modal.show();
       setIsModalOpen(true);
     }
   };
-  
 
   const handleModalHidden = () => {
     setIsModalOpen(false);
@@ -147,28 +116,23 @@ const Usuarios: React.FC = () => {
   };
 
   const validar = (): void => {
-    if (name.trim() === "") {
-      showAlert("Escribe el nombre del Usuarios", "warning");
+    if (!username || username.trim() === "") {
+      showAlert("Escribe el username del usuario", "warning");
       return;
     }
 
-    if (password.trim() === "") {
-      showAlert("Escribe el Password del Usuarios", "warning");
-      return;
-    }
-
-    if (selectedManagerIds.length === 0) {
-      showAlert("Selecciona Jefatura", "warning");
+    if (selectedRoles.length === 0) {
+      showAlert("Selecciona al menos un rol", "warning");
       return;
     }
 
     setLoading(true);
 
     const parametros: UsuarioData = {
-      name: name.trim(),
-      password: password.trim(),
-      roles: roles.trim(),
-      managerPositionId: selectedManagerIds[0], 
+      username: username.trim(),
+      password: password ? password.trim() : undefined, 
+      roles: selectedRoles, 
+      enabled: estado
     };
 
     const metodo: "PUT" | "POST" = id ? "PUT" : "POST";
@@ -178,7 +142,8 @@ const Usuarios: React.FC = () => {
   const enviarSolicitud = async (method: "POST" | "PUT", data: UsuarioData) => {
     setLoading(true);
     try {
-      const url = method === "PUT" && id ? `${baseURL}/role/${id}` : `${baseURL}/role/`;
+      const url = method === "PUT" && id ? `${baseURL}/user/${id}` : `${baseURL}/user/`;
+      
       const response = await axios({
         method,
         url,
@@ -186,15 +151,15 @@ const Usuarios: React.FC = () => {
         headers: { "Content-Type": "application/json" },
       });
   
-      const newActividad = response.data; 
+      const newUser = response.data;
   
       showAlert("Operación realizada con éxito", "success");
   
       if (method === "POST") {
-        setPositions((prev) => [...prev, newActividad]);
+        setUsers((prev) => [...prev, newUser]);
       } else if (method === "PUT") {
-        setPositions((prev) =>
-          prev.map((pos) => (pos.id === newActividad.id ? newActividad : pos))
+        setUsers((prev) =>
+          prev.map((us) => (us.id === newUser.id ? newUser : us))
         );
       }
   
@@ -203,8 +168,8 @@ const Usuarios: React.FC = () => {
         modal?.hide();
       }
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        showAlert(`Error: ${error.response.data.message || "No se pudo completar la solicitud."}`, "error");
+      if (axios.isAxiosError(error)) {
+        showAlert(`Error: ${error.response?.data?.message || "No se pudo completar la solicitud."}`, "error");
       } else {
         showAlert("Error al realizar la solicitud", "error");
       }
@@ -212,29 +177,26 @@ const Usuarios: React.FC = () => {
       setLoading(false);
     }
   };
-
-
-  const deletePosition = async (id: number) => {
+  
+  const deleteUser = async (id: number) => {
     try {
-      const response = await axios.delete(`${baseURL}/role/${id}`, {
-        headers: { "Content-Type": "application/json" },
+      const response = await axios.delete(`${baseURL}/user/${id}`, {
+        headers: { "Content-Type": "application/json" }, 
       });
   
       if (response.status === 200) {
-        setPositions(positions.filter((position) => position.id !== id));
-        showAlert("Eliminado con éxito", "success");
+        setUsers(users.filter((user) => user.id !== id));
+        showAlert("Usuario eliminado con éxito", "success");
       } else {
-        showAlert("Error al eliminar", "error");
+        showAlert("Error al eliminar el usuario", "error");
       }
     } catch (error) {
-      showAlert("Error al eliminar la posición", "error");
+      if (axios.isAxiosError(error)) {
+        console.error("Error en la eliminación:", error.response?.data);
+      }
+      showAlert("Error al eliminar el usuario", "error");
     }
   };
-
-  const opcionesEquipo = subordinatePositions.map(rl => ({
-    value: rl.id,
-    label: rl.roles,
-  }));
 
   return (
     <div className="App">
@@ -265,43 +227,31 @@ const Usuarios: React.FC = () => {
                   >
                     <tr>
                       <th>ID</th>
-                      <th>Nombre de Usuario</th>
+                      <th>Username</th>
                       <th>Roles</th>
                       <th>Estado</th>
                       <th>Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="table-group-divider">
-                    {positions &&
-                      positions.length > 0 &&
-                      positions.map((pos, i) => (
-                        <tr key={pos.id} className="text-center">
+                    {users &&
+                      users.length > 0 &&
+                      users.map((us, i) => (
+                        <tr key={us.id} className="text-center">
                           <td>{i + 1}</td>
-                          <td>{pos.name}</td>
-                          <td>{pos.managerPosition?.name || "N/A"}</td>
+                          <td>{us.username || "N/A"}</td>
                           <td>
-                            <Accordion>
-                              <Accordion.Item eventKey="0">
-                                <Accordion.Header>Roles</Accordion.Header>
-                                <Accordion.Body>
-                                  <ul>
-                                    {pos.subordinatePositions &&
-                                    pos.subordinatePositions.length > 0 ? (
-                                      pos.subordinatePositions.map((sub) => (
-                                        <li key={sub.id}>{sub.roles}</li>
-                                      ))
-                                    ) : (
-                                      <li>No hay subordinados</li>
-                                    )}
-                                  </ul>
-                                </Accordion.Body>
-                              </Accordion.Item>
-                            </Accordion>
+                            <ul>
+                              {us.roles?.map((role) => (
+                                <li key={role.id}>{role.name}</li>
+                              )) || <li>No roles</li>}
+                            </ul>
                           </td>
+                          <td>{us.enabled ? "Activo" : "Inactivo"}</td>
                           <td className="text-center">
                             <OverlayTrigger placement="top" overlay={<Tooltip id="button-tooltip-edit">Editar</Tooltip>}>
                               <button
-                                onClick={() => openModal("2", pos)}
+                                onClick={() => openModal("2", us)}
                                 className="btn btn-custom-editar m-2"
                               >
                                 <i className="fa-solid fa-edit"></i>
@@ -320,7 +270,7 @@ const Usuarios: React.FC = () => {
                                     cancelButtonText: "Cancelar",
                                   }).then((result) => {
                                     if (result.isConfirmed) {
-                                      deletePosition(pos.id); 
+                                      deleteUser(us.id);
                                     }
                                   });
                                 }}
@@ -348,22 +298,22 @@ const Usuarios: React.FC = () => {
               <div className="modal-body">
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                    <i className="fa-solid fa-address-card"></i>
+                    <i className="fa-solid fa-user"></i>
                   </span>
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Nombre del Usuario"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                   />
                 </div>
                 <div className="input-group mb-3">
                   <span className="input-group-text">
-                  <i className="fa-solid fa-key"></i>
+                    <i className="fa-solid fa-key"></i>
                   </span>
                   <input
-                    type="text"
+                    type="password"
                     className="form-control"
                     placeholder="Contraseña"
                     value={password}
@@ -371,35 +321,31 @@ const Usuarios: React.FC = () => {
                   />
                 </div>
                 <div className="mb-3">
-
-      <label htmlFor="Estado">Estado:</label>
-      <select
-        id="Estado"
-        className="form-select"
-        value={estado}
-        onChange={(e) => setEstado(Number(e.target.value))}
-      >
-        <option value={1}>Activo</option>
-        <option value={0}>Inactivo</option>
-      </select>
-      </div>
-
-                {/* Multiselect for ROLES1 */}
+                  <label htmlFor="Estado">Estado:</label>
+                  <select
+                    id="Estado"
+                    className="form-select"
+                    value={estado ? 1 : 0}
+                    onChange={(e) => setEstado(e.target.value === "1")}
+                  >
+                    <option value={1}>Activo</option>
+                    <option value={0}>Inactivo</option>
+                  </select>
+                </div>
                 <div className="form-group mt-3">
-                  <label htmlFor="managerPosition">Roles:</label>
+                  <label htmlFor="roles">Roles:</label>
                   <Select
                     isMulti
-                    value={managerPosition
-                      .filter((proc) => selectedManagerIds.includes(proc.id))
-                      .map((proc) => ({ value: proc.id, label: proc.name }))
-                    }
+                    value={roles
+                      .filter((role) => selectedRoles.includes(role.id))
+                      .map((role) => ({ value: role.id, label: role.name }))}
                     onChange={(selectedOptions) => {
                       const selectedIds = selectedOptions.map((option) => option.value);
-                      setSelectedManagerIds(selectedIds);
+                      setSelectedRoles(selectedIds);
                     }}
-                    options={managerPosition.map((proc) => ({
-                      value: proc.id,
-                      label: proc.name,
+                    options={roles.map((role) => ({
+                      value: role.id,
+                      label: role.name,
                     }))}
                   />
                 </div>
