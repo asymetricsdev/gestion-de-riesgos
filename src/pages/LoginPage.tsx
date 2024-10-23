@@ -13,6 +13,10 @@ type LoginFormsInputs = {
   password: string;
 };
 
+interface LoginPageProps {
+  onLogin: (token: string) => void;
+}
+
 const validationSchema = Yup.object().shape({
   userName: Yup.string().required("Usuario es requerido"),
   password: Yup.string().required("Password es requerido"),
@@ -20,12 +24,10 @@ const validationSchema = Yup.object().shape({
 
 const baseURL = import.meta.env.VITE_API_URL;
 
-const LoginPage = ({ onLogin }: { onLogin: (token: string) => void }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormsInputs>({ resolver: yupResolver(validationSchema) });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
-
   const navigate = useNavigate();
 
   const handleLogin = async (formData: LoginFormsInputs) => {
@@ -35,17 +37,22 @@ const LoginPage = ({ onLogin }: { onLogin: (token: string) => void }) => {
         username: formData.userName,
         password: formData.password
       };
-  
+
       const response = await axios.post(`${baseURL}/auth/login`, data);
-     console.log(response);
+      console.log(response);
+
       const token = response.data.token;
+      const roles = response.data.roles;
+      const menuRol = response.data.menuRol;
       setLoading(false);
-      if (token) {
+
+      if (token && roles) {
         await showAlert("Bienvenido a la sesión", "success");
-        setIsLoggedIn(true);
-        onLogin(token); 
+        onLogin(token);
         setErrorMessage(null);
-        sessionStorage.setItem('authToken', token); 
+
+        sessionStorage.setItem('authToken', token);
+        sessionStorage.setItem('userRole', roles[0]);
         navigate("/home");
       } else {
         setErrorMessage("Credenciales erróneas");
@@ -53,7 +60,6 @@ const LoginPage = ({ onLogin }: { onLogin: (token: string) => void }) => {
     } catch (error: any) {
       console.error("Error durante el inicio de sesión", error);
       setLoading(false);
-  
       if (error.response && error.response.data && error.response.data.message) {
         setErrorMessage(error.response.data.message);
       } else {
@@ -61,10 +67,6 @@ const LoginPage = ({ onLogin }: { onLogin: (token: string) => void }) => {
       }
     }
   };
-
-  if (isLoggedIn) {
-    return null; 
-  }
 
   return (
     <div className="login-container">
@@ -105,19 +107,19 @@ const LoginPage = ({ onLogin }: { onLogin: (token: string) => void }) => {
                 {errors.password && <p className="text-danger">{errors.password.message}</p>}
               </div>
               <button
-									type="submit"
-									className="btn btn-primary"
-									disabled={loading}>
-									{loading ? (
-										<span
-											className="spinner-border spinner-border-sm"
-											role="status"
-											aria-hidden="true"
-										></span>
-									) : (
-										"Iniciar Sesión"
-									)}
-								</button>
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}>
+                {loading ? (
+                  <span
+                    className="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                ) : (
+                  "Iniciar Sesión"
+                )}
+              </button>
             </form>
             <div className="mt-3">
               
@@ -130,3 +132,6 @@ const LoginPage = ({ onLogin }: { onLogin: (token: string) => void }) => {
 };
 
 export default LoginPage;
+
+
+

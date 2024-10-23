@@ -7,6 +7,7 @@ import Menu from './components/Menu/Menu';
 import { UserProvider } from './Context/UserProvider';
 import LoginPage from './Pages/LoginPage';
 import { AppRoutes } from './Routes/Routes';
+import ErrorBoundary from './Helpers/ErrorBoundary';
 
 export function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false); 
@@ -16,7 +17,6 @@ export function App() {
     const token = localStorage.getItem('token');
     if (token) {
       setIsAuthenticated(true);
-      //setIsAuthenticated(false);MOC comenta esto para que no se cierre la sesion
     }
   }, []);
 
@@ -43,6 +43,7 @@ export function App() {
   }
 
   return (
+  <ErrorBoundary>
 <BrowserRouter>
 <UserProvider>
   <Container fluid>
@@ -58,11 +59,12 @@ export function App() {
   </Container>
   </UserProvider>
 </BrowserRouter>
+</ErrorBoundary>
 
 );
 }
 
-
-  
-
 export default App;
+
+
+

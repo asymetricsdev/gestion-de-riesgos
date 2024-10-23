@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import menuData from '../../Json/menuAdministrador.json';
+import menuData from '../../Json/menuApp.json';
 import './SidebarMenu.css';
 
 interface Submenu {
@@ -10,8 +10,8 @@ interface Submenu {
   url: string;
   icono: string;
   icono_arrow?: string;
+  icono_arrow_left?: string;
   indicador: string;
-  submenu: Submenu[];
 }
 
 interface MenuItem {
@@ -19,45 +19,54 @@ interface MenuItem {
   id_menu: number;
   url: string;
   icono: string;
-  icono_arrow: string;
+  icono_arrow?: string;
   icono_arrow_left?: string;
   indicador: string;
   submenu: Submenu[];
 }
 
+interface RoleMenu {
+  rol: string;
+  menu: MenuItem[];
+}
+
 interface SidebarProps {
   isOpen: boolean;
   toggleSidebar: () => void;
-  isLoggedIn: boolean;
 }
 
 const renderTooltip = (text: string) => <Tooltip id="button-tooltip">{text}</Tooltip>;
 
-const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isLoggedIn }) => {
+const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const [openMenus, setOpenMenus] = useState<{ [key: number]: boolean }>({});
+  const [data, setData] = useState<MenuItem[]>([]);
 
+  const userRole = sessionStorage.getItem('userRole') || "ROLE_DEFAULT";
 
   useEffect(() => {
-    const initialMenuState = menuData.reduce((acc: { [key: number]: boolean }, item: MenuItem) => {
+    const roleMenu = (menuData as RoleMenu[]).find(role => role.rol === userRole);
+    
+    if (roleMenu && Array.isArray(roleMenu.menu)) {
+      setData(roleMenu.menu);
+    } else {
+      console.error("Menu no encontrado por role:", userRole);
+    }
+  }, [userRole]);
+
+  useEffect(() => {
+    const initialMenuState = data.reduce((acc: { [key: number]: boolean }, item: MenuItem) => {
       acc[item.id_menu] = false;
       return acc;
     }, {});
     setOpenMenus(initialMenuState);
-  }, []);
+  }, [data]);
 
-  const toggleSubmenu = (menuId: number) => {
+  const toggleMenu = (menuId: number) => {
     setOpenMenus((prevOpenMenus) => ({
       ...prevOpenMenus,
       [menuId]: !prevOpenMenus[menuId],
     }));
   };
-
-  const [data, setData] = useState<MenuItem[]>([]);
-
-
-  useEffect(() => {
-    setData(menuData);
-  }, []);
 
   return (
     <div className={`sidebar ${isOpen ? "open" : ""}`}>
@@ -65,24 +74,19 @@ const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isLoggedIn
         <ul className="menu flex-column">
           {data.map((item) => (
             <li key={item.id_menu} className="menu-item">
-              <div className="d-flex align-items-center nav-link" onClick={() => toggleSubmenu(item.id_menu)}>
+              <div className="d-flex align-items-center nav-link" onClick={() => toggleMenu(item.id_menu)}>
                 <NavLink to={item.url || "#"} className="d-flex align-items-center">
                   <i className={item.icono}></i> {isOpen && <span>{item.menu}</span>}
                 </NavLink>
-                {item.submenu.length > 0 && (
-                  <i 
-                    className={`ms-auto ${openMenus[item.id_menu] ? "fa-chevron-up" : "fa-chevron-down"} fa-solid`} 
-                    onClick={() => toggleSubmenu(item.id_menu)}
-                  ></i>
-                )}
               </div>
 
+              {/* Si hay submenús, mostrarlos */}
               {item.submenu.length > 0 && openMenus[item.id_menu] && (
-                <ul className={`submenu ${isOpen ? "submenu-open" : ""}`}>
-                  {item.submenu.map((subItem) => (
-                    <li key={`${item.id_menu}-${subItem.id_menu}`} className="submenu-item">
-                      <NavLink to={subItem.url} className="nav-link d-flex align-items-center">
-                        <i className={subItem.icono}></i> {isOpen && <span>{subItem.menu}</span>}
+                <ul className="submenu">
+                  {item.submenu.map((subitem) => (
+                    <li key={subitem.id_menu} className="submenu-item">
+                      <NavLink to={subitem.url || "#"} className="nav-link">
+                        <i className={subitem.icono}></i> {subitem.menu}
                       </NavLink>
                     </li>
                   ))}
@@ -103,3 +107,8 @@ const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, isLoggedIn
 };
 
 export default SidebarMenu;
+
+
+
+
+
