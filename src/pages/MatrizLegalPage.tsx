@@ -1,6 +1,8 @@
-
+import MatrizLegal  from "../components/MatrizLegal/MatrizLegal"
 export default function MatrizLegalPage() {
   return (
-    <div>Matriz Legal</div>
+    <div>
+      <MatrizLegal />
+    </div>
   )
 }
