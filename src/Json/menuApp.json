@@ -129,6 +129,24 @@
        ]
      },
      {
+      "menu": "Matriz Legal",
+      "id_menu": 123,
+      "url": "",
+      "icono": "fa-solid fa-file",
+      "icono_arrow": "fa-solid fa-chevron-down",
+      "indicador": "Visible",
+      "submenu": [
+        {
+          "menu": "Matriz Legal",
+          "id_menu": 124,
+          "url": "/matriz-de-peligro/matriz-legal",
+          "icono": "fa-solid fa-file",
+          "indicador": "Visible",
+          "submenu": []
+        }
+      ]
+    },
+     {
        "menu": "Configuración",
        "id_menu": 42,
        "url": "",
