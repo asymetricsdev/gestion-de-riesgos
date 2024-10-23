@@ -94,73 +94,91 @@
         "submenu": []
       }
     ]
-  },    
+  },
   {
-        "menu": "Configuración",
-        "id_menu": 42,
-        "url": "",
-        "icono": "fa-solid fa-gear",
-        "icono_arrow": "fa-solid fa-chevron-down",
+    "menu": "Matriz Legal",
+    "id_menu": 123,
+    "url": "",
+    "icono": "fa-solid fa-file",
+    "icono_arrow": "fa-solid fa-chevron-down",
+    "indicador": "Visible",
+    "submenu": [
+      {
+        "menu": "Matriz Legal",
+        "id_menu": 124,
+        "url": "/matriz-de-peligro/matriz-legal",
+        "icono": "fa-solid fa-file",
         "indicador": "Visible",
-        "submenu": [
-          {
-            "menu": "Tareas",
-            "id_menu": 421,
-            "url": "/matriz-de-peligro/configuracion/tareas",
-            "icono": "fa-solid fa-bars-progress",
-            "indicador": "Visible",
-            "submenu": []
-          },
-          {
-            "menu": "Tipo de Tareas",
-            "id_menu": 422,
-            "url": "/matriz-de-peligro/configuracion/tipo-de-tareas",
-            "icono": "fa-solid fa-list-check",
-            "indicador": "Visible",
-            "submenu": []
-          },
-          {
-            "menu": "Criticidad",
-            "id_menu": 424,
-            "url": "/matriz-de-peligro/configuracion/criticidad-de-peligro",
-            "icono": "fa-solid fa-bolt",
-            "indicador": "Visible",
-            "submenu": []
-          },
-          {
-            "menu": "Jerarquía de Control",
-            "id_menu": 425,
-            "url": "/matriz-de-peligro/configuracion/jerarquia-de-control",
-            "icono": "fa-solid fa-network-wired",
-            "indicador": "Visible",
-            "submenu": []
-          },
-          {
-            "menu": "Peligros",
-            "id_menu": 426,
-            "url": "/matriz-de-peligro/configuracion/peligro",
-            "icono": "fa-solid fa-circle-radiation",
-            "indicador": "Visible",
-            "submenu": []
-          },
-          {
-            "menu": "Riesgos",
-            "id_menu": 427,
-            "url": "/matriz-de-peligro/configuracion/riesgos",
-            "icono": "fa-solid fa-circle-exclamation",
-            "indicador": "Visible",
-            "submenu": []
-          },
-          {
-            "menu": "Estados",
-            "id_menu": 423,
-            "url": "/matriz-de-peligro/configuracion/estados",
-            "icono": "fa-solid fa-user-check",
-            "indicador": "Visible",
-            "submenu": []
-          }
-        ]
+        "submenu": []
+      }
+    ]
+  },
+  {
+    "menu": "Configuración",
+    "id_menu": 42,
+    "url": "",
+    "icono": "fa-solid fa-gear",
+    "icono_arrow": "fa-solid fa-chevron-down",
+    "indicador": "Visible",
+    "submenu": [
+      {
+        "menu": "Tareas",
+        "id_menu": 421,
+        "url": "/matriz-de-peligro/configuracion/tareas",
+        "icono": "fa-solid fa-bars-progress",
+        "indicador": "Visible",
+        "submenu": []
       },
+      {
+        "menu": "Tipo de Tareas",
+        "id_menu": 422,
+        "url": "/matriz-de-peligro/configuracion/tipo-de-tareas",
+        "icono": "fa-solid fa-list-check",
+        "indicador": "Visible",
+        "submenu": []
+      },
+      {
+        "menu": "Criticidad",
+        "id_menu": 424,
+        "url": "/matriz-de-peligro/configuracion/criticidad-de-peligro",
+        "icono": "fa-solid fa-bolt",
+        "indicador": "Visible",
+        "submenu": []
+      },
+      {
+        "menu": "Jerarquía de Control",
+        "id_menu": 425,
+        "url": "/matriz-de-peligro/configuracion/jerarquia-de-control",
+        "icono": "fa-solid fa-network-wired",
+        "indicador": "Visible",
+        "submenu": []
+      },
+      {
+        "menu": "Peligros",
+        "id_menu": 426,
+        "url": "/matriz-de-peligro/configuracion/peligro",
+        "icono": "fa-solid fa-circle-radiation",
+        "indicador": "Visible",
+        "submenu": []
+      },
+      {
+        "menu": "Riesgos",
+        "id_menu": 427,
+        "url": "/matriz-de-peligro/configuracion/riesgos",
+        "icono": "fa-solid fa-circle-exclamation",
+        "indicador": "Visible",
+        "submenu": []
+      },
+      {
+        "menu": "Estados",
+        "id_menu": 423,
+        "url": "/matriz-de-peligro/configuracion/estados",
+        "icono": "fa-solid fa-user-check",
+        "indicador": "Visible",
+        "submenu": []
+      }
+    ]
+  },
   {
     "menu": "Tipo de Actividad",
     "id_menu": 5,

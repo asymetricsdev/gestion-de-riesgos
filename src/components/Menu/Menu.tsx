@@ -23,7 +23,6 @@
             <SidebarMenu 
               isOpen={isOpen} 
               toggleSidebar={toggleSidebar} 
-              isLoggedIn={isLoggedIn} 
             />
           )}
         </>
@@ -31,3 +30,5 @@
     };
     
     export default Menu;
+
+

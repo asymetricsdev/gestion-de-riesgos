@@ -1,31 +1,35 @@
-
-import { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserProfile } from '../Models/User'; 
 import { loginAPI } from '../Services/AuthService';
 import { Modal, Button } from 'react-bootstrap';
 
-type UserContextType = {
+interface UserProfile {
+  userName: string;
+  email: string;
+  role: string;
+}
+
+interface UserContextType {
   user: UserProfile | null;
   role: string | null;
-  loginUser: (username: string, password: string) => void;
+  loginUser: (username: string, password: string) => Promise<void>;
   logout: () => void;
   token: string | null;
-};
+}
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(null);
-  const [role, setRole] = useState<string | null>(null); 
+  const [role, setRole] = useState<string | null>(null);
   const [showSessionModal, setShowSessionModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
-    const storedRole = localStorage.getItem('role'); 
+    const storedRole = localStorage.getItem('role');
 
     if (storedUser && storedToken && storedRole) {
       setUser(JSON.parse(storedUser));
@@ -39,15 +43,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     if (res) {
       const token = res.data.token;
       const userObj = { userName: res.data.userName, email: res.data.email, role: res.data.role };
-      const userRole = res.data.role;  
+      const userRole = res.data.role;
 
       setUser(userObj);
       setToken(token);
-      setRole(userRole); 
+      setRole(userRole);
 
       localStorage.setItem('user', JSON.stringify(userObj));
       localStorage.setItem('token', token);
-      localStorage.setItem('role', userRole);  
+      localStorage.setItem('role', userRole);
       navigate('/home');
     }
   };
@@ -55,34 +59,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
-    setRole(null); 
+    setRole(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/');
   };
-
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    const resetTimer = () => {
-      clearTimeout(timeoutId); 
-      timeoutId = setTimeout(() => {
-        setShowSessionModal(true);
-      }, 1000 * 60 * 30);
-    };
-
-    window.addEventListener('mousemove', resetTimer);
-    window.addEventListener('keydown', resetTimer);
-
-    resetTimer(); 
-
-    return () => {
-      clearTimeout(timeoutId);
-      window.removeEventListener('mousemove', resetTimer);
-      window.removeEventListener('keydown', resetTimer);
-    };
-  }, []);
 
   const extendSession = () => {
     const storedToken = localStorage.getItem('token');
@@ -93,6 +75,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       logout();
     }
   };
+
+    useEffect(() => {
+    const sessionTimeout = setTimeout(() => {
+      if (token) {
+        setShowSessionModal(true);
+      }
+    }, 2 * 60 * 1000);
+
+    return () => clearTimeout(sessionTimeout);
+  }, [token]);
 
   return (
     <UserContext.Provider value={{ user, role, loginUser, logout, token }}>

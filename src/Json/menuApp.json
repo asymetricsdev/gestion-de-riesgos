@@ -1,0 +1,351 @@
+
+[
+  {
+    "rol": "ROLE_ROLE_ADMIN",
+    "menuRol": [
+      {
+        "menu": "",
+        "id_menu": 1,
+        "url": "/home",
+        "icono": "fa-solid fa-circle-user",
+        "icono_arrow": "fa-solid fa-chevron-down",
+        "indicador": "Visible",
+        "submenu": []
+      },
+      {
+        "menu": "Usuarios",
+        "id_menu": 66,
+        "url": "/usuarios",
+        "icono": "fa-solid fa-users",
+        "icono_arrow": "fa-solid fa-chevron-down",
+        "indicador": "Visible",
+        "submenu": [
+          {
+            "menu": "Roles",
+            "id_menu": 77,
+            "url": "/roles",
+            "icono": "fa-solid fa-users-gear",
+            "indicador": "Visible",
+            "submenu": []
+          }
+        ]
+      }
+  ],
+    "menu":[
+     {
+       "menu": "Home",
+       "id_menu": 1,
+       "url": "/home",
+       "icono": "fa-solid fa-home",
+       "icono_arrow": "fa-solid fa-chevron-down",
+       "icono_arrow_left": "fa-solid fa-chevron-left",
+       "indicador": "Visible",
+       "submenu": []
+     },
+     {
+       "menu": "Planificación",
+       "id_menu": 2,
+       "url": "",
+       "icono": "fa-solid fa-business-time",
+       "icono_arrow": "fa-solid fa-chevron-down",
+       "indicador": "Visible",
+       "submenu": [
+         {
+           "menu": "Planificación",
+           "id_menu": 21,
+           "url": "/planificacion/planificacion",
+           "icono": "fa-solid fa-calendar-week",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Planificador de Actividad",
+           "id_menu": 22,
+           "url": "/planificacion/planificador-de-actividad",
+           "icono": "fa-solid fa-calendar-alt",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Actividades",
+           "id_menu": 23,
+           "url": "/planificacion/actividades",
+           "icono": "fa-solid fa-chart-line",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Perfil",
+           "id_menu": 24,
+           "url": "/planificacion/perfiles",
+           "icono": "fa-solid fa-id-badge",
+           "indicador": "Visible",
+           "submenu": []
+         }
+       ]
+     },
+     {
+       "menu": "Verificación",
+       "id_menu": 3,
+       "url": "",
+       "icono": "fa-solid fa-circle-check",
+       "icono_arrow": "fa-solid fa-chevron-down",
+       "indicador": "Visible",
+       "submenu": [
+         {
+           "menu": "Verificadores de Control",
+           "id_menu": 31,
+           "url": "/verificacion/verificadores-de-control",
+           "icono": "fa-solid fa-list-check",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Items",
+           "id_menu": 32,
+           "url": "/verificacion/items",
+           "icono": "fa-solid fa-rectangle-list",
+           "indicador": "Visible",
+           "submenu": []
+         }
+       ]
+     },
+     {
+       "menu": "Matriz de Peligro",
+       "id_menu": 4,
+       "url": "",
+       "icono": "fa-solid fa-triangle-exclamation",
+       "icono_arrow": "fa-solid fa-chevron-down",
+       "indicador": "Visible",
+       "submenu": [
+         {
+           "menu": "Matriz de Peligro",
+           "id_menu": 41,
+           "url": "/matriz-de-peligro/matriz-peligro",
+           "icono": "fa-solid fa-table-cells",
+           "indicador": "Visible",
+           "submenu": []
+         }
+       ]
+     },
+     {
+      "menu": "Matriz Legal",
+      "id_menu": 123,
+      "url": "",
+      "icono": "fa-solid fa-file",
+      "icono_arrow": "fa-solid fa-chevron-down",
+      "indicador": "Visible",
+      "submenu": [
+        {
+          "menu": "Matriz Legal",
+          "id_menu": 124,
+          "url": "/matriz-de-peligro/matriz-legal",
+          "icono": "fa-solid fa-file",
+          "indicador": "Visible",
+          "submenu": []
+        }
+      ]
+    },
+     {
+       "menu": "Configuración",
+       "id_menu": 42,
+       "url": "",
+       "icono": "fa-solid fa-gear",
+       "icono_arrow": "fa-solid fa-chevron-down",
+       "indicador": "Visible",
+       "submenu": [
+         {
+           "menu": "Tareas",
+           "id_menu": 421,
+           "url": "/matriz-de-peligro/configuracion/tareas",
+           "icono": "fa-solid fa-bars-progress",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Tipo de Tareas",
+           "id_menu": 422,
+           "url": "/matriz-de-peligro/configuracion/tipo-de-tareas",
+           "icono": "fa-solid fa-list-check",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Criticidad",
+           "id_menu": 424,
+           "url": "/matriz-de-peligro/configuracion/criticidad-de-peligro",
+           "icono": "fa-solid fa-bolt",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Jerarquía de Control",
+           "id_menu": 425,
+           "url": "/matriz-de-peligro/configuracion/jerarquia-de-control",
+           "icono": "fa-solid fa-network-wired",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Peligros",
+           "id_menu": 426,
+           "url": "/matriz-de-peligro/configuracion/peligro",
+           "icono": "fa-solid fa-circle-radiation",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Riesgos",
+           "id_menu": 427,
+           "url": "/matriz-de-peligro/configuracion/riesgos",
+           "icono": "fa-solid fa-circle-exclamation",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Estados",
+           "id_menu": 423,
+           "url": "/matriz-de-peligro/configuracion/estados",
+           "icono": "fa-solid fa-user-check",
+           "indicador": "Visible",
+           "submenu": []
+         }
+       ]
+     },
+     {
+       "menu": "Tipo de Actividad",
+       "id_menu": 5,
+       "url": "",
+       "icono": "fa-solid fa-people-robbery",
+       "icono_arrow": "fa-solid fa-chevron-down",
+       "indicador": "Visible",
+       "submenu": [
+         {
+           "menu": "Tipo de Actividad",
+           "id_menu": 51,
+           "url": "/tipo-de-actividad/tipo-de-actividad",
+           "icono": "fa-solid fa-people-robbery",
+           "indicador": "Visible",
+           "submenu": []
+         }
+       ]
+     },
+     {
+       "menu": "Organización",
+       "id_menu": 6,
+       "url": "",
+       "icono": "fa-solid fa-layer-group",
+       "icono_arrow": "fa-solid fa-chevron-down",
+       "indicador": "Visible",
+       "submenu": [
+         {
+           "menu": "Ciudad",
+           "id_menu": 61,
+           "url": "/organizacion/ciudad",
+           "icono": "fa-solid fa-tree-city",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Compañías",
+           "id_menu": 62,
+           "url": "/organizacion/compañias",
+           "icono": "fa-solid fa-building",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Áreas",
+           "id_menu": 63,
+           "url": "/organizacion/areas",
+           "icono": "fa-solid fa-sitemap",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Colaboradores",
+           "id_menu": 64,
+           "url": "/organizacion/colaboradores",
+           "icono": "fa-solid fa-id-card-clip",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Cargos",
+           "id_menu": 65,
+           "url": "/organizacion/cargos",
+           "icono": "fa-solid fa-address-card",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Procesos",
+           "id_menu": 66,
+           "url": "/organizacion/procesos",
+           "icono": "fa-solid fa-arrows-rotate",
+           "indicador": "Visible",
+           "submenu": []
+         }
+       ]
+     }
+   ]
+  },
+  {
+    "rol": "ROLE_USER",
+    "menu":[
+     {
+       "menu": "Home",
+       "id_menu": 1,
+       "url": "/home",
+       "icono": "fa-solid fa-home",
+       "icono_arrow": "fa-solid fa-chevron-down",
+       "icono_arrow_left": "fa-solid fa-chevron-left",
+       "indicador": "Visible",
+       "submenu": []
+     },
+     {
+       "menu": "Planificación",
+       "id_menu": 2,
+       "url": "",
+       "icono": "fa-solid fa-business-time",
+       "icono_arrow": "fa-solid fa-chevron-down",
+       "indicador": "Visible",
+       "submenu": [
+         {
+           "menu": "Planificación",
+           "id_menu": 21,
+           "url": "/planificacion/planificacion",
+           "icono": "fa-solid fa-calendar-week",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Planificador de Actividad",
+           "id_menu": 22,
+           "url": "/planificacion/planificador-de-actividad",
+           "icono": "fa-solid fa-calendar-alt",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Actividades",
+           "id_menu": 23,
+           "url": "/planificacion/actividades",
+           "icono": "fa-solid fa-chart-line",
+           "indicador": "Visible",
+           "submenu": []
+         },
+         {
+           "menu": "Perfil",
+           "id_menu": 24,
+           "url": "/planificacion/perfiles",
+           "icono": "fa-solid fa-id-badge",
+           "indicador": "Visible",
+           "submenu": []
+         }
+       ]
+     }
+   ]
+  }
+ ]
+ 

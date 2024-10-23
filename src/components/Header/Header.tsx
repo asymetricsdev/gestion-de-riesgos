@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dropdown, Nav, Navbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -14,16 +13,22 @@ interface HeaderProps {
 
 export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
   const navigate = useNavigate(); 
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+  useEffect(() => {
+    const role = sessionStorage.getItem('userRole');
+    setUserRole(role);
+  }, []);
+
   const renderLogOutTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
     <Tooltip id="button-tooltip-edit" {...props}>
       Cerrar sesión
     </Tooltip>
   );
 
-
   const mainMenu = menuDataRoles.find((item: any) => item.id_menu === 1);
   const usuariosRolesMenu = menuDataRoles.find((item: any) => item.id_menu === 66); 
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const handleLogoutClick = () => {
     Swal.fire({
@@ -45,7 +50,6 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
   const handleNavigation = (url: string) => {
     navigate(url); 
   };
-
 
   const renderSubmenu = (submenu: any) => {
     return submenu.map((subItem: any) => (
@@ -82,8 +86,7 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
                 <i className="fa-solid fa-bell"></i>
               </Nav.Link>
 
-              {/* Menu principal con submenu anidado */}
-              {mainMenu && usuariosRolesMenu && (
+              {userRole === 'ROLE_ROLE_ADMIN' && mainMenu && usuariosRolesMenu && (
                 <Dropdown className="newmenu-item">
                   <Dropdown.Toggle as={Nav.Link} className="d-flex align-items-center custom-icon newmenu-link1 main-icon">
                     <i className={mainMenu.icono}></i>
@@ -115,15 +118,6 @@ export default function Header({ toggleMenu, handleLogout }: HeaderProps) {
           </Nav>
         </Navbar.Collapse>
       </Navbar>
-              {/*}
-      <button 
-        className="navbar-toggler always-visible custom-button" 
-        type="button" 
-        onClick={toggleMenu}
-      >
-        <i className="fa-solid fa-bars"></i>
-      </button>
-      */}
     </>
   );
 }
