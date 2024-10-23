@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute'; 
 import Home from '../Pages/HomePage';
 import MatrizPeligro from '../Pages/MatrizPeligroPage';
+import MatrizLegal from '../Pages/MatrizLegalPage';
 import PlanificadorActividad from '../Pages/PlanificadorActividadPage';
 import Planificacion from '../Pages/PlanificacionPage';
 import Perfiles from '../Pages/PerfilesPage';
@@ -121,6 +122,11 @@ export const AppRoutes = ({ isAuthenticated, onLogin }: { isAuthenticated: boole
 			<Route
 				path="/matriz-de-peligro/configuracion/estados"
 				element={<PrivateRoute isAuthenticated={isAuthenticated} component={<Estados />} />}
+			/>
+			{/* Matriz Legal */}
+			<Route
+				path="/matriz-de-peligro/matriz-legal"
+				element={<PrivateRoute isAuthenticated={isAuthenticated} component={<MatrizLegal />} />}
 			/>
 
 			{/* Tipos de Actividad */}
