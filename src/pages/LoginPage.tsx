@@ -120,8 +120,7 @@ const LoginPage = ({ onLogin }: { onLogin: (token: string) => void }) => {
 								</button>
             </form>
             <div className="mt-3">
-              <a className="dropdown-item text-white" href="#">Registrarse</a>
-              <a className="dropdown-item text-white" href="#">¿Has olvidado tu contraseña?</a>
+              
             </div>
           </div>
         </div>
