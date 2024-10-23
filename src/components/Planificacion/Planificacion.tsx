@@ -7,7 +7,7 @@ import Select from "react-select";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import EncabezadoTabla from "../EncabezadoTabla/EncabezadoTabla";
-import { showAlert } from "../functions";
+import { capitalizeFirstLetter, showAlert } from "../functions";
 import "./Planificacion.css";
 
 const MySwal = withReactContent(Swal);
@@ -222,8 +222,6 @@ const Planning: React.FC = () => {
 		const parametros: PlanningData = {
 			name: name.trim(),
 			description: description.trim(),
-			//startDate: formattedStartDate,
-			//endDate: formattedEndDate,
 			startDate: startDate,
 			endDate: endDate,
 			employeeIds: selectedEmployeeIds,
@@ -360,13 +358,12 @@ const Planning: React.FC = () => {
 										style={{
 											background: "linear-gradient(90deg, #009FE3 0%, #00CFFF 100%)",
 											color: "#fff",
-										}}
-									>
+										}}>
 										<tr>
 											<th>N°</th>
 											<th>Planificación</th>
 											<th>Perfiles</th>
-											<th className="w-40">Colaboradores</th>
+											<th className="w-40 capitalizeFirstLetter">Colaboradores</th>
 											<th>Fecha de Inicio</th>
 											<th>Fecha de Fin</th>
 											<th>Acciones</th>
@@ -375,21 +372,23 @@ const Planning: React.FC = () => {
 									<tbody className="table-group-divider">
 										{planning.map((plan, i) => (
 											<tr key={JSON.stringify(plan)} className="text-center">
-												<td className="vtop">{i + 1}</td>
-												<td className="vtop">{plan.name}</td>
-												<td className="vtop">{plan.profile?.name}</td>
+												<td className="vtop capitalizeFirstLetter">{i + 1}</td>
+												<td className="vtop capitalizeFirstLetter">{plan.name}</td>
+												<td className="vtop capitalizeFirstLetter">{plan.profile?.name}</td>
 												<td className="vtop">
 													<table className="vtop">
 														{plan.employees?.map((emp) => (
-														<tr className="vtop">
-															<td className="w-30 vtop">{emp.rut}</td>
-															<td className="text-start w-70 vtop">{emp.fullName}</td>
-														</tr>
+															<tr className="vtop">
+																<td className="w-30 vtop capitalizeFirstLetter">{emp.rut}</td>
+																<td className="text-start w-70 vtop capitalizeFirstLetter">
+																	{emp.fullName}
+																</td>
+															</tr>
 														))}
 													</table>
 												</td>
-												<td className="vtop">{formatDate(plan.startDate)}</td>
-												<td className="vtop">{formatDate(plan.endDate)}</td>
+												<td className="vtop capitalizeFirstLetter">{formatDate(plan.startDate)}</td>
+												<td className="vtop capitalizeFirstLetter">{formatDate(plan.endDate)}</td>
 												<td className="vtop text-center">
 													<OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
 														<button

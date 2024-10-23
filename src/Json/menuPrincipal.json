@@ -1,0 +1,9 @@
+{
+	"menu": "Home",
+	"id_menu": 1,
+	"url": "/home",
+	"icono": "fa-solid fa-home",
+	"icono_arrow": "fa-solid fa-chevron-down",
+	"icono_arrow_left": "fa-solid fa-chevron-left",
+	"indicador": "Visible"
+}

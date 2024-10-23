@@ -371,7 +371,6 @@ const Actividades: React.FC = () => {
                     <tr>
                       <th>N°</th>
                       <th>Nombre</th>
-                      {/*<th>Descripción</th>*/}
                       <th>Tipo de Actividad</th>
                       <th>Proceso</th>
                       <th>Peligro / Criticidad</th>
@@ -384,7 +383,6 @@ const Actividades: React.FC = () => {
                         <tr key={act.id} className="text-center">
                           <td>{i + 1}</td>
                           <td style={{ textAlign: 'left' }}>{capitalizeFirstLetter(act.name)}</td>
-                          {/*<td>{capitalizeFirstLetter(act.description)}</td>*/}
                           <td>{act.activityType?.name || "Sin tipo de actividad"}</td>
                           <td>{act.process?.name || "Sin proceso"}</td>
                           <td style={{ textAlign: 'left' }}>
