@@ -318,11 +318,11 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    {/*<th>Descripción</th>*/}
                     <th>Proceso</th>
                     <th>Responsable</th>
                     <th>Tareas</th> 
                     <th>Acciones</th>
+                    <th className="w-6"></th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
@@ -330,7 +330,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: ProfilesData) => {
                     <tr key={JSON.stringify(prof)} className="text-center">
                       <td>{i + 1}</td>
                       <td>{prof.name}</td>
-                      {/*<td>{prof.description}</td>*/}
                       <td>{prof.process.name}</td> 
                       <td>
                       <ul style={{ listStyleType: "none", paddingLeft: 0, textAlign: "left" }}>

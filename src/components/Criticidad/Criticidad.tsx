@@ -211,11 +211,11 @@ const Criticidad: React.FC = () => {
                   <tr>
                     <th>N°</th>
                     <th>Nivel</th>
-                    {/*<th>Nombre</th>*/}
                     <th>Descripción</th>
                     <th>Color</th>
                     <th>Fecha Actualización</th>
                     <th>Acciones</th>
+                    <th className="w-6"></th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">

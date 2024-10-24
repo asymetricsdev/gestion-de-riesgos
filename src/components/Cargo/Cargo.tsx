@@ -295,7 +295,6 @@ const Cargo: React.FC = () => {
   const opcionesEquipo = subordinatePositions.map(sp => ({
     value: sp.id,
     label: sp.name
-    /*label: sp.description,]*/
   }));
 
   return (
@@ -328,6 +327,7 @@ const Cargo: React.FC = () => {
 										<th>Jefatura</th>
 										<th>Equipo</th>
 										<th>Acciones</th>
+                    <th className="w-6"></th>
 									</tr>
 								</thead>
 								<tbody className="table-group-divider">
@@ -424,7 +424,7 @@ const Cargo: React.FC = () => {
 									/>
 								</div>
 								<div className="mb-3">
-									<label htmlFor="managerPosition">Jefatura:</label>
+									<label htmlFor="managerPosition">Cargo dependiente a la Jefatura:</label>
 									<select
 										id="managerPosition"
 										className="form-select"

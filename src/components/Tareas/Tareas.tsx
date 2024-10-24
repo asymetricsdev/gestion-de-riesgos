@@ -403,11 +403,11 @@ function Tareas() {
 										<th>N°</th>
 										<th>Tipo de Tarea</th>
 										<th>Nombre</th>
-										{/*<th>Descripción</th>*/}
 										<th>Versión</th>
 										<th>Verificadores</th>
 										<th>Archivo</th>
 										<th>Acciones</th>
+										<th className="w-6"></th>
 									</tr>
 								</thead>
 								<tbody className="table-group-divider">
@@ -417,7 +417,6 @@ function Tareas() {
 												<td>{i + 1}</td>
 												<td>{tr.taskType?.name || "N/A"}</td>
 												<td>{tr.name}</td>
-												{/*<td>{tr.description}</td>*/}
 												<td>{tr.version}</td>
 												<td>
 													{

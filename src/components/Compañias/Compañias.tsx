@@ -55,7 +55,7 @@ const Company: React.FC = () => {
     } catch (error) {
       showAlert("Error al obtener Compañia", "error");
     } finally {
-      setPendingRequests(prev => prev - 1);  // Disminuir contador
+      setPendingRequests(prev => prev - 1); 
     }
   };
 
@@ -197,6 +197,7 @@ const Company: React.FC = () => {
                     <th>Tipo de Empresa </th>
                     <th>Fecha</th>
                     <th>Acciones</th>
+                    {/* <th className="w-6"></th> */}
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">

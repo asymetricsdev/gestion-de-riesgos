@@ -301,6 +301,7 @@ const Colaboradores: React.FC = () => {
 											<th>Cargo</th>
 											<th>Ver Tareas</th>
 											<th>Acciones</th>
+											<th className="w-6"></th>
 										</tr>
 									</thead>
 									<tbody className="table-group-divider">

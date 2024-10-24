@@ -266,10 +266,11 @@ const Peligro: React.FC = () => {
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    <th>Verificador</th>
                     <th>Riesgos</th> 
+                    <th>Verificador</th>
                     <th>Fecha</th>
                     <th>Acciones</th>
+                    <th className="w-6"></th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
@@ -277,8 +278,8 @@ const Peligro: React.FC = () => {
                     <tr key={JSON.stringify(hazz)} className="text-center">
                       <td>{i + 1}</td>
                       <td>{capitalizeFirstLetter(hazz.name)}</td>
-                      <td>{hazz.checker.name.toUpperCase()}</td>
                       <td>{hazz.risks.map(h => capitalizeFirstLetter(h.name)).join(', ')}</td>
+                      <td>{hazz.checker.name.toUpperCase()}</td>
                       <td>{formatDate(hazz.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>

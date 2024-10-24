@@ -200,7 +200,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: JerarquiaControlDat
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    {/*<th>Descripción </th>*/}
                     <th>Fecha</th>
                     <th>Acciones</th>
                   </tr>
@@ -210,7 +209,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: JerarquiaControlDat
                     <tr key={check.id} className="text-center">
                       <td>{i + 1}</td>
                       <td>{check.name}</td>
-                      {/*<td>{check.description}</td>*/}
                       <td>{formatDate(check.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>

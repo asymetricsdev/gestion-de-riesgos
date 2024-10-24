@@ -87,9 +87,10 @@ const MatrizPeligro: React.FC = () => {
                   <th>Peligro</th>
                   <th>Riesgo</th>
                   <th>Criticidad</th>
-                  <th>Medidas Preventivas</th>
+                  <th style={{ textEmphasis: 'open' }}>Medidas Preventivas</th>
                   <th>Verificador de Control</th>
                   <th>Jerarquía de Control</th>
+                  <th className="w-6"></th>
                 </tr>
               </thead>
               <tbody className="table-group-divider">

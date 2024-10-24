@@ -3,9 +3,6 @@
   transition: width 0.3s;
 }
 
-/* .sidebar.open {
-  width: 250px;
-} */
 
 .main-content {
   padding: 5px;
@@ -15,6 +12,10 @@
 
 .main-content.with-sidebar {
   margin-left: 200px;
+}
+
+.w-6{
+  width: 6px;
 }
 
 /* CSS PROVISORIOS */
