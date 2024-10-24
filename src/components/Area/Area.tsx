@@ -288,11 +288,11 @@ const deleteDivision = async (id: number) => {
 									<tr>
 										<th>N°</th>
 										<th>Nombre</th>
-										{/*<th>Descripción</th>*/}
 										<th>Compañía</th>
 										<th>Sitio/Sucursal</th>
 										<th>Fecha</th>
 										<th>Acciones</th>
+										<th className="w-6"></th>
 									</tr>
 								</thead>
 								<tbody className="table-group-divider">
@@ -300,7 +300,6 @@ const deleteDivision = async (id: number) => {
 										<tr key={JSON.stringify(div)} className="text-center">
 											<td>{i + 1}</td>
 											<td>{div.name}</td>
-											{/*<td>{div.description}</td>*/}
 											<td>{div.company.name}</td>
 											<td>{div.city.name}</td> 
 											<td>{div.createDate ? formatDate(div.createDate) : ''}</td>

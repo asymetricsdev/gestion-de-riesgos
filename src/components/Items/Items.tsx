@@ -224,6 +224,7 @@ const Items: React.FC = () => {
 											<th>Descripción</th>
 											<th>Verificador</th>
 											<th>Acciones</th>
+											<th className="w-6"></th>
 										</tr>
 									</thead>
 									<tbody className="table-group-divider">

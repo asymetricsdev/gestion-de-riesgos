@@ -206,8 +206,8 @@ const Ciudad: React.FC = () => {
                   <tr>
                     <th>ID</th>
                     <th>Nombre</th>
-                    {/*<th>Descripción</th>*/}
                     <th>Acciones</th>
+                    {/* <th className="w-6"></th> */}
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
@@ -215,7 +215,6 @@ const Ciudad: React.FC = () => {
                     <tr key={cit.id} className="text-center">
                       <td>{i + 1}</td>
                       <td>{cit.name}</td>
-                      {/*<td>{cit.description}</td>*/}
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
                         <button

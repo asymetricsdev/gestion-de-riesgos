@@ -367,6 +367,7 @@ const Planning: React.FC = () => {
 											<th>Fecha de Inicio</th>
 											<th>Fecha de Fin</th>
 											<th>Acciones</th>
+											<th className="w-6"></th>
 										</tr>
 									</thead>
 									<tbody className="table-group-divider">

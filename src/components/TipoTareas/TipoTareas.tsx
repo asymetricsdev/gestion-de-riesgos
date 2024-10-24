@@ -193,9 +193,9 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoTareasData) => 
 									<tr>
 										<th>N°</th>
 										<th>Nombre</th>
-										{/*<th>Descripción </th>*/}
 										<th>Fecha</th>
 										<th>Acciones</th>
+										<th className="w-6"></th>
 									</tr>
 								</thead>
 								<tbody className="table-group-divider">

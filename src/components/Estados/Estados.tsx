@@ -231,10 +231,10 @@ const Estados: React.FC = () => {
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    {/*<th>Descripción </th>*/}
                     <th>Tipo de Tarea</th>
                     <th>Es Objetivo</th>
                     <th>Acciones</th>
+                    <th className="w-6"></th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">

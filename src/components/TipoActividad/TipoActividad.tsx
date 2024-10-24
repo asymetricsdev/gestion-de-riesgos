@@ -197,9 +197,9 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) 
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    {/*<th>Descripción </th>*/}
                     <th>Fecha</th>
                     <th>Acciones</th>
+                    {/* <th className="w-6"></th> */}
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
@@ -207,7 +207,6 @@ const enviarSolicitud = async (method: "POST" | "PUT", data: TipoActividadData) 
                     <tr key={act.id} className="text-center">
                       <td>{i + 1}</td>
                       <td>{capitalizeFirstLetter(act.name)}</td>
-                      {/*<td>{act.description}</td>*/}
                       <td>{formatDate(act.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>

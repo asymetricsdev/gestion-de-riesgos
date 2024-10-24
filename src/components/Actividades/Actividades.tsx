@@ -375,6 +375,7 @@ const Actividades: React.FC = () => {
                       <th>Proceso</th>
                       <th>Peligro / Criticidad</th>
                       <th>Acciones</th>
+                      <th className="w-6"></th>
                     </tr>
                   </thead>
                   <tbody className="table-group-divider">

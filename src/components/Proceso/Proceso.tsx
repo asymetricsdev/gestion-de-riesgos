@@ -199,9 +199,9 @@ const Proceso: React.FC = () => {
                   <tr>
                     <th>N°</th>
                     <th>Nombre</th>
-                    {/*<th>Descripción </th>*/}
                     <th>Fecha</th>
                     <th>Acciones</th>
+                    <th className="w-6"></th>
                   </tr>
                 </thead>
                 <tbody className="table-group-divider">
@@ -209,7 +209,6 @@ const Proceso: React.FC = () => {
                     <tr key={proc.id} className="text-center">
                       <td>{i + 1}</td>
                       <td>{proc.name}</td>
-                      {/*<td>{proc.description}</td>*/}
                       <td>{formatDate(proc.createDate)}</td>
                       <td className="text-center">
                         <OverlayTrigger placement="top" overlay={renderEditTooltip({})}>
