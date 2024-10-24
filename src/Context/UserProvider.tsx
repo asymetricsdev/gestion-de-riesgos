@@ -81,7 +81,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       if (token) {
         setShowSessionModal(true);
       }
-    }, 2 * 60 * 1000);
+    }, 30 * 60 * 1000);
 
     return () => clearTimeout(sessionTimeout);
   }, [token]);
