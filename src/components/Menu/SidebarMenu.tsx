@@ -50,7 +50,6 @@ const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
       setData(roleMenu.menu);
     } else {
 
-      console.error(`Menu no encontrado por role: ${userRole}`);
       setData([]); 
     }
   }, [userRole]);
