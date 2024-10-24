@@ -49,7 +49,9 @@ const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     if (roleMenu && Array.isArray(roleMenu.menu)) {
       setData(roleMenu.menu);
     } else {
-      console.error("Menu no encontrado por role:", userRole);
+
+      console.error(`Menu no encontrado por role: ${userRole}`);
+      setData([]); 
     }
   }, [userRole]);
 
@@ -72,28 +74,32 @@ const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     <div className={`sidebar ${isOpen ? "open" : ""}`}>
       <nav>
         <ul className="menu flex-column">
-          {data.map((item) => (
-            <li key={item.id_menu} className="menu-item">
-              <div className="d-flex align-items-center nav-link" onClick={() => toggleMenu(item.id_menu)}>
-                <NavLink to={item.url || "#"} className="d-flex align-items-center">
-                  <i className={item.icono}></i> {isOpen && <span>{item.menu}</span>}
-                </NavLink>
-              </div>
+          {data.length > 0 ? (
+            data.map((item) => (
+              <li key={item.id_menu} className="menu-item">
+                <div className="d-flex align-items-center nav-link" onClick={() => toggleMenu(item.id_menu)}>
+                  <NavLink to={item.url || "#"} className="d-flex align-items-center">
+                    <i className={item.icono}></i> {isOpen && <span>{item.menu}</span>}
+                  </NavLink>
+                </div>
 
-              {/* Si hay submenús, mostrarlos */}
-              {item.submenu.length > 0 && openMenus[item.id_menu] && (
-                <ul className="submenu">
-                  {item.submenu.map((subitem) => (
-                    <li key={subitem.id_menu} className="submenu-item">
-                      <NavLink to={subitem.url || "#"} className="nav-link">
-                        <i className={subitem.icono}></i> {subitem.menu}
-                      </NavLink>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
+                {/* Si hay submenús, mostrarlos */}
+                {item.submenu.length > 0 && openMenus[item.id_menu] && (
+                  <ul className="submenu">
+                    {item.submenu.map((subitem) => (
+                      <li key={subitem.id_menu} className="submenu-item">
+                        <NavLink to={subitem.url || "#"} className="nav-link">
+                          <i className={subitem.icono}></i> {subitem.menu}
+                        </NavLink>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))
+          ) : (
+            <li className="menu-item text-danger">No se encontró menú para este rol</li>
+          )}
         </ul>
       </nav>
 
@@ -107,8 +113,3 @@ const SidebarMenu: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 };
 
 export default SidebarMenu;
-
-
-
-
-
