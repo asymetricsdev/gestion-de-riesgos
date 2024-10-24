@@ -3,7 +3,7 @@
     justify-content: space-between;
     align-items:first baseline ;
     margin: 10px;
-    margin-top: -80px;
+    margin-top: -20px;
     flex-direction: column; 
     margin-left: 50px; 
     margin-right: 195px;
@@ -21,13 +21,30 @@
   #tableta {
     min-width: 2500px; 
   }
+
+  thead th {
+    position: sticky; /* Hace que el encabezado quede fijo */
+    top: 0; /* Alinea el encabezado en la parte superior */
+    background-color: #f8f9fa; /* Fondo para que se vea claramente al desplazarse */
+    z-index: 10; /* Asegura que el encabezado esté por encima del contenido */
+  }
    
   .table th, .table td {
     min-width: 100px; 
     text-align: center;
   }
+
+  .col-tareas{
+    width: 30%; 
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+  }
  
- 
+  .doughnut-chart-container {
+    margin-top: 20px;
+    text-align: center;
+}
   
 
   

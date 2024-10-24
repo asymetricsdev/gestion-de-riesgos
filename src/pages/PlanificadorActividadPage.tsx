@@ -1,13 +1,11 @@
-import { PlanificadorActividad }from '../components/PlanificadorActividad/PlanificadorActividad'
-import ActivityPlanner from "../components/ActivityPlanner/ActivityPlanner";
-import InfoCard from '../components/InfoCard/InfoCard';
+import PlanificadorActividad from '../components/PlanificadorActividad/PlanificadorActividad';
 
 export default function PlanificadorActividadPage() {
   return (
     <div>
-       <ActivityPlanner /> 
-       <InfoCard name="John Doe" rut="123456789" program="Program A" numberOfPeople={5} />
-       <PlanificadorActividad title="Actividades" /> 
+       {/* <ActivityPlanner /> 
+       <InfoCard name="John Doe" rut="123456789" program="Program A" numberOfPeople={5} /> */}
+       <PlanificadorActividad /> 
       
       
     </div>

@@ -1,130 +1,141 @@
-import React from 'react';
-import './PlanificadorActividadStyle.css'; 
-import TableHeaderComponent from '../TableHeader/TableHeader';
-import CardActivities from '../CardActivities/CardActivities';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import React, { useEffect, useState } from "react";
+import axios, { AxiosResponse } from "axios";
+import { DoughnutChart } from "../DoughnutChart/DoughnutChart"; 
+import "./PlanificadorActividadStyle.css";
+import TableHeaderComponent from "../TableHeader/TableHeader";
+import { showAlert } from "../functions";
 
-
-interface TableHeaderProps {
-  title: string;
+interface MonthlyCompletion {
+  task: string;
+  color: string;
+  completion: { [month: string]: number };
 }
 
-const renderVeriTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <Tooltip id="button-tooltip-verifications" {...props}>
-    Verificaciones
-  </Tooltip>
-  );
+interface Task {
+  period: number;
+  month: string;
+  task: string;
+  color: string;
+  completion: number;
+}
 
-const renderProcTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-    <Tooltip id="button-tooltip-verifications" {...props}>
-      Procedimientos
-    </Tooltip>
-  );
+const PlanificadorActividad: React.FC = () => {
+  const baseURL = import.meta.env.VITE_API_URL;
+  const [planificador, setPlanificador] = useState<MonthlyCompletion[]>([]);
+  const [currentMonthCompletion, setCurrentMonthCompletion] = useState<number | null>(null); 
+  const [tasksByColor, setTasksByColor] = useState<{ completion: number }[]>([]); 
 
-  const renderCapTooltip = (props: React.HTMLAttributes<HTMLDivElement>) => (
-      <Tooltip id="button-tooltip-verifications" {...props}>
-        Capacitación Factor Humano
-      </Tooltip>
-  );
+  useEffect(() => {
+      const getPlanificador = async () => {
+          try {
+              const response: AxiosResponse<any> = await axios.get(`${baseURL}/gantt/overview`);
+              const tasksByMonth: MonthlyCompletion[] = [];
 
-export const PlanificadorActividad: React.FC<TableHeaderProps> = ({ title }: TableHeaderProps ) => {
+              for (const [monthKey, tasks] of Object.entries(response.data as { [month: string]: Task[] })) {
+                  tasks.forEach((task: Task) => {
+                      const existingTask = tasksByMonth.find((t) => t.task === task.task);
+
+                      if (existingTask) {
+                          if (task.completion !== undefined && task.completion !== null) {
+                              existingTask.completion[monthKey] = task.completion;
+                          }
+                      } else {
+                          if (task.completion !== undefined && task.completion !== null) {
+                              tasksByMonth.push({
+                                  task: task.task,
+                                  color: task.color,
+                                  completion: { [monthKey]: task.completion },
+                              });
+                          }
+                      }
+                  });
+              }
+
+              setPlanificador(tasksByMonth);
+
+              const months = ["202408", "202409", "202410", "202411", "202412"];
+              let totalCompletion = 0;
+              let taskCount = 0;
+              const allTasks: { completion: number }[] = []; 
+              months.forEach((month) => {
+                  tasksByMonth.forEach((actividad) => {
+                      const completionValue = actividad.completion[month];
+                      if (completionValue !== undefined) {
+                          totalCompletion += completionValue;
+                          taskCount++;
+                          allTasks.push({ completion: completionValue }); 
+                      }
+                  });
+              });
+
+              const averageCompletion = taskCount > 0 ? totalCompletion / taskCount : null;
+              setCurrentMonthCompletion(averageCompletion);
+              setTasksByColor(allTasks); 
+          } catch (error) {
+              showAlert("Error al obtener los datos", "error");
+          }
+      };
+
+      getPlanificador();
+  }, [baseURL]);
+
+  // Función para determinar el color basado en el porcentaje
+  const getColor = (completionValue: number | undefined) => {
+      if (completionValue === undefined) return "";
+      if (completionValue === 0.00) return "blue"; // Programado
+      if (completionValue === 100) return "green"; // Completado
+      if (completionValue > 70) return "yellow"; // Cumplimiento parcial
+      return "red"; // Cumplimiento incompleto
+  };
+
+  console.log("Cumplimiento promedio de Tareas:", currentMonthCompletion);
+
   return (
-    <div className="table-container">
-      <div className="tabla-contenedor-header">
-      <TableHeaderComponent title='Planificador de Actividad'/>
+      <div className="table-container">
+          <div className="tabla-contenedor-header">
+              <TableHeaderComponent title="Planificador de Actividad" />
+          </div>
+          <div className="table-responsives">
+              <table id="tableta" className="table table-bordered">
+                  <thead className="text-center">
+                      <tr>
+                          <th className="col-tareas">Tareas</th>
+                          {["Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"].map((month) => (
+                              <th key={month}>{month}</th>
+                          ))}
+                      </tr>
+                  </thead>
+                  <tbody className="table-group-divider">
+                      {planificador.map((actividad, index) => (
+                          <tr key={index} className="text-center">
+                              <td style={{ backgroundColor: actividad.color, color: '#fff' }}>
+                                  {actividad.task}
+                              </td>
+                              {["202408", "202409", "202410", "202411", "202412"].map(month => {
+                                  const completionValue = actividad.completion[month];
+                                  return (
+                                      <td key={month} style={{ backgroundColor: getColor(completionValue), color: "#fff" }}>
+                                          {completionValue !== undefined
+                                              ? `${completionValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
+                                              : ''} 
+                                      </td>
+                                  );
+                              })}
+                          </tr>
+                      ))}
+                  </tbody>
+              </table>
+          </div>
+
+          {/* Mostrar el gráfico con los datos pasados */}
+          {currentMonthCompletion !== null && (
+              <div className="doughnut-chart-container">
+                  <h3>Cumplimiento promedio de Tareas</h3>
+                  <DoughnutChart tasks={tasksByColor} />
+              </div>
+          )}
       </div>
-      <div className="table-responsives">
-        <table id="tableta" className="table table-bordered">
-          <thead className="text-center">
-            <tr>
-              <th>Actividades</th>
-              <th>Enero</th>
-              <th>Febrero</th>
-              <th>Marzo</th>
-              <th>Abril</th>
-              <th>Mayo</th>
-              <th>Junio</th>
-              <th>Julio</th>
-              <th>Agosto</th>
-              <th>Septiembre</th>
-              <th>Octubre</th>
-              <th>Noviembre</th>
-              <th>Diciembre</th>
-            </tr>
-          </thead>
-          <tbody className="table-group-divider">
-            <tr className="text-center">
-              <OverlayTrigger placement="top" overlay={renderVeriTooltip}>
-              <td style={{ backgroundColor: '#f25252', color: '#fff' }}>VE44</td>
-              </OverlayTrigger>
-              <td>0%</td>
-              <td>0%</td>
-              <td>0%</td>
-              <td>0%</td>
-              <td>0%</td>
-              <td>0%</td>
-              <td>0%</td>
-              <td>Programado</td>
-              <td>Programado</td>
-              <td>0%</td>
-              <td>0%</td>
-              <td>0%</td>
-            </tr>
-            <tr className="text-center">
-              <OverlayTrigger placement="top" overlay={renderProcTooltip}>
-              <td style={{ backgroundColor: '#4AB37B', color: '#fff' }}>PTS 76/Test</td>
-              </OverlayTrigger>
-              <td>50%</td>
-              <td>50%</td>
-              <td>50%</td>
-              <td>50%</td>
-              <td>50%</td>
-              <td>50%</td>
-              <td>50%</td>
-              <td>Programado</td>
-              <td></td>
-              <td>50%</td>
-              <td>50%</td>
-              <td>50%</td>
-            </tr>
-            <tr className="text-center">
-              <OverlayTrigger placement="top" overlay={renderCapTooltip}>
-              <td style={{ backgroundColor: '#FFC558', color: '#000' }}>FHO4</td>
-              </OverlayTrigger>
-              <td>80%</td>
-              <td>80%</td>
-              <td>80%</td>
-              <td>80%</td>
-              <td>80%</td>
-              <td>80%</td>
-              <td>80%</td>
-              <td>Programado</td>
-              <td></td>
-              <td>80%</td>
-              <td>80%</td>
-              <td>80%</td>
-            </tr>
-            <tr className="text-center">
-              <OverlayTrigger placement="top" overlay={renderVeriTooltip}>
-              <td style={{ backgroundColor: 'yellow', color: '#000' }}>VE56</td>
-              </OverlayTrigger>
-              <td>30%</td>
-              <td>30%</td>
-              <td>30%</td>
-              <td>30%</td>
-              <td>30%</td>
-              <td>30%</td>
-              <td>30%</td>
-              <td></td>
-              <td>Programado</td>
-              <td>30%</td>
-              <td>30%</td>
-              <td>30%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <CardActivities />
-    </div>
   );
-} 
+};
+
+export default PlanificadorActividad;
